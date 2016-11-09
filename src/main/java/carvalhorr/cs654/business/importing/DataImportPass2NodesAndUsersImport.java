@@ -5,38 +5,26 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.model.NodeOsmObject;
-import carvalhorr.cs654.model.OsmObject;
-import carvalhorr.cs654.model.OsmUser;
-import carvalhorr.cs654.model.RelationOsmObject;
+import carvalhorr.cs654.model.OsmBounds;
+import carvalhorr.cs654.model.PropertiesExtractor;
 import carvalhorr.cs654.model.WayOsmObject;
-import carvalhorr.cs654.persistence.OsmDataPersistence;
 import exception.UnexpectedTokenException;
 
-public class DataImportPass2NodesAndUsersImport {
+public class DataImportPass2NodesAndUsersImport extends DataImportPass {
 
-	private int lineCount = 0;
-	private OsmObject objectBeingImported;
-	private boolean osmStarted = false;
-	
-	private OsmObjectsReadCallback objectReadCallback;
-	
-	private String fileName;
-	
 	public DataImportPass2NodesAndUsersImport(String fileName, OsmObjectsReadCallback objectReadCallback) {
-		this.objectReadCallback = objectReadCallback;
-		this.fileName = fileName;
+		super(fileName, objectReadCallback);
+	
 	}
 
 	public void importFile() throws IOException, UnexpectedTokenException, ErrorInsertingDataToDatabase {
 		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		String line = reader.readLine();
 		List<String> types = new ArrayList<String>();
-
-		long startTime = System.currentTimeMillis();
 		do {
 			lineCount++;
 
@@ -55,7 +43,7 @@ public class DataImportPass2NodesAndUsersImport {
 				break;
 			}
 			case "<bounds": {
-				System.out.println(line);
+				processBounds(line);
 				break;
 			}
 			case "<node": {
@@ -79,24 +67,16 @@ public class DataImportPass2NodesAndUsersImport {
 				break;
 			}
 			case "<nd": {
-				//addNodeToWay(line);
+				// addNodeToWay(line);
 				break;
-			}/*
-			case "<relation": {
-				//startRelationObject(line);
-				break;
-			}
-			case "</relation>": {
-				//finishRelationObject(line);
-				break;
-			}
-			case "<member": {
-				//addMember(line);
-				break;
-			}*/
+			} /*
+				 * case "<relation": { //startRelationObject(line); break; }
+				 * case "</relation>": { //finishRelationObject(line); break; }
+				 * case "<member": { //addMember(line); break; }
+				 */
 			default:
-				throw new UnexpectedTokenException(
-						lineCount + ": unexpected token " + lineStartsWith.toUpperCase() + "found");
+				//throw new UnexpectedTokenException(
+				//		lineCount + ": unexpected token " + lineStartsWith.toUpperCase() + "found");
 			}
 			if (!types.contains(lineStartsWith)) {
 				types.add(lineStartsWith);
@@ -104,8 +84,7 @@ public class DataImportPass2NodesAndUsersImport {
 
 			line = reader.readLine();
 		} while (line != null);
-		long endTime = System.currentTimeMillis();
-		System.out.println("read " + lineCount + " lines in " + (endTime - startTime) + " milliseconds");
+		//System.out.println("read " + lineCount + " lines in " + (endTime - startTime) + " milliseconds");
 	}
 
 	private void openOsm() {
@@ -124,7 +103,7 @@ public class DataImportPass2NodesAndUsersImport {
 			throw new UnexpectedTokenException(lineCount + ": opening <way> tag found inside other object tag");
 		}
 		objectBeingImported = new WayOsmObject();
-		objectBeingImported.processCloseTag(tag);
+		objectBeingImported.processOpenTag(tag);
 		if (lineContainsCloseTag(tag)) {
 			finishWayObject(tag);
 		}
@@ -135,9 +114,20 @@ public class DataImportPass2NodesAndUsersImport {
 			throw new UnexpectedTokenException(
 					lineCount + ": closing <way> tag found without corresponding opening <way> tag");
 		}
-		//objectBeingImported.processCloseTag(tag);
+		// objectBeingImported.processCloseTag(tag);
 		extractUser();
 		objectBeingImported = null;
+	}
+	
+	private void processBounds(String bounds)  throws UnexpectedTokenException, ErrorInsertingDataToDatabase {
+		Map<String, String> properties = PropertiesExtractor.extractPropertiesFromLine(bounds);
+		double minLat, minLon, maxLat, maxLon;
+		minLat = Double.parseDouble(properties.get("minlat"));
+		minLon = Double.parseDouble(properties.get("minlon"));
+		maxLat = Double.parseDouble(properties.get("maxlat"));
+		maxLon = Double.parseDouble(properties.get("maxlon"));
+		OsmBounds osmBounds = new OsmBounds(minLat, minLon, maxLat, maxLon);
+		objectReadCallback.boundsObjectReadfFromFile(osmBounds);
 	}
 
 	private void startNodeObject(String tag) throws UnexpectedTokenException, ErrorInsertingDataToDatabase {
@@ -160,30 +150,19 @@ public class DataImportPass2NodesAndUsersImport {
 					lineCount + ": closing <node> tag found without corresponding opening <node> tag");
 		}
 		objectBeingImported.processCloseTag(tag);
+		objectBeingImported.computeCoordinates();
 		extractUser();
 		objectReadCallback.nodeObjectReadFromFile((NodeOsmObject) objectBeingImported);
 		objectBeingImported = null;
 	}
 
 	private void addTag(String tag) throws UnexpectedTokenException {
-		if (objectBeingImported == null) {
-			throw new UnexpectedTokenException(lineCount + ": tag <tag> found outside any tagged object");
-		}
+		//if (objectBeingImported == null) {
+		//	throw new UnexpectedTokenException(lineCount + ": tag <tag> found outside any tagged object");
+		//}
 		if (objectBeingImported instanceof NodeOsmObject) {
 			objectBeingImported.addTagFromString(tag);
 		}
-	}
-	
-	private void extractUser() throws ErrorInsertingDataToDatabase {
-		Integer uid = Integer.parseInt(objectBeingImported.getPropertyByKey("uid"));
-		String userName = objectBeingImported.getPropertyByKey("user");
-		OsmUser user = new OsmUser(uid, userName);
-		objectReadCallback.userObjectReadFromFile(user);
-
-	}
-
-	private boolean lineContainsCloseTag(String line) {
-		return line.endsWith("/>");
 	}
 
 }

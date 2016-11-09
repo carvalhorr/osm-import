@@ -4,14 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class DataImportPass1CountLines {
-
-	private NumberObjectsCallback numberObjectsCallback;
-	private String fileName;
+public class DataImportPass1CountLines extends DataImportPass {
 	
-	public DataImportPass1CountLines(String fileName, NumberObjectsCallback numberObjectsDeterminedCallback) {
-		this.numberObjectsCallback = numberObjectsDeterminedCallback;
-		this.fileName = fileName;
+	public DataImportPass1CountLines(String fileName, OsmObjectsReadCallback numberObjectsDeterminedCallback) {
+		super(fileName, numberObjectsDeterminedCallback);
 	}
 
 	public void countObjects() throws IOException {
@@ -20,8 +16,6 @@ public class DataImportPass1CountLines {
 
 		long totalNodes = 0;
 		long totalWays = 0;
-		long totalRelations = 0;
-
 		do {
 			String lineStartsWith = line.trim().split(" ")[0];
 			switch (lineStartsWith) {
@@ -33,10 +27,6 @@ public class DataImportPass1CountLines {
 				totalWays++;
 				break;
 			}
-			case "<relation": {
-				totalRelations++;
-				break;
-			}
 			default:
 
 			}
@@ -44,7 +34,7 @@ public class DataImportPass1CountLines {
 		} while (line != null);
 		reader.close();
 
-		numberObjectsCallback.numberObjectsDetermined(totalNodes, totalWays, totalRelations);
+		objectReadCallback.numberObjectsDetermined(totalNodes, totalWays);
 	}
 
 }

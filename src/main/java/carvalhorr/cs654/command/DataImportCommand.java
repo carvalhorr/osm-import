@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.business.importing.DataImportBusinessLogic;
 import carvalhorr.cs654.config.Configuration;
+import carvalhorr.cs654.exception.CouldNotCreateSchemaException;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
@@ -18,6 +19,11 @@ public class DataImportCommand implements ProgressIndicator {
 
 	public static void main(String[] args)
 			throws FileNotFoundException, SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase {
+		
+		//TODO Handle exceptions
+		//TODO Receive file name and schema as parameters
+		//TODO Optionally, receive configuration file as parameter
+		
 		String fileName = "//home//carvalhorr//carvalhorr@gmail.com//DESEM//Maynooth//CS645 - Dissertation//data//maynooth//maynooth.osh";
 		String schemaName = "schema1";
 		// String fileName =
@@ -45,12 +51,17 @@ public class DataImportCommand implements ProgressIndicator {
 		} catch (ErrorInsertingDataToDatabase e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (CouldNotCreateSchemaException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void updateProgress(int progress) {
-		// TODO Auto-generated method stub
+	public void updateProgress(String type, int progress) {
+		if (progress == 100) {
+			System.out.println("finished " + type);
+		}
 
 	}
 

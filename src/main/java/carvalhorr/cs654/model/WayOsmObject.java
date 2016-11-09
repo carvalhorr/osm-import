@@ -22,6 +22,10 @@ public class WayOsmObject extends OsmObject{
 		}
 	}
 	
+	public List<String> getNodeIds() {
+		return nodes;
+	}
+	
 
 	@Override
 	protected void validateProperties() {
@@ -33,6 +37,12 @@ public class WayOsmObject extends OsmObject{
 	protected void validateTags() {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	@Override
+	public void computeCoordinates() {
+		coordinates = "not computed";
 	}
 
 }
