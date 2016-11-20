@@ -2,6 +2,7 @@ package carvalhorr.cs654.persistence;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -28,7 +29,7 @@ public abstract class OshDatabasePersistence {
 		connectToDatabase();
 
 	}
-	
+
 	private void connectToDatabase() throws PostgresqlDriverNotFound, ErrorConnectingToDatabase {
 		try {
 			Class.forName("org.postgresql.Driver");
@@ -45,16 +46,20 @@ public abstract class OshDatabasePersistence {
 
 	}
 
-
 	/**
 	 * Check if a schema already exists in the database. 
 	 * 
 	 * @return true if the schema name provided already exists.
+	 * @throws SQLException 
 	 */
-	protected boolean schemaExists() {
-		//TODO Implement schemaExists
-		return false;
-	}
+	protected boolean schemaExists() throws SQLException {
+		boolean exists = false;
+		ResultSet result = statement.executeQuery("SELECT schema_name FROM information_schema.schemata WHERE schema_name = '" + schemaName + "';");
+		while (result.next()) {
+			exists = true;
+		}
 
+		return exists;
+	}
 
 }
