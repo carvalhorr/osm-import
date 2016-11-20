@@ -60,10 +60,10 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 			properties.put("user_name", "" + result.getString(10));
 			properties.put("visible", "" + result.getBoolean(8));
 
-			ResultSet resultTags = statementTags.executeQuery("");
+			ResultSet resultTags = statementTags.executeQuery("select tag_key, tag_value from " + schemaName + ".osm_tag where object_key = " + result.getLong(1) + ";");
 			
 			while(resultTags.next()) {
-				//TODO implement query tags
+				properties.put(resultTags.getString(1), resultTags.getString(2));
 			}
 
 			geoJson.setProperties(properties);

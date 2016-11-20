@@ -44,9 +44,9 @@ public class GeoJsonObject {
 		}
 		propertiesStr += "}";
 
-		return "{ \"type\": \"Feature\", \"geometry\": { \"type\": \"" + geometryType.toString() + "\", \"coordinates\": [ "
+		return "{ \"type\": \"Feature\", \"geometry\": { \"type\": \"" + geometryType.toString() + "\", \"coordinates\": "
             + coordinates
-				+ "]" +
+				+ 
           "}, \"properties\": " + propertiesStr +
           "}";
 	}

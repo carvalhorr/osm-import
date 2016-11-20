@@ -16,7 +16,7 @@ public class NodeOsmObject extends OsmObject {
 
 	@Override
 	public void computeCoordinates() {
-		coordinates =  "[" + getPropertyByKey("lat") + "," + getPropertyByKey("lon") + "]";
+		coordinates =  "[" + getPropertyByKey("lon") + "," + getPropertyByKey("lat") + "]";
 	}
 	
 	@Override
