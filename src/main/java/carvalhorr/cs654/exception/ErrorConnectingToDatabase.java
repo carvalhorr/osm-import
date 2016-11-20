@@ -2,6 +2,11 @@ package carvalhorr.cs654.exception;
 
 public class ErrorConnectingToDatabase extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1467978703160365079L;
+
 	public ErrorConnectingToDatabase() {
 		super();
 	}

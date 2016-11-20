@@ -2,6 +2,11 @@ package carvalhorr.cs654.exception;
 
 public class PostgresqlDriverNotFound extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8616487280135933815L;
+
 	public PostgresqlDriverNotFound() {
 		super();
 	}

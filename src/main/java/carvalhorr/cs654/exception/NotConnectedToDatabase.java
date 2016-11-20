@@ -2,6 +2,11 @@ package carvalhorr.cs654.exception;
 
 public class NotConnectedToDatabase extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2815524255639126828L;
+
 	public NotConnectedToDatabase() {
 		super();
 	}

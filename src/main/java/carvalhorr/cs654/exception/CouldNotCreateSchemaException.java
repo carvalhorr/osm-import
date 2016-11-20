@@ -2,6 +2,11 @@ package carvalhorr.cs654.exception;
 
 public class CouldNotCreateSchemaException extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2057478688357747140L;
+
 	public CouldNotCreateSchemaException() {
 		super();
 	}
