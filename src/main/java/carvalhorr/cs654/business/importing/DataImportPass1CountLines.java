@@ -16,7 +16,9 @@ public class DataImportPass1CountLines extends DataImportPass {
 
 		long totalNodes = 0;
 		long totalWays = 0;
+		long lineCount = 0;
 		do {
+			lineCount++;
 			String lineStartsWith = line.trim().split(" ")[0];
 			switch (lineStartsWith) {
 			case "<node": {
@@ -33,6 +35,7 @@ public class DataImportPass1CountLines extends DataImportPass {
 			line = reader.readLine();
 		} while (line != null);
 		reader.close();
+		System.out.println("number of lines on file: " + lineCount);
 
 		objectReadCallback.numberObjectsDetermined(totalNodes, totalWays);
 	}

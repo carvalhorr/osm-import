@@ -46,21 +46,33 @@ public class DataImportBusinessLogic implements OsmObjectsReadCallback {
 		} catch (SQLException e) {
 			throw new CouldNotCreateSchemaException(e);
 		}
-		
+
+		long startTime = System.currentTimeMillis();
+
 		DataImportPass1CountLines pass1 = new DataImportPass1CountLines(fileName, this);
 		pass1.countObjects();
 		
-		long startTime = System.currentTimeMillis();
+		long endTime = System.currentTimeMillis();
+
+		System.out.println("time to count: " + ((endTime - startTime) / 1000));
+
+		startTime = System.currentTimeMillis();
 
 		DataImportPass2NodesAndUsersImport pass2 = new DataImportPass2NodesAndUsersImport(fileName, this);
 		pass2.importFile();
-		
+
+		endTime = System.currentTimeMillis();
+
+		System.out.println("time to import nodes: " + ((endTime - startTime) / 1000));
+
+		startTime = System.currentTimeMillis();
+
 		DataImportPass3WaysImport pass3 = new DataImportPass3WaysImport(fileName, this);
 		pass3.importFile();
 
-		long endTime = System.currentTimeMillis();
+		endTime = System.currentTimeMillis();
 
-		System.out.println("time to import: " + ((endTime - startTime) / 1000));
+		System.out.println("time to import ways: " + ((endTime - startTime) / 1000));
 		
 	}
 
@@ -88,7 +100,7 @@ public class DataImportBusinessLogic implements OsmObjectsReadCallback {
 	@Override
 	public void wayObjectReadFromFile(WayOsmObject way) throws ErrorInsertingDataToDatabase {
 		try {
-			String coordinates = persistence.readCoordinatesForNodes(way.getNodeIds()).toString();
+			String coordinates = persistence.readCoordinatesForNodes(way.getNodeIds(), way.getTimestamp()).toString();
 			//String coordinates = persistence.readCoordinatesForNodes(new ArrayList<String>()).toString();
 			way.setCoordinates(coordinates);
 			long wayId = persistence.insertWay(way);

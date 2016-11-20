@@ -24,8 +24,8 @@ public class DataImportCommand implements ProgressIndicator {
 		//TODO Receive file name and schema as parameters
 		//TODO Optionally, receive configuration file as parameter
 		
-		String fileName = "//home//carvalhorr//carvalhorr@gmail.com//DESEM//Maynooth//CS645 - Dissertation//data//maynooth//maynooth.osh";
-		String schemaName = "schema1";
+		String fileName = "//home//carvalhorr//maynooth-dissertation//nottingham_history_file.osh";
+		String schemaName = "nottingham";
 		// String fileName =
 		// "//home//carvalhorr//carvalhorr@gmail.com//DESEM//Maynooth//CS645 -
 		// Dissertation//data//nottingham//nottingham_university.osh";
@@ -59,7 +59,7 @@ public class DataImportCommand implements ProgressIndicator {
 
 	@Override
 	public void updateProgress(String type, int progress) {
-		if (progress == 100) {
+		if (progress == 1) {
 			System.out.println("finished " + type);
 		}
 
