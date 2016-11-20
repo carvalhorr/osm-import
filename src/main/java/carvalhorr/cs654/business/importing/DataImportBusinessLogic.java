@@ -15,8 +15,9 @@ import carvalhorr.cs654.model.OsmUser;
 import carvalhorr.cs654.model.WayOsmObject;
 import carvalhorr.cs654.persistence.OsmDataPersistence;
 import exception.UnexpectedTokenException;
+import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;;
 
-public class DataImportBusinessLogic implements OsmObjectsReadCallback {
+public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
 
 	private long totalNodes = 0;
 	private long totalWays = 0;
@@ -141,10 +142,3 @@ public class DataImportBusinessLogic implements OsmObjectsReadCallback {
 
 }
 
-interface OsmObjectsReadCallback {
-	public void boundsObjectReadfFromFile(OsmBounds bounds) throws ErrorInsertingDataToDatabase;
-	public void nodeObjectReadFromFile(NodeOsmObject node) throws ErrorInsertingDataToDatabase ;
-	public void wayObjectReadFromFile(WayOsmObject way) throws ErrorInsertingDataToDatabase ;
-	public void userObjectReadFromFile(OsmUser user) throws ErrorInsertingDataToDatabase ;
-	public void numberObjectsDetermined(long nodesCount, long waysCount);
-}

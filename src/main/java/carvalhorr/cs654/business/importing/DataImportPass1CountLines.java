@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
+
 public class DataImportPass1CountLines extends DataImportPass {
 	
-	public DataImportPass1CountLines(String fileName, OsmObjectsReadCallback numberObjectsDeterminedCallback) {
+	public DataImportPass1CountLines(String fileName, OsmObjectsReadFromFileCallback numberObjectsDeterminedCallback) {
 		super(fileName, numberObjectsDeterminedCallback);
 	}
 

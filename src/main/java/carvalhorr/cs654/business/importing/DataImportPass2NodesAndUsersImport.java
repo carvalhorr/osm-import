@@ -10,13 +10,14 @@ import java.util.Map;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
+import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
 import carvalhorr.cs654.model.PropertiesExtractor;
 import carvalhorr.cs654.model.WayOsmObject;
 import exception.UnexpectedTokenException;
 
 public class DataImportPass2NodesAndUsersImport extends DataImportPass {
 
-	public DataImportPass2NodesAndUsersImport(String fileName, OsmObjectsReadCallback objectReadCallback) {
+	public DataImportPass2NodesAndUsersImport(String fileName, OsmObjectsReadFromFileCallback objectReadCallback) {
 		super(fileName, objectReadCallback);
 	
 	}

@@ -5,13 +5,13 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
-import carvalhorr.cs654.model.OsmObject;
+import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
 import carvalhorr.cs654.model.WayOsmObject;
 import exception.UnexpectedTokenException;
 
 public class DataImportPass3WaysImport extends DataImportPass {
 	
-	public DataImportPass3WaysImport(String fileName, OsmObjectsReadCallback objectReadCallback) {
+	public DataImportPass3WaysImport(String fileName, OsmObjectsReadFromFileCallback objectReadCallback) {
 		super(fileName, objectReadCallback);
 	}
 
