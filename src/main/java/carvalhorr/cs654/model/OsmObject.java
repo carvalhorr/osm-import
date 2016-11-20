@@ -3,10 +3,14 @@ package carvalhorr.cs654.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import carvalhorr.cs654.model.geojson.GeoJsonObjectType;
+
 public abstract class OsmObject {
 
 	protected Map<String, String> properties = new HashMap<String, String>();
 	protected Map<String, String> tags = new HashMap<String, String>();
+	
+	protected GeoJsonObjectType geoJsonType;
 
 	protected String coordinates = "";
 
@@ -86,6 +90,14 @@ public abstract class OsmObject {
 	
 	public String getVisible() {
 		return getPropertyByKey("visible");
+	}
+
+	public GeoJsonObjectType getGeoJsonType() {
+		return geoJsonType;
+	}
+
+	public void setGeoJsonType(GeoJsonObjectType geoJsonType) {
+		this.geoJsonType = geoJsonType;
 	}
 
 }

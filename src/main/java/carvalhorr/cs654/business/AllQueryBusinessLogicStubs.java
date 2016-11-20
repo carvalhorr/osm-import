@@ -1,20 +1,33 @@
 package carvalhorr.cs654.business;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import carvalhorr.cs654.exception.ErrorProcessingReadGeoJsonObjectException;
+import carvalhorr.cs654.exception.ErrorWritingToFileException;
+import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.model.EditInfo;
 import carvalhorr.cs654.model.EditRank;
-import carvalhorr.cs654.model.OsmObjectTypes;
+import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.model.geojson.GeoJsonObject;
+import carvalhorr.cs654.model.geojson.GeoJsonObjectReadFromDatabaseListener;
+import carvalhorr.cs654.persistence.OshQueryPersistence;
 
-public class QueryObjectBusinessLogic {
+public class AllQueryBusinessLogicStubs {
 
 	private String schema;
 
 	private String workingDirectory;
 
-	public QueryObjectBusinessLogic(String workingDirectory, String schema) {
+	private OshQueryPersistence persistence = null;
+
+	public AllQueryBusinessLogicStubs(OshQueryPersistence persistence, String workingDirectory, String schema) {
+		this.persistence = persistence;
 		this.workingDirectory = workingDirectory;
 		this.schema = schema;
 	}
@@ -30,10 +43,12 @@ public class QueryObjectBusinessLogic {
 	 * @param id
 	 *            the id of the object to query.
 	 * @return The GeoJson data for all versions of the specified object.
+	 * @throws NotConnectedToDatabase
+	 * @throws SQLException
 	 * 
 	 */
-	public GeoJsonObject queryObjectsById(OsmObjectTypes type, long id) {
-		return null;
+	public void queryObjectsById(OsmObjectType type, long id, final String fileName)
+			throws SQLException, NotConnectedToDatabase, ErrorWritingToFileException {
 	}
 
 	/**
@@ -48,7 +63,7 @@ public class QueryObjectBusinessLogic {
 	 *            the id of the object to query.
 	 * @return The GeoJson data for the versions of the objects.
 	 */
-	public GeoJsonObject queryFirstAndLastVersionsOfObjectById(OsmObjectTypes type, long id) {
+	public GeoJsonObject queryFirstAndLastVersionsOfObjectById(OsmObjectType type, long id) {
 		return null;
 	}
 
@@ -64,7 +79,7 @@ public class QueryObjectBusinessLogic {
 	 *            the id of the object to query.
 	 * @return List of tags
 	 */
-	public List<String> queryAllTagsForAllVersionsOfObject(OsmObjectTypes type, long id) {
+	public List<String> queryAllTagsForAllVersionsOfObject(OsmObjectType type, long id) {
 		return null;
 	}
 

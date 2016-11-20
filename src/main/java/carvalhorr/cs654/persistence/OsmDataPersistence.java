@@ -62,31 +62,33 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 	private long insertOsmObject(OsmObject object) throws SQLException {
 		String objectType = (object instanceof NodeOsmObject) ? "N" : "W";
 		ResultSet result = statement.executeQuery("INSERT INTO " + schemaName
-				+ ".osm_object(osm_type, osm_id, osm_version, coordinates, timestamp, user_id, visible) " + "VALUES('"
-				+ objectType + "', " + object.getId() + ", " + object.getVersion() + ", '" + object.getCoordinates()
-				+ "', '" + object.getTimestamp() + "', " + object.getUid() + ", " + object.getVisible()
-				+ ") RETURNING object_key;");
+				+ ".osm_object(osm_type, osm_id, osm_version, coordinates, timestamp, user_id, visible, geojson_type) "
+				+ "VALUES('" + objectType + "', " + object.getId() + ", " + object.getVersion() + ", '"
+				+ object.getCoordinates() + "', '" + object.getTimestamp() + "', " + object.getUid() + ", "
+				+ object.getVisible() + ", '" + object.getGeoJsonType().getDatabaseType() + "'" + ") RETURNING object_key;");
 		result.next();
 		return result.getLong(1);
 	}
 
 	public void insertTag(long object_id, String key, String value) throws SQLException {
-		statement.execute("insert into " + schemaName + ".osm_tag(object_key, tag_key, tag_value) values( " + object_id + ", '"
-				+ key + "', '" + value + "');");
+		statement.execute("insert into " + schemaName + ".osm_tag(object_key, tag_key, tag_value) values( " + object_id
+				+ ", '" + key + "', '" + value + "');");
 	}
 
 	public void updateBounds(OsmBounds bounds) throws SQLException {
 		statement.execute("DELETE FROM " + schemaName + ".OSM_BOUNDS");
-		statement.execute("insert into " + schemaName + ".osm_bounds(minlat, minlon, maxlat, maxlon) values(" + bounds.getMinLat()
-				+ ", " + bounds.getMinLon() + ", " + bounds.getMaxLat() + ", " + bounds.getMaxLon() + ");");
+		statement.execute(
+				"insert into " + schemaName + ".osm_bounds(minlat, minlon, maxlat, maxlon) values(" + bounds.getMinLat()
+						+ ", " + bounds.getMinLon() + ", " + bounds.getMaxLat() + ", " + bounds.getMaxLon() + ");");
 	}
 
 	public List<String> readCoordinatesForNodes(List<String> nodes, String timestamp) throws SQLException {
 		List<String> coordinates = new ArrayList<String>();
 		if (nodes.size() > 0) {
-			ResultSet result = statement.executeQuery(
-					"select coordinates from " + schemaName + ".osm_object where (osm_id, osm_version) in (select osm_id, max(osm_version) from " + schemaName + ".osm_object where osm_id in ("
-							+ nodes.toString().replace("[", "").replace("]", "") + ") and timestamp <= '" + timestamp + "' and osm_type = 'N' group by osm_id) and osm_type = 'N';");
+			ResultSet result = statement.executeQuery("select coordinates from " + schemaName
+					+ ".osm_object where (osm_id, osm_version) in (select osm_id, max(osm_version) from " + schemaName
+					+ ".osm_object where osm_id in (" + nodes.toString().replace("[", "").replace("]", "")
+					+ ") and timestamp <= '" + timestamp + "' and osm_type = 'N' group by osm_id) and osm_type = 'N';");
 			while (result.next()) {
 				coordinates.add(result.getString(1));
 			}
@@ -112,7 +114,8 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 		statement.execute("CREATE TABLE " + schemaName + ".osm_object(" + "object_key BIGSERIAL PRIMARY KEY, "
 				+ "osm_type CHAR(1), " + "osm_id BIGINT, " + "osm_version INTEGER, " + "coordinates TEXT, "
 				+ "timestamp TIMESTAMP, " + "user_id INTEGER REFERENCES " + schemaName + ".osm_user(user_id), "
-				+ "visible boolean, " + "CONSTRAINT osm_object_unique UNIQUE (osm_type, osm_id, osm_version));");
+				+ "visible boolean, geojson_type CHAR(1), "
+				+ "CONSTRAINT osm_object_unique UNIQUE (osm_type, osm_id, osm_version));");
 		createOsmObjectTableIndexes(schemaName);
 	}
 
@@ -123,12 +126,12 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 				+ "CONSTRAINT osm_tag_primary_key PRIMARY KEY (object_key, tag_key, tag_value));");
 
 	}
-	
+
 	private void createOsmObjectTableIndexes(String schemaName) throws SQLException {
 		statement.execute("CREATE INDEX osm_object_type ON " + schemaName + ".osm_object(osm_type);");
 		statement.execute("CREATE INDEX osm_object_timestamp ON " + schemaName + ".osm_object(timestamp);");
 		statement.execute("CREATE INDEX osm_object_id_version ON " + schemaName + ".osm_object(osm_id, osm_version);");
-		
+
 	}
 
 }
