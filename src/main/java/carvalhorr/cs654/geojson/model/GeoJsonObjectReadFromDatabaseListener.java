@@ -1,4 +1,4 @@
-package carvalhorr.cs654.model.geojson;
+package carvalhorr.cs654.geojson.model;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadGeoJsonObjectException;
 
