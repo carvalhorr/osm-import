@@ -3,11 +3,16 @@ package carvalhorr.cs654.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import carvalhorr.cs654.model.geojson.GeoJsonObjectType;
+import carvalhorr.cs654.geojson.model.GeoJsonObjectType;
 
 public abstract class OsmObject {
+	
+	private long id;
+	private int version;
+	private String timestamp;
+	private OsmUser user;
+	private boolean visible;
 
-	protected Map<String, String> properties = new HashMap<String, String>();
 	protected Map<String, String> tags = new HashMap<String, String>();
 	
 	protected GeoJsonObjectType geoJsonType;
@@ -17,7 +22,19 @@ public abstract class OsmObject {
 	public void processOpenTag(String lineString) {
 		Map<String, String> properties = extractPropertiesFromLine(lineString);
 		// TODO Validate properties
-		setProperties(properties);
+		//setProperties(properties);
+		setId(Long.parseLong(properties.get("id")));
+		setVersion(Integer.parseInt(properties.get("version")));
+		setTimestamp(properties.get("timestamp"));
+		OsmUser user = null;
+		if (properties.get("uid") == null) {
+			user = new OsmUser(-1, "unknown user");
+		} else {
+			user = new OsmUser(Integer.parseInt(properties.get("uid")), properties.get("user"));
+		}
+		setUser(user);
+		setVisible(Boolean.parseBoolean(properties.get("visible")));
+		setCoordinates("[" + properties.get("lon") + "," + properties.get("lat") + "]");
 		validateProperties();
 	}
 
@@ -41,17 +58,13 @@ public abstract class OsmObject {
 	public Map<String, String> getTags() {
 		return tags;
 	}
+	
+	public void setTags(Map<String, String> tags) {
+		this.tags = tags;
+	}
 
 	protected Map<String, String> extractPropertiesFromLine(String lineString) {
 		return PropertiesExtractor.extractPropertiesFromLine(lineString);
-	}
-
-	protected void setProperties(Map<String, String> properties) {
-		this.properties = properties;
-	}
-
-	protected String getPropertyByKey(String key) {
-		return properties.get(key);
 	}
 
 	protected abstract void validateProperties();
@@ -68,28 +81,44 @@ public abstract class OsmObject {
 		this.coordinates = coordinates;
 	}
 	
-	public String getId() {
-		return getPropertyByKey("id");
+	public Long getId() {
+		return id;
 	}
 	
-	public String getVersion() {
-		return getPropertyByKey("version") ;
+	public void setId(Long id) {
+		this.id = id;
+	}
+	
+	public Integer getVersion() {
+		return version;
+	}
+	
+	public void setVersion(Integer version) {
+		this.version = version;
 	}
 	
 	public String getTimestamp() {
-		return getPropertyByKey("timestamp");
+		return timestamp;
 	}
 	
-	public String getUid() {
-		return getPropertyByKey("uid");
+	public void setTimestamp(String timestamp) {
+		this.timestamp = timestamp;
 	}
 	
-	public String getUserName() {
-		return getPropertyByKey("user");
+	public OsmUser getUser() {
+		return user;
 	}
 	
-	public String getVisible() {
-		return getPropertyByKey("visible");
+	public void setUser(OsmUser user) {
+		this.user = user;
+	}
+	
+	public Boolean getVisible() {
+		return visible;
+	}
+	
+	public void setVisible(boolean visible) {
+		this.visible = visible;
 	}
 
 	public GeoJsonObjectType getGeoJsonType() {

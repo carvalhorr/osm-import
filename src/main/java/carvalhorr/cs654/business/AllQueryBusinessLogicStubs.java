@@ -1,21 +1,14 @@
 package carvalhorr.cs654.business;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import carvalhorr.cs654.exception.ErrorProcessingReadGeoJsonObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
-import carvalhorr.cs654.model.EditInfo;
+import carvalhorr.cs654.geojson.model.GeoJsonObject;
 import carvalhorr.cs654.model.EditRank;
 import carvalhorr.cs654.model.OsmObjectType;
-import carvalhorr.cs654.model.geojson.GeoJsonObject;
-import carvalhorr.cs654.model.geojson.GeoJsonObjectReadFromDatabaseListener;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 public class AllQueryBusinessLogicStubs {
@@ -92,9 +85,9 @@ public class AllQueryBusinessLogicStubs {
 	 *            the user id for which to get all the edits.
 	 * @return List of EditInfo performed by the user.
 	 */
-	public List<EditInfo> queryEditsByUser(String userId) {
+	/*public List<EditInfo> queryEditsByUser(String userId) {
 		return null;
-	}
+	}*/
 
 	/**
 	 * RF 9.5
@@ -133,9 +126,9 @@ public class AllQueryBusinessLogicStubs {
 	 *            the value that the key was edit.
 	 * @return list of edits matching the key-value pair
 	 */
-	public List<EditInfo> queryAllEditsByKeyValue(String key, String value) {
+	/*public List<EditInfo> queryAllEditsByKeyValue(String key, String value) {
 		return null;
-	}
+	}*/
 
 	/**
 	 * FR 9.8

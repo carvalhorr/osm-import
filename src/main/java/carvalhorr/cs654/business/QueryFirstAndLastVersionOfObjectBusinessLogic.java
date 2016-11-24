@@ -2,8 +2,8 @@ package carvalhorr.cs654.business;
 
 import java.sql.SQLException;
 
-import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
+import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
@@ -14,21 +14,24 @@ import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 /**
- * FR 9.1
+ * FR 9.2
  * 
- * Given an object type and it's ID returns all the versions of this object in
- * GeoJSON format.
+ * Given an object type and ID returns its first and last versions in GeoJSON
+ * format.
  * 
  * @author carvalhorr
  *
  */
-public class QueryObjectsByIdBusinessLogic {
+public class QueryFirstAndLastVersionOfObjectBusinessLogic {
+
+	private OsmObject firstVersion = null;
+	private OsmObject lastVersion = null;
 
 	private String workingDirectory;
 
 	private OshQueryPersistence persistence = null;
 
-	public QueryObjectsByIdBusinessLogic(OshQueryPersistence persistence, String workingDirectory) {
+	public QueryFirstAndLastVersionOfObjectBusinessLogic(OshQueryPersistence persistence, String workingDirectory) {
 		this.persistence = persistence;
 		this.workingDirectory = workingDirectory;
 	}
@@ -48,7 +51,7 @@ public class QueryObjectsByIdBusinessLogic {
 	 * @throws SQLException
 	 * 
 	 */
-	public void queryObjectsById(OsmObjectType type, long id, final String fileName)
+	public void queryFirstAndLastVersionsOfObject(OsmObjectType type, long id, final String fileName)
 			throws FailedToCompleteQueryException {
 
 		try {
@@ -57,11 +60,22 @@ public class QueryObjectsByIdBusinessLogic {
 			persistence.queryObjectsById(type, id, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override
-				public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
-					geoJsonWriter.writeGeoJsonObject(object, isFirst);
-				}
+				public void osmObjectRead(OsmObject object, boolean isFirst) {
 
+					if (isFirst) {
+						firstVersion = object;
+						lastVersion = object;
+					} else {
+						if (object.getVersion() > lastVersion.getVersion()) {
+							lastVersion = object;
+						} else if (object.getVersion() < firstVersion.getVersion()) {
+							firstVersion = object;
+						}
+					}
+				}
 			});
+			geoJsonWriter.writeGeoJsonObject(firstVersion, true);
+			geoJsonWriter.writeGeoJsonObject(lastVersion, false);
 
 			geoJsonWriter.finishWritingFile();
 		} catch (ErrorProcessingReadObjectException e) {
@@ -88,21 +102,21 @@ public class QueryObjectsByIdBusinessLogic {
 	 * @throws NotConnectedToDatabase
 	 * @throws ErrorWritingToFileException
 	 */
-	public void queryObjectsById(OsmObjectType type, long id) throws FailedToCompleteQueryException {
+	public void queryFirstAndLastVersionsOfObject(OsmObjectType type, long id) throws FailedToCompleteQueryException {
 		String fileName = "";
 		switch (type) {
 		case NODE: {
-			fileName = "nodes-" + id + ".geojson";
+			fileName = "nodes-" + id + "-first-and-last.geojson";
 			break;
 		}
 		case WAY: {
-			fileName = "ways-" + id + ".geojson";
+			fileName = "ways-" + id + "-first-and-last.geojson";
 			break;
 		}
 		default:
 			break;
 		}
-		queryObjectsById(type, id, fileName);
+		queryFirstAndLastVersionsOfObject(type, id, fileName);
 	}
 
 }

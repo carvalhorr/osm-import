@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import carvalhorr.cs654.geojson.model.GeoJsonObjectType;
+
 public class WayOsmObject extends OsmObject{
+	
+	String startNodeId = "";
+	
+	Integer numberOfClosedPolygons = 0;
 	
 	List<String> nodes = new ArrayList<String>();
 	
@@ -19,6 +25,24 @@ public class WayOsmObject extends OsmObject{
 			System.out.println("Error adding node to way.");
 		} else {
 			nodes.add(ref);
+			if (startNodeId.equals("")) {
+				startNodeId = ref;
+			} else {
+				if (startNodeId.equals(ref)) {
+					startNodeId = "";
+					numberOfClosedPolygons ++;
+				}
+			}
+		}
+	}
+	
+	public GeoJsonObjectType determineGeoJsonType() {
+		if (numberOfClosedPolygons == 0) {
+			return GeoJsonObjectType.LINE_STRING;
+		} else if (numberOfClosedPolygons == 1) {
+			return GeoJsonObjectType.POLYGON;
+		} else {
+			return GeoJsonObjectType.MULTI_POLYGON;
 		}
 	}
 	
@@ -38,6 +62,7 @@ public class WayOsmObject extends OsmObject{
 		// TODO Auto-generated method stub
 		
 	}
+	
 
 
 	@Override

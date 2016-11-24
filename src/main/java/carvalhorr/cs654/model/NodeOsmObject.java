@@ -1,6 +1,6 @@
 package carvalhorr.cs654.model;
 
-import carvalhorr.cs654.model.geojson.GeoJsonObjectType;
+import carvalhorr.cs654.geojson.model.GeoJsonObjectType;
 
 public class NodeOsmObject extends OsmObject {
 
@@ -16,7 +16,7 @@ public class NodeOsmObject extends OsmObject {
 
 	@Override
 	public void computeCoordinates() {
-		coordinates =  "[" + getPropertyByKey("lon") + "," + getPropertyByKey("lat") + "]";
+		//coordinates =  "[" + getPropertyByKey("lon") + "," + getPropertyByKey("lat") + "]";
 	}
 	
 	@Override

@@ -47,6 +47,9 @@ public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
 		} catch (SQLException e) {
 			throw new CouldNotCreateSchemaException(e);
 		}
+		
+		// insert initial data
+		userObjectReadFromFile(new OsmUser(-1, "unknown user"));
 
 		long startTime = System.currentTimeMillis();
 
@@ -61,6 +64,14 @@ public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
 
 		DataImportPass2NodesAndUsersImport pass2 = new DataImportPass2NodesAndUsersImport(fileName, this);
 		pass2.importFile();
+		
+
+		try {
+			persistence.createOsmObjectTableIndexes();
+		} catch (SQLException e) {
+			throw new CouldNotCreateSchemaException(e);
+		}
+		
 
 		endTime = System.currentTimeMillis();
 
@@ -104,6 +115,7 @@ public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
 			String coordinates = persistence.readCoordinatesForNodes(way.getNodeIds(), way.getTimestamp()).toString();
 			//String coordinates = persistence.readCoordinatesForNodes(new ArrayList<String>()).toString();
 			way.setCoordinates(coordinates);
+			way.setGeoJsonType(way.determineGeoJsonType());
 			long wayId = persistence.insertWay(way);
 			
 			Map<String, String> tags = way.getTags();

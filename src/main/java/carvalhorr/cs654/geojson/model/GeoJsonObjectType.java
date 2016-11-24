@@ -1,7 +1,7 @@
 package carvalhorr.cs654.geojson.model;
 
 public enum GeoJsonObjectType {
-	POINT("Point", "P"), LINE_STRING("LineString", "L"), POLYGON("Polygon", "Y");
+	POINT("Point", "P"), LINE_STRING("LineString", "L"), POLYGON("Polygon", "Y"), MULTI_POLYGON("MultiPolygon", "M");
 	
     private final String geoJsonType;
     private final String databaseType;
@@ -31,6 +31,8 @@ public enum GeoJsonObjectType {
 			return LINE_STRING;
 		case "Y":
 			return POLYGON;
+		case "M":
+			return MULTI_POLYGON;
 		default:
 			return null;
 		}

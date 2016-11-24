@@ -64,7 +64,7 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 		ResultSet result = statement.executeQuery("INSERT INTO " + schemaName
 				+ ".osm_object(osm_type, osm_id, osm_version, coordinates, timestamp, user_id, visible, geojson_type) "
 				+ "VALUES('" + objectType + "', " + object.getId() + ", " + object.getVersion() + ", '"
-				+ object.getCoordinates() + "', '" + object.getTimestamp() + "', " + object.getUid() + ", "
+				+ object.getCoordinates() + "', '" + object.getTimestamp() + "', " + object.getUser().getUid() + ", "
 				+ object.getVisible() + ", '" + object.getGeoJsonType().getDatabaseType() + "'" + ") RETURNING object_key;");
 		result.next();
 		return result.getLong(1);
@@ -116,7 +116,7 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 				+ "timestamp TIMESTAMP, " + "user_id INTEGER REFERENCES " + schemaName + ".osm_user(user_id), "
 				+ "visible boolean, geojson_type CHAR(1), "
 				+ "CONSTRAINT osm_object_unique UNIQUE (osm_type, osm_id, osm_version));");
-		createOsmObjectTableIndexes(schemaName);
+		//createOsmObjectTableIndexes(schemaName);
 	}
 
 	private void createTagTable(String schemaName) throws SQLException {
@@ -132,6 +132,10 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 		statement.execute("CREATE INDEX osm_object_timestamp ON " + schemaName + ".osm_object(timestamp);");
 		statement.execute("CREATE INDEX osm_object_id_version ON " + schemaName + ".osm_object(osm_id, osm_version);");
 
+	}
+
+	public void createOsmObjectTableIndexes() throws SQLException {
+		createOsmObjectTableIndexes(schemaName);
 	}
 
 }

@@ -21,12 +21,12 @@ public class DataImportPass {
 	}
 
 	protected void extractUser() throws ErrorInsertingDataToDatabase {
-		String uidStr = objectBeingImported.getUid();
+		Integer uidStr = objectBeingImported.getUser().getUid();
 		if (uidStr == null) {
 			System.out.println(lineCount);
 		} else {
-			Integer uid = Integer.parseInt(uidStr);
-			String userName = objectBeingImported.getUserName();
+			Integer uid = uidStr;
+			String userName = objectBeingImported.getUser().getUserName();
 			OsmUser user = new OsmUser(uid, userName);
 			objectReadCallback.userObjectReadFromFile(user);
 		}
