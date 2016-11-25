@@ -1,7 +1,5 @@
 package carvalhorr.cs654.model;
 
-import carvalhorr.cs654.geojson.model.GeoJsonObjectType;
-
 public class NodeOsmObject extends OsmObject {
 
 	@Override

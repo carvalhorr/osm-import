@@ -6,7 +6,6 @@ import java.util.List;
 
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
-import carvalhorr.cs654.geojson.model.GeoJsonObject;
 import carvalhorr.cs654.model.EditRank;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
@@ -56,8 +55,8 @@ public class AllQueryBusinessLogicStubs {
 	 *            the id of the object to query.
 	 * @return The GeoJson data for the versions of the objects.
 	 */
-	public GeoJsonObject queryFirstAndLastVersionsOfObjectById(OsmObjectType type, long id) {
-		return null;
+	public void queryFirstAndLastVersionsOfObjectById(OsmObjectType type, long id) {
+		//return null;
 	}
 
 	/**

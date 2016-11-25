@@ -7,32 +7,28 @@ import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
+import carvalhorr.cs654.files.OsmObjectCsvWriter;
+import carvalhorr.cs654.files.OsmObjectFileWriter;
 import carvalhorr.cs654.files.OsmObjectGeoJsonWriter;
+import carvalhorr.cs654.files.OsmObjectJsonWriter;
 import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 /**
- * FR 9.2
- * 
- * Given an object type and ID returns its first and last versions in GeoJSON
- * format.
- * 
+ * FR 9.7
+ *  
  * @author carvalhorr
  *
  */
-public class QueryFirstAndLastVersionOfObjectBusinessLogic {
-
-	private OsmObject firstVersion = null;
-	private OsmObject lastVersion = null;
+public class QueryObjectsByTagBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
 	
 	private String defaultWorkingDirectory = "";
 
-
-	public QueryFirstAndLastVersionOfObjectBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
+	public QueryObjectsByTagBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
 		this.persistence = persistence;
 		this.defaultWorkingDirectory = defaultWorkingDirectory;
 	}
@@ -52,33 +48,27 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic {
 	 * @throws SQLException
 	 * 
 	 */
-	public void queryFirstAndLastVersionsOfObject(OsmObjectType type, long id, final String fileName)
+	public void queryObjectsByTag(ExportFormatType format, String tagName, String tagValue, final String fileName)
+			throws FailedToCompleteQueryException {
+		OsmObjectFileWriter writer = getFileWriterForExportType(format, fileName);
+		queryObjectsByTag(tagName, tagValue, writer);
+	}
+	
+	private void queryObjectsByTag(String tagName, String tagValue, final OsmObjectFileWriter writer)
 			throws FailedToCompleteQueryException {
 
 		try {
-			final OsmObjectGeoJsonWriter geoJsonWriter = new OsmObjectGeoJsonWriter(fileName);
 
-			persistence.queryObjectsById(type, id, new OsmObjectsReadFromDatabaseCallback() {
+			persistence.queryObjectsByTagValue(tagName, tagValue, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override
-				public void osmObjectRead(OsmObject object, boolean isFirst) {
-
-					if (isFirst) {
-						firstVersion = object;
-						lastVersion = object;
-					} else {
-						if (object.getVersion() > lastVersion.getVersion()) {
-							lastVersion = object;
-						} else if (object.getVersion() < firstVersion.getVersion()) {
-							firstVersion = object;
-						}
-					}
+				public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
+					writer.writeObject(object, isFirst);
 				}
-			});
-			geoJsonWriter.writeObject(firstVersion, true);
-			geoJsonWriter.writeObject(lastVersion, false);
 
-			geoJsonWriter.finishWritingFile();
+			});
+
+			writer.finishWritingFile();
 		} catch (ErrorProcessingReadObjectException e) {
 			throw new FailedToCompleteQueryException(e);
 		} catch (ErrorWritingToFileException e) {
@@ -103,21 +93,39 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic {
 	 * @throws NotConnectedToDatabase
 	 * @throws ErrorWritingToFileException
 	 */
-	public void queryFirstAndLastVersionsOfObject(OsmObjectType type, long id) throws FailedToCompleteQueryException {
-		String fileName = "";
-		switch (type) {
-		case NODE: {
-			fileName = defaultWorkingDirectory + "nodes-" + id + "-first-and-last.geojson";
-			break;
+	public void queryObjectsByTag(ExportFormatType format, String tagName, String tagValue) throws FailedToCompleteQueryException {
+		String fileName = defaultWorkingDirectory + "tag-" + tagName + "-" + tagValue + "." + format.toString();
+		OsmObjectFileWriter writer = getFileWriterForExportType(format, fileName);
+		queryObjectsByTag(tagName, tagValue, writer);
+	}
+	
+	private OsmObjectFileWriter getFileWriterForExportType(ExportFormatType format, String fileName)
+			throws FailedToCompleteQueryException {
+
+		OsmObjectFileWriter fileWriter = null;
+		try {
+			switch (format) {
+			case CSV: {
+				fileWriter = new OsmObjectCsvWriter(fileName);
+				break;
+			}
+			case GEOJSON: {
+				// FR 9.1
+				fileWriter = new OsmObjectGeoJsonWriter(fileName);
+				break;
+			}
+			case JSON: {
+				// FR 9.3
+				fileWriter = new OsmObjectJsonWriter(fileName);
+				break;
+			}
+			default:
+				break;
+			}
+		} catch (ErrorWritingToFileException e) {
+			throw new FailedToCompleteQueryException(e);
 		}
-		case WAY: {
-			fileName = defaultWorkingDirectory + "ways-" + id + "-first-and-last.geojson";
-			break;
-		}
-		default:
-			break;
-		}
-		queryFirstAndLastVersionsOfObject(type, id, fileName);
+		return fileWriter;
 	}
 
 }

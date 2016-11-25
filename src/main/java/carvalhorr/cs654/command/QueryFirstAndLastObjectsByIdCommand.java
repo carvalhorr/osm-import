@@ -4,12 +4,9 @@ import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
 import carvalhorr.cs654.business.QueryFirstAndLastVersionOfObjectBusinessLogic;
-import carvalhorr.cs654.business.QueryObjectsByIdBusinessLogic;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
-import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
-import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
 import carvalhorr.cs654.model.OsmObjectType;
@@ -31,7 +28,7 @@ public class QueryFirstAndLastObjectsByIdCommand {
 
 		QueryFirstAndLastVersionOfObjectBusinessLogic business = new QueryFirstAndLastVersionOfObjectBusinessLogic(persistence, workingDirectory);
 
-		business.queryFirstAndLastVersionsOfObject(OsmObjectType.NODE, 180788);
+		business.queryFirstAndLastVersionsOfObject(OsmObjectType.NODE, 2877892);
 	}
 
 }

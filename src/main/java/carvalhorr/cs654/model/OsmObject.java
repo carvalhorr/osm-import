@@ -3,8 +3,6 @@ package carvalhorr.cs654.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import carvalhorr.cs654.geojson.model.GeoJsonObjectType;
-
 public abstract class OsmObject {
 	
 	private long id;

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import carvalhorr.cs654.geojson.model.GeoJsonObjectType;
-
 public class WayOsmObject extends OsmObject{
 	
 	String startNodeId = "";

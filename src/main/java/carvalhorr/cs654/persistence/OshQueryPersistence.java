@@ -3,7 +3,9 @@ package carvalhorr.cs654.persistence;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
@@ -12,7 +14,7 @@ import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
-import carvalhorr.cs654.geojson.model.GeoJsonObjectType;
+import carvalhorr.cs654.model.GeoJsonObjectType;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.OsmObjectType;
@@ -30,34 +32,75 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 		}
 	}
 
+	@Deprecated
+	public List<String> queryTagsForObject(OsmObjectType type, long id)
+			throws NotConnectedToDatabase, ErrorReadingDataFromDatabase {
+		List<String> tags = new ArrayList<String>();
+		if (connection == null) {
+			throw new NotConnectedToDatabase();
+		}
+		try {
+			ResultSet result = statement.executeQuery("select distinct tag_key from " + schemaName
+					+ ".osm_tag where object_key in (select object_key from " + schemaName
+					+ ".osm_object where osm_id = " + id + " and osm_type = '" + type.toString() + "');");
+
+			while (result.next()) {
+				tags.add(result.getString(1));
+			}
+		} catch (SQLException ex) {
+			throw new ErrorReadingDataFromDatabase(
+					"Error while reading tags for object of type '" + type.toString() + "' and id = " + id, ex);
+		}
+		return tags;
+	}
+
 	public void queryEditsByUser(long userId, OsmObjectsReadFromDatabaseCallback callback)
 			throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
 		try {
-			baseQueryOsmObject(" and o.user_id = " + userId, callback);
+			baseQueryOsmObjectWhithWhereClause(" and o.user_id = " + userId, callback);
 		} catch (SQLException ex) {
 			throw new ErrorReadingDataFromDatabase("Error while reading edits for user " + userId, ex);
+		}
+	}
+
+	public void queryObjectsByTagValue(String tagName, String tagValue, OsmObjectsReadFromDatabaseCallback callback) 
+			throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
+		try {
+			String sql = "select o.object_key, o.osm_type, o.osm_id, o.osm_version, o.coordinates, o.timestamp, o.user_id, o.visible, o.geojson_type, u.user_name from "
+					+ schemaName + ".osm_object o, " + schemaName + ".osm_user u, " + schemaName
+					+ ".osm_tag t where o.user_id = u.user_id " + " and o.object_key = t.object_key and t.tag_key = '"
+					+ tagName + "' and tag_value = '" + tagValue + "'" + " order by timestamp;";
+			baseQueryOsmObjectWhithSql(sql, callback);
+		} catch (SQLException ex) {
+			throw new ErrorReadingDataFromDatabase("Error while reading edits for for tag " + tagName + "=" + tagValue, ex);
 		}
 	}
 
 	public void queryObjectsById(OsmObjectType type, long id, OsmObjectsReadFromDatabaseCallback callback)
 			throws NotConnectedToDatabase, ErrorProcessingReadObjectException, ErrorReadingDataFromDatabase {
 		try {
-			baseQueryOsmObject("and osm_type = '" + type.toString() + "' and osm_id = " + id, callback);
+			baseQueryOsmObjectWhithWhereClause("and osm_type = '" + type.toString() + "' and osm_id = " + id, callback);
 		} catch (SQLException ex) {
 			throw new ErrorReadingDataFromDatabase(
 					"Error while reading objects of type '" + type.toString() + "' and id = " + id, ex);
 		}
 	}
 
-	protected void baseQueryOsmObject(String whereClause, OsmObjectsReadFromDatabaseCallback callback)
+	protected void baseQueryOsmObjectWhithWhereClause(String whereClause, OsmObjectsReadFromDatabaseCallback callback)
+			throws NotConnectedToDatabase, SQLException, ErrorProcessingReadObjectException {
+
+		String sql = "select o.object_key, o.osm_type, o.osm_id, o.osm_version, o.coordinates, o.timestamp, o.user_id, o.visible, o.geojson_type, u.user_name from "
+				+ schemaName + ".osm_object o, " + schemaName + ".osm_user u where o.user_id = u.user_id " + whereClause
+				+ " order by timestamp;";
+		baseQueryOsmObjectWhithSql(sql, callback);
+	}
+
+	protected void baseQueryOsmObjectWhithSql(String sql, OsmObjectsReadFromDatabaseCallback callback)
 			throws NotConnectedToDatabase, SQLException, ErrorProcessingReadObjectException {
 		if (connection == null) {
 			throw new NotConnectedToDatabase();
 		}
-		ResultSet result = statement.executeQuery(
-				"select o.object_key, o.osm_type, o.osm_id, o.osm_version, o.coordinates, o.timestamp, o.user_id, o.visible, o.geojson_type, u.user_name from "
-						+ schemaName + ".osm_object o, " + schemaName + ".osm_user u where o.user_id = u.user_id "
-						+ whereClause + " order by timestamp;");
+		ResultSet result = statement.executeQuery(sql);
 
 		Statement statementTags = connection.createStatement();
 

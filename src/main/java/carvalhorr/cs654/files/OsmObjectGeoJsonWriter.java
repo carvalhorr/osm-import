@@ -1,4 +1,4 @@
-package carvalhorr.cs654.geojson;
+package carvalhorr.cs654.files;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,10 +7,9 @@ import java.io.IOException;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
-import carvalhorr.cs654.geojson.model.GeoJsonObject;
 import carvalhorr.cs654.model.OsmObject;
 
-public class GeoJsonWriter {
+public class OsmObjectGeoJsonWriter implements OsmObjectFileWriter {
 
 	private String fileName = "";
 
@@ -18,12 +17,12 @@ public class GeoJsonWriter {
 
 	private BufferedWriter writer = null;
 
-	public GeoJsonWriter(String workingDirectory, String fileName) throws ErrorWritingToFileException {
+	public OsmObjectGeoJsonWriter(String fileName) throws ErrorWritingToFileException {
 
 		this.fileName = fileName;
 
 		try {
-			file = new File(workingDirectory + fileName);
+			file = new File(fileName);
 
 			writer = new BufferedWriter(new FileWriter(file));
 
@@ -36,7 +35,7 @@ public class GeoJsonWriter {
 
 	private String getGeoJsonStringForOsmObject(OsmObject object) {
 		String propertiesStr = "{";
-		
+
 		propertiesStr += "\"id\":" + "\"" + object.getId() + "\"";
 		propertiesStr += ", \"version\":" + "\"" + object.getVersion() + "\"";
 		propertiesStr += ", \"timestamp\":" + "\"" + object.getTimestamp() + "\"";
@@ -55,12 +54,12 @@ public class GeoJsonWriter {
 		return geoJsonString;
 	}
 
-	public void writeGeoJsonObject(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
+	public void writeObject(Object object, boolean isFirst) throws ErrorProcessingReadObjectException {
 		try {
 			if (!isFirst) {
 				writer.write(", ");
 			}
-			writer.write(getGeoJsonStringForOsmObject(object));
+			writer.write(getGeoJsonStringForOsmObject((OsmObject)object));
 
 		} catch (IOException ex) {
 			throw new ErrorProcessingReadObjectException("Error while writing to file: " + fileName, ex);

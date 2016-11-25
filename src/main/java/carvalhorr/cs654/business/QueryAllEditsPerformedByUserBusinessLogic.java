@@ -1,77 +1,72 @@
 package carvalhorr.cs654.business;
 
-import java.sql.SQLException;
-
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
-import carvalhorr.cs654.files.OsmObjectCsvWriter;
-import carvalhorr.cs654.files.OsmObjectFileWriter;
 import carvalhorr.cs654.files.OsmObjectGeoJsonWriter;
 import carvalhorr.cs654.files.OsmObjectJsonWriter;
+import carvalhorr.cs654.files.OsmObjectCsvWriter;
+import carvalhorr.cs654.files.OsmObjectFileWriter;
 import carvalhorr.cs654.model.OsmObject;
-import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 /**
- * FR 9.1
+ * FR 9.4
  * 
- * Given an object type and it's ID returns all the versions of this object in
- * GeoJSON format.
  * 
  * @author carvalhorr
  *
  */
-public class QueryObjectsByIdBusinessLogic {
+public class QueryAllEditsPerformedByUserBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
 	
 	private String defaultWorkingDirectory = "";
 
-	public QueryObjectsByIdBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
+	public QueryAllEditsPerformedByUserBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
 		this.persistence = persistence;
 		this.defaultWorkingDirectory = defaultWorkingDirectory;
 	}
 
 	/**
 	 * 
-	 * Calls the persistence to retrieve the objects from the database and use
-	 * the GeoJsonWriter to write to the file name specified.
-	 * 
 	 * @param type
 	 *            the type of the object to query.
 	 * @param id
 	 *            the id of the object to query.
-	 * @return The GeoJson data for all versions of the specified object.
+	 * @return List of tags
 	 * @throws FailedToCompleteQueryException
-	 * @throws NotConnectedToDatabase
-	 * @throws SQLException
-	 * 
 	 */
-	public void queryObjectsById(ExportFormatType format, OsmObjectType type, long id, final String fileName)
+	public void exportAllEditsPerformedByUSer(ExportFormatType format, long userId, String fileName)
 			throws FailedToCompleteQueryException {
-		OsmObjectFileWriter writer = getFileWriterForExportType(format, fileName, id);
-		queryObjectsById(type, id, writer);
+		OsmObjectFileWriter fileWriter = getFileWriterForExportType(format, fileName);
+		exportAllEditsPerformedByUSer(userId, fileWriter);
 	}
-	
-	private void queryObjectsById(OsmObjectType type, long id, final OsmObjectFileWriter writer)
+
+	public void exportAllEditsPerformedByUSer(ExportFormatType format, long userId)
+			throws FailedToCompleteQueryException {
+		String fileName = defaultWorkingDirectory + "changes-by-user-" + userId + "." + format.toString();
+		OsmObjectFileWriter fileWriter = getFileWriterForExportType(format, fileName);
+		exportAllEditsPerformedByUSer(userId, fileWriter);
+	}
+
+	private void exportAllEditsPerformedByUSer(long userId, final OsmObjectFileWriter geoJsonWriter)
 			throws FailedToCompleteQueryException {
 
 		try {
-
-			persistence.queryObjectsById(type, id, new OsmObjectsReadFromDatabaseCallback() {
+			persistence.queryEditsByUser(userId, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override
 				public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
-					writer.writeObject(object, isFirst);
+					geoJsonWriter.writeObject(object, isFirst);
 				}
 
 			});
 
-			writer.finishWritingFile();
+			geoJsonWriter.finishWritingFile();
 		} catch (ErrorProcessingReadObjectException e) {
 			throw new FailedToCompleteQueryException(e);
 		} catch (ErrorWritingToFileException e) {
@@ -83,38 +78,7 @@ public class QueryObjectsByIdBusinessLogic {
 		}
 	}
 
-	/**
-	 * 
-	 * Generates a file name based on the id and type and calls the method to
-	 * retrieve the data and write to the file.
-	 * 
-	 * @param type
-	 * @param id
-	 * @throws FailedToCompleteQueryException
-	 * 
-	 * @throws SQLException
-	 * @throws NotConnectedToDatabase
-	 * @throws ErrorWritingToFileException
-	 */
-	public void queryObjectsById(ExportFormatType format, OsmObjectType type, long id) throws FailedToCompleteQueryException {
-		String fileName = "";
-		switch (type) {
-		case NODE: {
-			fileName = defaultWorkingDirectory + "nodes-" + id + format.toString();
-			break;
-		}
-		case WAY: {
-			fileName = defaultWorkingDirectory + "ways-" + id + format.toString();
-			break;
-		}
-		default:
-			break;
-		}
-		OsmObjectFileWriter writer = getFileWriterForExportType(format, fileName, id);
-		queryObjectsById(type, id, writer);
-	}
-	
-	private OsmObjectFileWriter getFileWriterForExportType(ExportFormatType format, String fileName, long objectId)
+	private OsmObjectFileWriter getFileWriterForExportType(ExportFormatType format, String fileName)
 			throws FailedToCompleteQueryException {
 
 		OsmObjectFileWriter fileWriter = null;
@@ -127,7 +91,7 @@ public class QueryObjectsByIdBusinessLogic {
 			case GEOJSON: {
 				fileWriter = new OsmObjectGeoJsonWriter(fileName);
 				break;
-			}
+			} 
 			case JSON: {
 				fileWriter = new OsmObjectJsonWriter(fileName);
 				break;

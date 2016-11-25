@@ -1,4 +1,4 @@
-package carvalhorr.cs654.geojson.model;
+package carvalhorr.cs654.model;
 
 public enum GeoJsonObjectType {
 	POINT("Point", "P"), LINE_STRING("LineString", "L"), POLYGON("Polygon", "Y"), MULTI_POLYGON("MultiPolygon", "M");
