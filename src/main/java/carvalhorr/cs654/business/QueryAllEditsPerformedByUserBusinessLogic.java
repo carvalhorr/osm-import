@@ -1,14 +1,15 @@
 package carvalhorr.cs654.business;
 
+import java.util.Map;
+
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
-import carvalhorr.cs654.files.OsmObjectGeoJsonWriter;
-import carvalhorr.cs654.files.OsmObjectJsonWriter;
-import carvalhorr.cs654.files.OsmObjectCsvWriter;
+import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.files.OsmObjectFileWriter;
+import carvalhorr.cs654.files.OsmObjectWriterFactory;
 import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
@@ -23,7 +24,7 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
 public class QueryAllEditsPerformedByUserBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
-	
+
 	private String defaultWorkingDirectory = "";
 
 	public QueryAllEditsPerformedByUserBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
@@ -42,31 +43,37 @@ public class QueryAllEditsPerformedByUserBusinessLogic {
 	 */
 	public void exportAllEditsPerformedByUSer(ExportFormatType format, long userId, String fileName)
 			throws FailedToCompleteQueryException {
-		OsmObjectFileWriter fileWriter = getFileWriterForExportType(format, fileName);
+		OsmObjectFileWriter fileWriter = OsmObjectWriterFactory.getOsmObjectWriter(format, fileName);
 		exportAllEditsPerformedByUSer(userId, fileWriter);
 	}
 
 	public void exportAllEditsPerformedByUSer(ExportFormatType format, long userId)
 			throws FailedToCompleteQueryException {
 		String fileName = defaultWorkingDirectory + "changes-by-user-" + userId + "." + format.toString();
-		OsmObjectFileWriter fileWriter = getFileWriterForExportType(format, fileName);
-		exportAllEditsPerformedByUSer(userId, fileWriter);
+		exportAllEditsPerformedByUSer(format, userId, fileName);
 	}
 
-	private void exportAllEditsPerformedByUSer(long userId, final OsmObjectFileWriter geoJsonWriter)
+	private void exportAllEditsPerformedByUSer(long userId, final OsmObjectFileWriter fileWriter)
 			throws FailedToCompleteQueryException {
 
 		try {
+			fileWriter.startWritinFile();
 			persistence.queryEditsByUser(userId, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override
 				public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
-					geoJsonWriter.writeObject(object, isFirst);
+					fileWriter.writeObject(object, isFirst);
+				}
+
+				@Override
+				public void osmObjectReadWithAdditionalInfo(OsmObject object, Map<String, Object> additionalInfo,
+						boolean isFirst) throws ErrorProcessingReadObjectException {
+					// TODO Auto-generated method stub
 				}
 
 			});
 
-			geoJsonWriter.finishWritingFile();
+			fileWriter.finishWritingFile();
 		} catch (ErrorProcessingReadObjectException e) {
 			throw new FailedToCompleteQueryException(e);
 		} catch (ErrorWritingToFileException e) {
@@ -76,33 +83,6 @@ public class QueryAllEditsPerformedByUserBusinessLogic {
 		} catch (ErrorReadingDataFromDatabase e) {
 			throw new FailedToCompleteQueryException(e);
 		}
-	}
-
-	private OsmObjectFileWriter getFileWriterForExportType(ExportFormatType format, String fileName)
-			throws FailedToCompleteQueryException {
-
-		OsmObjectFileWriter fileWriter = null;
-		try {
-			switch (format) {
-			case CSV: {
-				fileWriter = new OsmObjectCsvWriter(fileName);
-				break;
-			}
-			case GEOJSON: {
-				fileWriter = new OsmObjectGeoJsonWriter(fileName);
-				break;
-			} 
-			case JSON: {
-				fileWriter = new OsmObjectJsonWriter(fileName);
-				break;
-			}
-			default:
-				break;
-			}
-		} catch (ErrorWritingToFileException e) {
-			throw new FailedToCompleteQueryException(e);
-		}
-		return fileWriter;
 	}
 
 }

@@ -17,19 +17,9 @@ public class OsmObjectJsonWriter implements OsmObjectFileWriter {
 
 	private BufferedWriter writer = null;
 
-	public OsmObjectJsonWriter(String fileName) throws ErrorWritingToFileException {
+	public OsmObjectJsonWriter(String fileName) {
 
 		this.fileName = fileName;
-
-		try {
-			file = new File(fileName);
-
-			writer = new BufferedWriter(new FileWriter(file));
-			writer.write("{ \"objects\": [");
-
-		} catch (IOException e) {
-			throw new ErrorWritingToFileException(e);
-		}
 	}
 
 	private String getGeoJsonStringForOsmObject(OsmObject object) {
@@ -41,7 +31,7 @@ public class OsmObjectJsonWriter implements OsmObjectFileWriter {
 		jsonStr += ", \"user_id\":" + "\"" + object.getUser().getUid() + "\"";
 		jsonStr += ", \"user_name\":" + "\"" + object.getUser().getUserName() + "\"";
 		jsonStr += ", \"visible\":" + "\"" + object.getVisible() + "\"";
-		jsonStr += ", \"coordinates\": " + object.getCoordinates() ;
+		jsonStr += ", \"coordinates\": " + object.getCoordinates();
 		jsonStr += ", \"type\": " + object.getGeoJsonType().toString();
 		jsonStr += ", \"tags\": [";
 
@@ -57,22 +47,39 @@ public class OsmObjectJsonWriter implements OsmObjectFileWriter {
 		return jsonStr;
 	}
 
+	@Override
 	public void writeObject(Object object, boolean isFirst) throws ErrorProcessingReadObjectException {
 		try {
 			if (!isFirst) {
 				writer.write(", ");
 			}
-			writer.write(getGeoJsonStringForOsmObject((OsmObject)object));
+			writer.write(getGeoJsonStringForOsmObject((OsmObject) object));
 
 		} catch (IOException ex) {
 			throw new ErrorProcessingReadObjectException("Error while writing to file: " + fileName, ex);
 		}
 	}
 
+	@Override
 	public void finishWritingFile() throws ErrorWritingToFileException {
 		try {
 			writer.write("]}");
 			writer.close();
+
+		} catch (IOException e) {
+			throw new ErrorWritingToFileException(e);
+		}
+
+	}
+
+	@Override
+	public void startWritinFile() throws ErrorWritingToFileException {
+
+		try {
+			file = new File(fileName);
+
+			writer = new BufferedWriter(new FileWriter(file));
+			writer.write("{ \"objects\": [");
 
 		} catch (IOException e) {
 			throw new ErrorWritingToFileException(e);

@@ -54,6 +54,16 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 		return tags;
 	}
 
+	public void queryAllObjectCurrentVersion(OsmObjectsReadFromDatabaseCallback callback)
+			throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
+		try {
+			baseQueryOsmObjectWhithWhereClause(" and (osm_id, osm_version) in (select o2.osm_id, max(o2.osm_version) from nottingham.osm_object o2 group by o2.osm_id)", callback);
+		} catch (SQLException ex) {
+			throw new ErrorReadingDataFromDatabase("Error while reading current versions for all objects", ex);
+		}
+
+	}
+
 	public void queryEditsByUser(long userId, OsmObjectsReadFromDatabaseCallback callback)
 			throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
 		try {
@@ -63,7 +73,7 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 		}
 	}
 
-	public void queryObjectsByTagValue(String tagName, String tagValue, OsmObjectsReadFromDatabaseCallback callback) 
+	public void queryObjectsByTagValue(String tagName, String tagValue, OsmObjectsReadFromDatabaseCallback callback)
 			throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
 		try {
 			String sql = "select o.object_key, o.osm_type, o.osm_id, o.osm_version, o.coordinates, o.timestamp, o.user_id, o.visible, o.geojson_type, u.user_name from "
@@ -72,7 +82,8 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 					+ tagName + "' and tag_value = '" + tagValue + "'" + " order by timestamp;";
 			baseQueryOsmObjectWhithSql(sql, callback);
 		} catch (SQLException ex) {
-			throw new ErrorReadingDataFromDatabase("Error while reading edits for for tag " + tagName + "=" + tagValue, ex);
+			throw new ErrorReadingDataFromDatabase("Error while reading edits for for tag " + tagName + "=" + tagValue,
+					ex);
 		}
 	}
 

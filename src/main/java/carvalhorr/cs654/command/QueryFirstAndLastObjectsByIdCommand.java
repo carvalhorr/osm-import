@@ -9,6 +9,7 @@ import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
+import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
@@ -28,7 +29,7 @@ public class QueryFirstAndLastObjectsByIdCommand {
 
 		QueryFirstAndLastVersionOfObjectBusinessLogic business = new QueryFirstAndLastVersionOfObjectBusinessLogic(persistence, workingDirectory);
 
-		business.queryFirstAndLastVersionsOfObject(OsmObjectType.NODE, 2877892);
+		business.queryFirstAndLastVersionsOfObject(ExportFormatType.GEOJSON, OsmObjectType.NODE, 2877892);
 	}
 
 }

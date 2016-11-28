@@ -1,16 +1,16 @@
 package carvalhorr.cs654.business;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
-import carvalhorr.cs654.files.OsmObjectCsvWriter;
+import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.files.OsmObjectFileWriter;
-import carvalhorr.cs654.files.OsmObjectGeoJsonWriter;
-import carvalhorr.cs654.files.OsmObjectJsonWriter;
+import carvalhorr.cs654.files.OsmObjectWriterFactory;
 import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
@@ -53,7 +53,7 @@ public class QueryObjectsByIdBusinessLogic {
 	 */
 	public void queryObjectsById(ExportFormatType format, OsmObjectType type, long id, final String fileName)
 			throws FailedToCompleteQueryException {
-		OsmObjectFileWriter writer = getFileWriterForExportType(format, fileName, id);
+		OsmObjectFileWriter writer = OsmObjectWriterFactory.getOsmObjectWriter(format, fileName);
 		queryObjectsById(type, id, writer);
 	}
 	
@@ -67,6 +67,12 @@ public class QueryObjectsByIdBusinessLogic {
 				@Override
 				public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
 					writer.writeObject(object, isFirst);
+				}
+
+				@Override
+				public void osmObjectReadWithAdditionalInfo(OsmObject object, Map<String, Object> additionalInfo,
+						boolean isFirst) throws ErrorProcessingReadObjectException {
+					
 				}
 
 			});
@@ -100,45 +106,17 @@ public class QueryObjectsByIdBusinessLogic {
 		String fileName = "";
 		switch (type) {
 		case NODE: {
-			fileName = defaultWorkingDirectory + "nodes-" + id + format.toString();
+			fileName = defaultWorkingDirectory + "nodes-" + id ;
 			break;
 		}
 		case WAY: {
-			fileName = defaultWorkingDirectory + "ways-" + id + format.toString();
+			fileName = defaultWorkingDirectory + "ways-" + id ;
 			break;
 		}
 		default:
 			break;
 		}
-		OsmObjectFileWriter writer = getFileWriterForExportType(format, fileName, id);
-		queryObjectsById(type, id, writer);
-	}
-	
-	private OsmObjectFileWriter getFileWriterForExportType(ExportFormatType format, String fileName, long objectId)
-			throws FailedToCompleteQueryException {
-
-		OsmObjectFileWriter fileWriter = null;
-		try {
-			switch (format) {
-			case CSV: {
-				fileWriter = new OsmObjectCsvWriter(fileName);
-				break;
-			}
-			case GEOJSON: {
-				fileWriter = new OsmObjectGeoJsonWriter(fileName);
-				break;
-			}
-			case JSON: {
-				fileWriter = new OsmObjectJsonWriter(fileName);
-				break;
-			}
-			default:
-				break;
-			}
-		} catch (ErrorWritingToFileException e) {
-			throw new FailedToCompleteQueryException(e);
-		}
-		return fileWriter;
+		queryObjectsById(format, type, id, fileName);
 	}
 
 }

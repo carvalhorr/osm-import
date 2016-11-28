@@ -17,20 +17,10 @@ public class OsmObjectGeoJsonWriter implements OsmObjectFileWriter {
 
 	private BufferedWriter writer = null;
 
-	public OsmObjectGeoJsonWriter(String fileName) throws ErrorWritingToFileException {
+	public OsmObjectGeoJsonWriter(String fileName) {
 
 		this.fileName = fileName;
 
-		try {
-			file = new File(fileName);
-
-			writer = new BufferedWriter(new FileWriter(file));
-
-			writer.write("{\"type\": \"FeatureCollection\", \"features\": [");
-
-		} catch (IOException e) {
-			throw new ErrorWritingToFileException(e);
-		}
 	}
 
 	private String getGeoJsonStringForOsmObject(OsmObject object) {
@@ -54,6 +44,7 @@ public class OsmObjectGeoJsonWriter implements OsmObjectFileWriter {
 		return geoJsonString;
 	}
 
+	@Override
 	public void writeObject(Object object, boolean isFirst) throws ErrorProcessingReadObjectException {
 		try {
 			if (!isFirst) {
@@ -66,6 +57,7 @@ public class OsmObjectGeoJsonWriter implements OsmObjectFileWriter {
 		}
 	}
 
+	@Override
 	public void finishWritingFile() throws ErrorWritingToFileException {
 		try {
 			writer.write("]}");
@@ -75,6 +67,21 @@ public class OsmObjectGeoJsonWriter implements OsmObjectFileWriter {
 			throw new ErrorWritingToFileException(e);
 		}
 
+	}
+
+	@Override
+	public void startWritinFile() throws ErrorWritingToFileException {
+
+		try {
+			file = new File(fileName);
+
+			writer = new BufferedWriter(new FileWriter(file));
+
+			writer.write("{\"type\": \"FeatureCollection\", \"features\": [");
+
+		} catch (IOException e) {
+			throw new ErrorWritingToFileException(e);
+		}		
 	}
 
 }

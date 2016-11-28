@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
-import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmObject;
 
 public class OsmObjectCsvWriter implements OsmObjectFileWriter {
@@ -18,9 +17,26 @@ public class OsmObjectCsvWriter implements OsmObjectFileWriter {
 
 	private BufferedWriter writer = null;
 
-	public OsmObjectCsvWriter(String fileName) throws ErrorWritingToFileException {
+	public OsmObjectCsvWriter(String fileName) {
 
 		this.fileName = fileName;
+	}
+
+	@Override
+	public void writeObject(Object obj, boolean isFirst) throws ErrorProcessingReadObjectException {
+		OsmObject object = (OsmObject) obj;
+		try {
+			writer.write(object.getId() + "," + object.getVersion() + ", " + object.getGeoJsonType().toString() + ", "
+					+ object.getTimestamp());
+			writer.newLine();
+
+		} catch (IOException ex) {
+			throw new ErrorProcessingReadObjectException("Error while writing to file: " + fileName, ex);
+		}
+	}
+
+	@Override
+	public void startWritinFile() throws ErrorWritingToFileException {
 
 		try {
 			file = new File(fileName);
@@ -35,21 +51,7 @@ public class OsmObjectCsvWriter implements OsmObjectFileWriter {
 		}
 	}
 
-
-	public void writeObject(Object obj, boolean isFirst) throws ErrorProcessingReadObjectException {
-		OsmObject object = (OsmObject) obj;
-		try {
-			writer.write(object.getId() + "," +
-					object.getVersion() + ", " +
-					object.getGeoJsonType().toString() + ", " + 
-					object.getTimestamp());
-			writer.newLine();
-
-		} catch (IOException ex) {
-			throw new ErrorProcessingReadObjectException("Error while writing to file: " + fileName, ex);
-		}
-	}
-
+	@Override
 	public void finishWritingFile() throws ErrorWritingToFileException {
 		try {
 			writer.close();

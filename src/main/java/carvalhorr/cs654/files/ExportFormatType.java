@@ -1,4 +1,4 @@
-package carvalhorr.cs654.business;
+package carvalhorr.cs654.files;
 
 public enum ExportFormatType {
 	CSV("csv"), GEOJSON("geojson"), JSON("json");

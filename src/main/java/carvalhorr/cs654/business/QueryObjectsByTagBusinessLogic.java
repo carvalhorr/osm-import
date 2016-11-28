@@ -1,18 +1,17 @@
 package carvalhorr.cs654.business;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
-import carvalhorr.cs654.files.OsmObjectCsvWriter;
+import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.files.OsmObjectFileWriter;
-import carvalhorr.cs654.files.OsmObjectGeoJsonWriter;
-import carvalhorr.cs654.files.OsmObjectJsonWriter;
+import carvalhorr.cs654.files.OsmObjectWriterFactory;
 import carvalhorr.cs654.model.OsmObject;
-import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
@@ -50,7 +49,7 @@ public class QueryObjectsByTagBusinessLogic {
 	 */
 	public void queryObjectsByTag(ExportFormatType format, String tagName, String tagValue, final String fileName)
 			throws FailedToCompleteQueryException {
-		OsmObjectFileWriter writer = getFileWriterForExportType(format, fileName);
+		OsmObjectFileWriter writer = OsmObjectWriterFactory.getOsmObjectWriter(format, fileName);
 		queryObjectsByTag(tagName, tagValue, writer);
 	}
 	
@@ -64,6 +63,13 @@ public class QueryObjectsByTagBusinessLogic {
 				@Override
 				public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
 					writer.writeObject(object, isFirst);
+				}
+
+				@Override
+				public void osmObjectReadWithAdditionalInfo(OsmObject object, Map<String, Object> additionalInfo,
+						boolean isFirst) throws ErrorProcessingReadObjectException {
+					// TODO Auto-generated method stub
+					
 				}
 
 			});
@@ -95,37 +101,7 @@ public class QueryObjectsByTagBusinessLogic {
 	 */
 	public void queryObjectsByTag(ExportFormatType format, String tagName, String tagValue) throws FailedToCompleteQueryException {
 		String fileName = defaultWorkingDirectory + "tag-" + tagName + "-" + tagValue + "." + format.toString();
-		OsmObjectFileWriter writer = getFileWriterForExportType(format, fileName);
-		queryObjectsByTag(tagName, tagValue, writer);
+		queryObjectsByTag(format, tagName, tagValue, fileName);
 	}
 	
-	private OsmObjectFileWriter getFileWriterForExportType(ExportFormatType format, String fileName)
-			throws FailedToCompleteQueryException {
-
-		OsmObjectFileWriter fileWriter = null;
-		try {
-			switch (format) {
-			case CSV: {
-				fileWriter = new OsmObjectCsvWriter(fileName);
-				break;
-			}
-			case GEOJSON: {
-				// FR 9.1
-				fileWriter = new OsmObjectGeoJsonWriter(fileName);
-				break;
-			}
-			case JSON: {
-				// FR 9.3
-				fileWriter = new OsmObjectJsonWriter(fileName);
-				break;
-			}
-			default:
-				break;
-			}
-		} catch (ErrorWritingToFileException e) {
-			throw new FailedToCompleteQueryException(e);
-		}
-		return fileWriter;
-	}
-
 }
