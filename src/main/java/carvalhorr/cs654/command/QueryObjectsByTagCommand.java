@@ -14,6 +14,12 @@ import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
+/**
+ * FR 9.7
+ * 
+ * @author carvalhorr
+ *
+ */
 public class QueryObjectsByTagCommand {
 
 	public static void main(String[] args) throws FailedToCompleteQueryException, SQLException,

@@ -13,6 +13,11 @@ import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
+/**
+ * FR 9.1 and 9.3
+ * @author carvalhorr
+ *
+ */
 public class QueryObjectsByIdCommand {
 
 	public static void main(String[] args) throws FailedToCompleteQueryException, SQLException,

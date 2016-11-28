@@ -19,6 +19,10 @@ public class OsmObjectCsvWriter implements OsmObjectFileWriter {
 
 	public OsmObjectCsvWriter(String fileName) {
 
+		if (!fileName.endsWith(".csv")) {
+			fileName = fileName + ".csv";
+		}
+
 		this.fileName = fileName;
 	}
 

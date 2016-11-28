@@ -19,6 +19,10 @@ public class OsmObjectJsonWriter implements OsmObjectFileWriter {
 
 	public OsmObjectJsonWriter(String fileName) {
 
+		if (!fileName.endsWith(".json")) {
+			fileName = fileName + ".json";
+		}
+
 		this.fileName = fileName;
 	}
 

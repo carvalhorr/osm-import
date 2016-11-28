@@ -57,7 +57,7 @@ public class QueryObjectsByTagBusinessLogic {
 			throws FailedToCompleteQueryException {
 
 		try {
-
+			writer.startWritinFile();
 			persistence.queryObjectsByTagValue(tagName, tagValue, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override

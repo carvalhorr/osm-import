@@ -19,6 +19,10 @@ public class OsmObjectGeoJsonWriter implements OsmObjectFileWriter {
 
 	public OsmObjectGeoJsonWriter(String fileName) {
 
+		if (!fileName.endsWith(".geojson")) {
+			fileName = fileName + ".geojson";
+		}
+
 		this.fileName = fileName;
 
 	}

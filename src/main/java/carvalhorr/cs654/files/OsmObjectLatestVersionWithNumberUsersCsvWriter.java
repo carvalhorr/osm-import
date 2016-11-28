@@ -8,9 +8,9 @@ import java.util.Map;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
+import carvalhorr.cs654.model.OsmObject;
 
-@Deprecated
-public class ObjectTagsJsonWriter implements OsmObjectFileWriter {
+public class OsmObjectLatestVersionWithNumberUsersCsvWriter implements OsmObjectFileWriter {
 
 	private String fileName = "";
 
@@ -18,37 +18,24 @@ public class ObjectTagsJsonWriter implements OsmObjectFileWriter {
 
 	private BufferedWriter writer = null;
 
-	public ObjectTagsJsonWriter(String fileName) {
-		
+	public OsmObjectLatestVersionWithNumberUsersCsvWriter(String fileName) {
 		if (!fileName.endsWith(".csv")) {
 			fileName = fileName + ".csv";
 		}
-
-
 		this.fileName = fileName;
 	}
 
 	@Override
 	public void writeObject(Object obj, boolean isFirst) throws ErrorProcessingReadObjectException {
-		Map<String, Object> properties = (Map<String, Object>) obj;
+		OsmObject object = (OsmObject)((Map<String, Object>) obj).get("osmObject");
+		Integer countUsers = (Integer)((Map<String, Object>) obj).get("totalUsers");
 		try {
-			writer.write("{ \"type\": \"" + properties.get("type") + "\", \"id\": " + properties.get("id")
-					+ ", \"tags\": [" + properties.get("tags").toString() + "]}");
-
+			writer.write(object.getId() + "," + object.getVersion() + ", " + object.getGeoJsonType().toString() + ", "
+					+ countUsers);
+			writer.newLine();
 		} catch (IOException ex) {
 			throw new ErrorProcessingReadObjectException("Error while writing to file: " + fileName, ex);
 		}
-	}
-
-	@Override
-	public void finishWritingFile() throws ErrorWritingToFileException {
-		try {
-			writer.close();
-
-		} catch (IOException e) {
-			throw new ErrorWritingToFileException(e);
-		}
-
 	}
 
 	@Override
@@ -58,6 +45,18 @@ public class ObjectTagsJsonWriter implements OsmObjectFileWriter {
 			file = new File(fileName);
 
 			writer = new BufferedWriter(new FileWriter(file));
+			writer.write("ID, Version, Type, Number of editors");
+			writer.newLine();
+
+		} catch (IOException e) {
+			throw new ErrorWritingToFileException(e);
+		}
+	}
+
+	@Override
+	public void finishWritingFile() throws ErrorWritingToFileException {
+		try {
+			writer.close();
 
 		} catch (IOException e) {
 			throw new ErrorWritingToFileException(e);
