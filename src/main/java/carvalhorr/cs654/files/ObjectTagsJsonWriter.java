@@ -20,10 +20,9 @@ public class ObjectTagsJsonWriter implements OsmObjectFileWriter {
 
 	public ObjectTagsJsonWriter(String fileName) {
 		
-		if (!fileName.endsWith(".csv")) {
-			fileName = fileName + ".csv";
+		if (!fileName.endsWith(".json")) {
+			fileName = fileName + ".json";
 		}
-
 
 		this.fileName = fileName;
 	}

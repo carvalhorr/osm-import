@@ -38,6 +38,7 @@ public class QueryObjectsByTagCommand {
 
 		business.queryObjectsByTag(ExportFormatType.JSON, "highway", "footway");
 		business.queryObjectsByTag(ExportFormatType.GEOJSON, "highway", "footway");
+		business.queryObjectsByTag(ExportFormatType.CSV, "highway", "footway");
 	}
 
 }

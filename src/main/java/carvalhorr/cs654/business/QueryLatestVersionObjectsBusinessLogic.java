@@ -55,12 +55,13 @@ public class QueryLatestVersionObjectsBusinessLogic {
 	public void queryLatestVersionAllObjects(ExportFormatType format, final String fileName)
 			throws FailedToCompleteQueryException {
 		OsmObjectFileWriter writer = null;
+		// For CSV format, not the default CSV writer is used.
 		if (format.equals(ExportFormatType.CSV)) {
 			writer = new OsmObjectLatestVersionWithNumberUsersCsvWriter(fileName);
 		} else {
 			writer = OsmObjectWriterFactory.getOsmObjectWriter(format, fileName);
 		}
-		
+
 		queryLatestVersionAllObjects(writer);
 	}
 
@@ -68,7 +69,7 @@ public class QueryLatestVersionObjectsBusinessLogic {
 
 		try {
 			writer.startWritinFile();
-			
+
 			persistence.queryAllObjectCurrentVersion(new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override
@@ -78,10 +79,14 @@ public class QueryLatestVersionObjectsBusinessLogic {
 				@Override
 				public void osmObjectReadWithAdditionalInfo(OsmObject object, Map<String, Object> additionalInfo,
 						boolean isFirst) throws ErrorProcessingReadObjectException {
-					Map<String, Object> osmObjectWithExtraInfo = new HashMap<String, Object>();
-					osmObjectWithExtraInfo.put("osmObject", object);
-					osmObjectWithExtraInfo.put("totalUsers", additionalInfo.get("totalUsers"));
-					writer.writeObject(osmObjectWithExtraInfo, isFirst);
+					if (writer instanceof OsmObjectLatestVersionWithNumberUsersCsvWriter) {
+						Map<String, Object> osmObjectWithExtraInfo = new HashMap<String, Object>();
+						osmObjectWithExtraInfo.put("osmObject", object);
+						osmObjectWithExtraInfo.put("totalUsers", additionalInfo.get("totalUsers"));
+						writer.writeObject(osmObjectWithExtraInfo, isFirst);
+					} else {
+						writer.writeObject(object, isFirst);
+					}
 				}
 
 			});

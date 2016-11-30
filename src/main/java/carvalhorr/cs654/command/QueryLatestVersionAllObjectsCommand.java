@@ -35,6 +35,10 @@ public class QueryLatestVersionAllObjectsCommand {
 		QueryLatestVersionObjectsBusinessLogic business = new QueryLatestVersionObjectsBusinessLogic(persistence, workingDirectory);
 
 		business.queryLatestVersionAllObjects(ExportFormatType.CSV);
+		business.queryLatestVersionAllObjects(ExportFormatType.GEOJSON);
+		business.queryLatestVersionAllObjects(ExportFormatType.JSON);
+
+		
 		//business.queryObjectsById(ExportFormatType.GEOJSON, OsmObjectType.WAY, 2877892);
 	}
 

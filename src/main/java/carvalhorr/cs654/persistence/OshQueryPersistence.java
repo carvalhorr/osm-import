@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
+import carvalhorr.cs654.model.DataReadFromDatabaseCallback;
 import carvalhorr.cs654.model.GeoJsonObjectType;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmObject;
@@ -54,6 +56,41 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 		return tags;
 	}
 
+	public void queryRankingEditsByUser(DataReadFromDatabaseCallback callback)
+			throws NotConnectedToDatabase, ErrorReadingDataFromDatabase, ErrorProcessingReadObjectException {
+		if (connection == null) {
+			throw new NotConnectedToDatabase();
+		}
+		try {
+			ResultSet result = statement.executeQuery("select u.*, (select count(*) from " + schemaName
+					+ ".osm_object where user_id = u.user_id) total_edits, " + "(select count(*) from " + schemaName
+					+ ".osm_object where user_id = u.user_id and geojson_type = 'P') total_edits_points,"
+					+ "(select count(*) from " + schemaName
+					+ ".osm_object where user_id = u.user_id and geojson_type = 'L') total_edits_linestrings,"
+					+ "(select count(*) from " + schemaName
+					+ ".osm_object where user_id = u.user_id and geojson_type = 'Y') total_edits_polygons,"
+					+ "(select count(*) from " + schemaName
+					+ ".osm_object where user_id = u.user_id and geojson_type = 'M') total_edits_multilines from "
+					+ schemaName + ".osm_user u order by total_edits desc;");
+
+			boolean first = true;
+			while (result.next()) {
+				Map<String, Object> userEdits = new HashMap<String, Object>();
+				userEdits.put("user_id", result.getInt(1));
+				userEdits.put("user_name", result.getString(2));
+				userEdits.put("total_edits", result.getInt(3));
+				userEdits.put("total_edits_points", result.getInt(4));
+				userEdits.put("total_edits_linestrings", result.getInt(5));
+				userEdits.put("total_edits_polygons", result.getInt(6));
+				userEdits.put("total_edits_multilines", result.getInt(7));
+				callback.dataRead(userEdits, first);
+				first = false;
+			}
+		} catch (SQLException ex) {
+			throw new ErrorReadingDataFromDatabase("Error while reading rank of edits by user", ex);
+		}
+	}
+
 	public void queryAllObjectCurrentVersion(final OsmObjectsReadFromDatabaseCallback callback)
 			throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
 		try {
@@ -88,6 +125,26 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 		} catch (SQLException ex) {
 			throw new ErrorReadingDataFromDatabase("Error while reading edits for user " + userId, ex);
 		}
+	}
+
+	public Long queryEditingSummaryTotalObjectsByTypeAndPeriod(GeoJsonObjectType type, Date startDate, Date finishDate) throws NotConnectedToDatabase, ErrorReadingDataFromDatabase {
+		if (connection == null) {
+			throw new NotConnectedToDatabase();
+		}
+		Long totalEdits = 0l;
+		try {
+			ResultSet result = statement
+					.executeQuery("select count(*) totalEdits from nottingham.osm_object where geojson_type = '"
+							+ type.getDatabaseType() + "' and timestamp between '" + startDate.toString() + "' and '"
+							+ finishDate.toString() + "';");
+			while (result.next()) {
+				totalEdits = result.getLong(1);
+			}
+		} catch (SQLException ex) {
+			throw new ErrorReadingDataFromDatabase("Error while reading number of edits of type '" + type.toString() + "'", ex);
+		}
+
+		return totalEdits;
 	}
 
 	public void queryObjectsByTagValue(String tagName, String tagValue, OsmObjectsReadFromDatabaseCallback callback)

@@ -90,8 +90,12 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic {
 
 				}
 			});
-			fileWriter.writeObject(firstVersion, true);
-			fileWriter.writeObject(lastVersion, false);
+			if (firstVersion != null) {
+				fileWriter.writeObject(firstVersion, true);
+			}
+			if (lastVersion != null) {
+				fileWriter.writeObject(lastVersion, false);
+			}
 
 			fileWriter.finishWritingFile();
 		} catch (ErrorProcessingReadObjectException e) {

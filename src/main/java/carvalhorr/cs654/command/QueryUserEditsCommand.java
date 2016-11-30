@@ -13,8 +13,7 @@ import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 /**
- * FR 9.4
- * 
+ * 9.4
  * @author carvalhorr
  *
  */
@@ -35,6 +34,7 @@ public class QueryUserEditsCommand {
 		QueryAllEditsPerformedByUserBusinessLogic business = new QueryAllEditsPerformedByUserBusinessLogic(persistence,
 				workingDirectory);
 
+		business.exportAllEditsPerformedByUSer(ExportFormatType.JSON, 12671);
 		business.exportAllEditsPerformedByUSer(ExportFormatType.GEOJSON, 12671);
 		business.exportAllEditsPerformedByUSer(ExportFormatType.CSV, 12671);
 	}

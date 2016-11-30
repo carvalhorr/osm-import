@@ -35,7 +35,9 @@ public class QueryFirstAndLastObjectsByIdCommand {
 
 		QueryFirstAndLastVersionOfObjectBusinessLogic business = new QueryFirstAndLastVersionOfObjectBusinessLogic(persistence, workingDirectory);
 
-		business.queryFirstAndLastVersionsOfObject(ExportFormatType.GEOJSON, OsmObjectType.NODE, 2877892);
+		business.queryFirstAndLastVersionsOfObject(ExportFormatType.GEOJSON, OsmObjectType.WAY, 2877892);
+		business.queryFirstAndLastVersionsOfObject(ExportFormatType.JSON, OsmObjectType.WAY, 2877892);
+		business.queryFirstAndLastVersionsOfObject(ExportFormatType.CSV, OsmObjectType.WAY, 2877892);
 	}
 
 }

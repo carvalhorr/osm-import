@@ -124,14 +124,13 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 		statement.execute("CREATE TABLE " + schemaName + ".osm_tag(" + "object_key BIGINT REFERENCES " + schemaName
 				+ ".osm_object(object_key), " + "tag_key VARCHAR(100), " + "tag_value VARCHAR(300), "
 				+ "CONSTRAINT osm_tag_primary_key PRIMARY KEY (object_key, tag_key, tag_value));");
-
 	}
 
 	private void createOsmObjectTableIndexes(String schemaName) throws SQLException {
 		statement.execute("CREATE INDEX osm_object_type ON " + schemaName + ".osm_object(osm_type);");
 		statement.execute("CREATE INDEX osm_object_timestamp ON " + schemaName + ".osm_object(timestamp);");
 		statement.execute("CREATE INDEX osm_object_id_version ON " + schemaName + ".osm_object(osm_id, osm_version);");
-
+		statement.execute("CREATE INDEX user_id ON " + schemaName + ".osm_object(user_id);");
 	}
 
 	public void createOsmObjectTableIndexes() throws SQLException {

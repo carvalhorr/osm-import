@@ -62,6 +62,8 @@ public class QueryAllTagsForObjectBusinessLogic {
 			properties.put("type", (type.equals(OsmObjectType.NODE) ? "Node" : "Way"));
 			properties.put("tags", tags.toString().replace("[", "\"").replace("]", "\"").replace(", ", "\", \""));
 
+			objectWriter.startWritinFile();
+			
 			objectWriter.writeObject(properties, false);
 
 			objectWriter.finishWritingFile();
