@@ -106,11 +106,11 @@ public class QueryObjectsByIdBusinessLogic {
 		String fileName = "";
 		switch (type) {
 		case NODE: {
-			fileName = defaultWorkingDirectory + "nodes-" + id ;
+			fileName = defaultWorkingDirectory + "node-" + id + "-all-versions";
 			break;
 		}
 		case WAY: {
-			fileName = defaultWorkingDirectory + "ways-" + id ;
+			fileName = defaultWorkingDirectory + "way-" + id + "-all-versions";
 			break;
 		}
 		default:

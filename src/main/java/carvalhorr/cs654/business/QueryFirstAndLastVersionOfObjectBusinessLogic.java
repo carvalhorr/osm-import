@@ -127,11 +127,11 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic {
 		String fileName = "";
 		switch (type) {
 		case NODE: {
-			fileName = defaultWorkingDirectory + "nodes-" + id + "-first-and-last.geojson";
+			fileName = defaultWorkingDirectory + "node-" + id + "-first-and-last";
 			break;
 		}
 		case WAY: {
-			fileName = defaultWorkingDirectory + "ways-" + id + "-first-and-last.geojson";
+			fileName = defaultWorkingDirectory + "way-" + id + "-first-and-last";
 			break;
 		}
 		default:

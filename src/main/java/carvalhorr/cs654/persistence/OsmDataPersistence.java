@@ -65,7 +65,8 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 				+ ".osm_object(osm_type, osm_id, osm_version, coordinates, timestamp, user_id, visible, geojson_type) "
 				+ "VALUES('" + objectType + "', " + object.getId() + ", " + object.getVersion() + ", '"
 				+ object.getCoordinates() + "', '" + object.getTimestamp() + "', " + object.getUser().getUid() + ", "
-				+ object.getVisible() + ", '" + object.getGeoJsonType().getDatabaseType() + "'" + ") RETURNING object_key;");
+				+ object.getVisible() + ", '" + object.getGeoJsonType().getDatabaseType() + "'"
+				+ ") RETURNING object_key;");
 		result.next();
 		return result.getLong(1);
 	}
@@ -82,17 +83,27 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 						+ ", " + bounds.getMinLon() + ", " + bounds.getMaxLat() + ", " + bounds.getMaxLon() + ");");
 	}
 
-	public List<String> readCoordinatesForNodes(List<String> nodes, String timestamp) throws SQLException {
+	public List<String> readCoordinatesForNodes(String nodeIds, String timestamp) throws SQLException {
 		List<String> coordinates = new ArrayList<String>();
-		if (nodes.size() > 0) {
-			ResultSet result = statement.executeQuery("select coordinates from " + schemaName
-					+ ".osm_object where (osm_id, osm_version) in (select osm_id, max(osm_version) from " + schemaName
-					+ ".osm_object where osm_id in (" + nodes.toString().replace("[", "").replace("]", "")
-					+ ") and timestamp <= '" + timestamp + "' and osm_type = 'N' group by osm_id) and osm_type = 'N';");
-			while (result.next()) {
-				coordinates.add(result.getString(1));
+		// if (nodes.size() > 0) {
+		ResultSet result = statement.executeQuery("select coordinates from " + schemaName
+				+ ".osm_object where (osm_id, osm_version) in (select osm_id, max(osm_version) from " + schemaName
+				+ ".osm_object where osm_id in (" + nodeIds + ") and timestamp <= '" + timestamp
+				+ "' and osm_type = 'N' group by osm_id) and osm_type = 'N' order by position(osm_id::text in '"
+				+ nodeIds + "');");
+		while (result.next()) {
+			coordinates.add(result.getString(1));
+		}
+		// Hack to add the the initial coordinates to the end of the list for
+		// circular lists.
+		//TODO find better way to retrieve all the coordinates in order from database
+		String[] ids = nodeIds.split(",");
+		if (ids[0].trim().equals(ids[ids.length - 1].trim())) {
+			if (coordinates.size() > 0) {
+				coordinates.add(coordinates.get(0));
 			}
 		}
+		// }
 		return coordinates;
 	}
 
@@ -105,7 +116,7 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 	private void createUserTable(String schemaName) throws SQLException {
 		// Statement statement = connection.createStatement();
 		statement.execute("CREATE TABLE " + schemaName + ".osm_user(" + "user_id integer NOT NULL, "
-				+ "user_name character varying(20), " + "CONSTRAINT osm_user_pkey PRIMARY KEY (user_id));");
+				+ "user_name character varying(30), " + "CONSTRAINT osm_user_pkey PRIMARY KEY (user_id));");
 
 	}
 
@@ -116,7 +127,7 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 				+ "timestamp TIMESTAMP, " + "user_id INTEGER REFERENCES " + schemaName + ".osm_user(user_id), "
 				+ "visible boolean, geojson_type CHAR(1), "
 				+ "CONSTRAINT osm_object_unique UNIQUE (osm_type, osm_id, osm_version));");
-		//createOsmObjectTableIndexes(schemaName);
+		// createOsmObjectTableIndexes(schemaName);
 	}
 
 	private void createTagTable(String schemaName) throws SQLException {

@@ -47,6 +47,7 @@ public class QueryEditingSummaryBusinessLogic {
 					.queryEditingSummaryTotalObjectsByTypeAndPeriod(GeoJsonObjectType.POLYGON, startDate, finishDate);
 			Long totalMultiPolygonsEdited = persistence.queryEditingSummaryTotalObjectsByTypeAndPeriod(
 					GeoJsonObjectType.MULTI_POLYGON, startDate, finishDate);
+			Long numberUsersEdited = persistence.queryEditingSummaryTotalDistinctUsersByPeriod(startDate, finishDate);
 
 			Long totalEdits = totalPointsEdited + totalLinestringsEdited + totalPolygonsEdited
 					+ totalMultiPolygonsEdited;
@@ -57,6 +58,8 @@ public class QueryEditingSummaryBusinessLogic {
 			properties.put("total_edits_linestring", totalLinestringsEdited);
 			properties.put("total_edits_polygon", totalPolygonsEdited);
 			properties.put("total_edits_multipolygon", totalMultiPolygonsEdited);
+			properties.put("total_edits_users", numberUsersEdited);
+			
 			
 			writer.startWritinFile();
 			

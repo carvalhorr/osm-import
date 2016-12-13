@@ -1,4 +1,4 @@
-package carvalhorr.cs654.model;
+package carvalhorr.cs654.osh;
 
 import java.util.HashMap;
 import java.util.Map;

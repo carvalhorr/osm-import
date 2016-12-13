@@ -7,6 +7,7 @@ import java.io.IOException;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
 import carvalhorr.cs654.model.WayOsmObject;
+import carvalhorr.cs654.osh.OshProcessor;
 import exception.UnexpectedTokenException;
 
 public class DataImportPass3WaysImport extends DataImportPass {
@@ -77,7 +78,7 @@ public class DataImportPass3WaysImport extends DataImportPass {
 			throw new UnexpectedTokenException(lineCount + ": opening <way> tag found inside other object tag");
 		}
 		objectBeingImported = new WayOsmObject();
-		objectBeingImported.processOpenTag(tag);
+		OshProcessor.processOpenTag(objectBeingImported, tag);
 		if (lineContainsCloseTag(tag)) {
 			finishWayObject(tag);
 		}
@@ -88,9 +89,11 @@ public class DataImportPass3WaysImport extends DataImportPass {
 			throw new UnexpectedTokenException(
 					lineCount + ": closing <way> tag found without corresponding opening <way> tag");
 		}
-		objectBeingImported.processCloseTag(tag);
+		OshProcessor.addTagFromString(objectBeingImported, tag);
+		//objectBeingImported.processCloseTag(tag);
 		objectBeingImported.computeCoordinates();
-		extractUser();
+		//extractUser();
+		objectReadCallback.userObjectReadFromFile(objectBeingImported.getUser());
 		objectReadCallback.wayObjectReadFromFile((WayOsmObject) objectBeingImported);
 		objectBeingImported = null;
 	}
@@ -99,12 +102,13 @@ public class DataImportPass3WaysImport extends DataImportPass {
 		if (!(objectBeingImported instanceof WayOsmObject)) {
 			throw new UnexpectedTokenException(lineCount + ": <nd> tag found outside <way> tag");
 		}
-		((WayOsmObject) objectBeingImported).addNodeFromString(tag);
+		OshProcessor.addNodeToWayFromString((WayOsmObject) objectBeingImported, tag);
 	}
 
 	private void addTag(String tag) throws UnexpectedTokenException {
 		if (objectBeingImported instanceof WayOsmObject)
-			objectBeingImported.addTagFromString(tag);
+			OshProcessor.addTagFromString(objectBeingImported, tag);
+			//objectBeingImported.addTagFromString(tag);
 	}
 
 }

@@ -96,7 +96,7 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 		try {
 			String sql = "select o.object_key, o.osm_type, o.osm_id, o.osm_version, o.coordinates, o.timestamp, " + ""
 					+ "o.user_id, o.visible, o.geojson_type, u.user_name, "
-					+ "(select count(o3.user_id) from nottingham.osm_object o3 where o3.osm_id = o.osm_id) editors from "
+					+ "(select count(distinct o3.user_id) from nottingham.osm_object o3 where o3.osm_id = o.osm_id) editors from "
 					+ schemaName + ".osm_object o, " + schemaName
 					+ ".osm_user u where o.user_id = u.user_id and (osm_id, osm_version) in (select o2.osm_id, max(o2.osm_version) from "
 					+ schemaName + ".osm_object o2 group by o2.osm_id)" + " order by timestamp;";
@@ -127,7 +127,8 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 		}
 	}
 
-	public Long queryEditingSummaryTotalObjectsByTypeAndPeriod(GeoJsonObjectType type, Date startDate, Date finishDate) throws NotConnectedToDatabase, ErrorReadingDataFromDatabase {
+	public Long queryEditingSummaryTotalObjectsByTypeAndPeriod(GeoJsonObjectType type, Date startDate, Date finishDate)
+			throws NotConnectedToDatabase, ErrorReadingDataFromDatabase {
 		if (connection == null) {
 			throw new NotConnectedToDatabase();
 		}
@@ -141,10 +142,33 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 				totalEdits = result.getLong(1);
 			}
 		} catch (SQLException ex) {
-			throw new ErrorReadingDataFromDatabase("Error while reading number of edits of type '" + type.toString() + "'", ex);
+			throw new ErrorReadingDataFromDatabase(
+					"Error while reading number of edits of type '" + type.toString() + "'", ex);
 		}
 
 		return totalEdits;
+	}
+
+	public Long queryEditingSummaryTotalDistinctUsersByPeriod(Date startDate, Date finishDate)
+			throws NotConnectedToDatabase, ErrorReadingDataFromDatabase {
+		if (connection == null) {
+			throw new NotConnectedToDatabase();
+		}
+		Long totalEdits = 0l;
+		try {
+			ResultSet result = statement
+					.executeQuery("select count(distinct user_id) totalEdits from nottingham.osm_object "
+							+ "where timestamp between '" + startDate.toString() + "' and '" + finishDate.toString()
+							+ "';");
+			while (result.next()) {
+				totalEdits = result.getLong(1);
+			}
+		} catch (SQLException ex) {
+			throw new ErrorReadingDataFromDatabase("Error while reading number of users that edited by period.", ex);
+		}
+
+		return totalEdits;
+
 	}
 
 	public void queryObjectsByTagValue(String tagName, String tagValue, OsmObjectsReadFromDatabaseCallback callback)

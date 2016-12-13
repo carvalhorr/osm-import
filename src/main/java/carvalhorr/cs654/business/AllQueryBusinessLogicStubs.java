@@ -6,7 +6,6 @@ import java.util.List;
 
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
-import carvalhorr.cs654.model.EditRank;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
@@ -96,8 +95,8 @@ public class AllQueryBusinessLogicStubs {
 	 * 
 	 * @return list of users who edited the area
 	 */
-	public List<EditRank> queryEditsByUserRanks() {
-		return null;
+	public void queryEditsByUserRanks() {
+		//return null;
 	}
 
 	/**

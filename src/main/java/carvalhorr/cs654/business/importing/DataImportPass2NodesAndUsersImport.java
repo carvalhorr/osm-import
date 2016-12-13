@@ -11,8 +11,9 @@ import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
 import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
-import carvalhorr.cs654.model.PropertiesExtractor;
 import carvalhorr.cs654.model.WayOsmObject;
+import carvalhorr.cs654.osh.OshProcessor;
+import carvalhorr.cs654.osh.PropertiesExtractor;
 import exception.UnexpectedTokenException;
 
 public class DataImportPass2NodesAndUsersImport extends DataImportPass {
@@ -104,7 +105,7 @@ public class DataImportPass2NodesAndUsersImport extends DataImportPass {
 			throw new UnexpectedTokenException(lineCount + ": opening <way> tag found inside other object tag");
 		}
 		objectBeingImported = new WayOsmObject();
-		objectBeingImported.processOpenTag(tag);
+		OshProcessor.processOpenTag(objectBeingImported, tag);
 		if (lineContainsCloseTag(tag)) {
 			finishWayObject(tag);
 		}
@@ -116,7 +117,8 @@ public class DataImportPass2NodesAndUsersImport extends DataImportPass {
 					lineCount + ": closing <way> tag found without corresponding opening <way> tag");
 		}
 		// objectBeingImported.processCloseTag(tag);
-		extractUser();
+		//extractUser();
+		objectReadCallback.userObjectReadFromFile(objectBeingImported.getUser());
 		objectBeingImported = null;
 	}
 	
@@ -139,7 +141,7 @@ public class DataImportPass2NodesAndUsersImport extends DataImportPass {
 			throw new UnexpectedTokenException(lineCount + ": opening <way> tag found inside other object tag");
 		}
 		objectBeingImported = new NodeOsmObject();
-		objectBeingImported.processOpenTag(tag);
+		OshProcessor.processOpenTag(objectBeingImported, tag);
 		if (lineContainsCloseTag(tag)) {
 			finishNodeObject(tag);
 		}
@@ -150,9 +152,10 @@ public class DataImportPass2NodesAndUsersImport extends DataImportPass {
 			throw new UnexpectedTokenException(
 					lineCount + ": closing <node> tag found without corresponding opening <node> tag");
 		}
-		objectBeingImported.processCloseTag(tag);
+		OshProcessor.addTagFromString(objectBeingImported, tag);
 		objectBeingImported.computeCoordinates();
-		extractUser();
+		//extractUser();
+		objectReadCallback.userObjectReadFromFile(objectBeingImported.getUser());
 		objectReadCallback.nodeObjectReadFromFile((NodeOsmObject) objectBeingImported);
 		objectBeingImported = null;
 	}
@@ -162,7 +165,8 @@ public class DataImportPass2NodesAndUsersImport extends DataImportPass {
 		//	throw new UnexpectedTokenException(lineCount + ": tag <tag> found outside any tagged object");
 		//}
 		if (objectBeingImported instanceof NodeOsmObject) {
-			objectBeingImported.addTagFromString(tag);
+			OshProcessor.addTagFromString(objectBeingImported, tag);
+			//objectBeingImported.addTagFromString(tag);
 		}
 	}
 

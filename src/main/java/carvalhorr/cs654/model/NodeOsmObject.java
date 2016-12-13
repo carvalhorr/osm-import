@@ -2,15 +2,15 @@ package carvalhorr.cs654.model;
 
 public class NodeOsmObject extends OsmObject {
 
-	@Override
+	/*@Override
 	protected void validateProperties() {
 
-	}
+	}*/
 
-	@Override
+	/*@Override
 	protected void validateTags() {
 
-	}
+	}*/
 
 	@Override
 	public void computeCoordinates() {

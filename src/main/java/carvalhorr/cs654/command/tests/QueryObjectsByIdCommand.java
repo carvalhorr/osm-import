@@ -1,30 +1,27 @@
-package carvalhorr.cs654.command;
+package carvalhorr.cs654.command.tests;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
-import carvalhorr.cs654.business.QueryEditingSummaryBusinessLogic;
+import carvalhorr.cs654.business.QueryObjectsByIdBusinessLogic;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
+import carvalhorr.cs654.files.ExportFormatType;
+import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 /**
- * FR 9.6
- * 
+ * FR 9.1 and 9.3
  * @author carvalhorr
  *
  */
-public class QueryEditingSummaryCommand {
+public class QueryObjectsByIdCommand {
 
-	public static void main(String[] args)
-			throws FailedToCompleteQueryException, SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase,
-			SchemaDoesNotExistException, FileNotFoundException, ParseException {
+	public static void main(String[] args) throws FailedToCompleteQueryException, SQLException,
+			PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException, FileNotFoundException {
 
 		String schemaName = "nottingham";
 		String workingDirectory = "/home/carvalhorr/maynooth-dissertation/output/";
@@ -35,13 +32,11 @@ public class QueryEditingSummaryCommand {
 		OshQueryPersistence persistence = new OshQueryPersistence(config.getConfigurationForKey("jdbcString"),
 				config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
 
-		QueryEditingSummaryBusinessLogic business = new QueryEditingSummaryBusinessLogic(persistence, workingDirectory);
-		
-		String DEFAULT_PATTERN = "yyyy-MM-dd";
-		DateFormat formatter = new SimpleDateFormat(DEFAULT_PATTERN);
-		
-		business.queryRankingUserEdits(formatter.parse("2008-01-01"), formatter.parse("2008-12-31"));
+		QueryObjectsByIdBusinessLogic business = new QueryObjectsByIdBusinessLogic(persistence, workingDirectory);
 
+		business.queryObjectsById(ExportFormatType.JSON, OsmObjectType.NODE, 306119848);
+		business.queryObjectsById(ExportFormatType.GEOJSON, OsmObjectType.NODE, 306119848);
+		business.queryObjectsById(ExportFormatType.CSV, OsmObjectType.NODE, 306119848);
 	}
 
 }

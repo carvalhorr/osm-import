@@ -1,18 +1,25 @@
-package carvalhorr.cs654.command;
+package carvalhorr.cs654.command.tests;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
-import carvalhorr.cs654.business.QueryAllTagsForObjectBusinessLogic;
+import carvalhorr.cs654.business.QueryFirstAndLastVersionOfObjectBusinessLogic;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
+import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
-public class QueryTagsForObjectCommand {
+/**
+ * FR 9.2
+ * 
+ * @author carvalhorr
+ *
+ */
+public class QueryFirstAndLastObjectsByIdCommand {
 
 	public static void main(String[] args) throws FailedToCompleteQueryException, SQLException,
 			PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException, FileNotFoundException {
@@ -26,9 +33,11 @@ public class QueryTagsForObjectCommand {
 		OshQueryPersistence persistence = new OshQueryPersistence(config.getConfigurationForKey("jdbcString"),
 				config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
 
-		QueryAllTagsForObjectBusinessLogic business = new QueryAllTagsForObjectBusinessLogic(persistence, workingDirectory);
+		QueryFirstAndLastVersionOfObjectBusinessLogic business = new QueryFirstAndLastVersionOfObjectBusinessLogic(persistence, workingDirectory);
 
-		business.queryAllTagsForAllVersionsOfObject(OsmObjectType.WAY, 2877892);
+		business.queryFirstAndLastVersionsOfObject(ExportFormatType.GEOJSON, OsmObjectType.NODE, 14564609);
+		business.queryFirstAndLastVersionsOfObject(ExportFormatType.JSON, OsmObjectType.NODE, 14564609);
+		business.queryFirstAndLastVersionsOfObject(ExportFormatType.CSV, OsmObjectType.NODE, 14564609);
 	}
 
 }

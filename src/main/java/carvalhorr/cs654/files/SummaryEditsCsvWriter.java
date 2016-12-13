@@ -42,9 +42,10 @@ public class SummaryEditsCsvWriter implements OsmObjectFileWriter {
 			Long totalEditsLinestrings = (long) ((Map<String, Object>) obj).get("total_edits_linestring");
 			Long totalEditsPolygons = (long) ((Map<String, Object>) obj).get("total_edits_polygon");
 			Long totalEditsMultipolygons = (long) ((Map<String, Object>) obj).get("total_edits_multipolygon");
+			Long totalUsersEdited = (long) ((Map<String, Object>) obj).get("total_edits_users");
 
 			writer.write(totalEdits + ", " + totalEditsPoints + ", " + totalEditsLinestrings + ", " + totalEditsPolygons
-					+ ", " + totalEditsMultipolygons);
+					+ ", " + totalEditsMultipolygons + ", " + totalUsersEdited);
 
 			writer.newLine();
 
@@ -61,7 +62,7 @@ public class SummaryEditsCsvWriter implements OsmObjectFileWriter {
 
 			writer = new BufferedWriter(new FileWriter(file));
 
-			writer.write("Total edits, Total points, Total linestrings, Total polygons, Total multilines");
+			writer.write("Total edits, Total points, Total linestrings, Total polygons, Total multilines, Total distinct users");
 			writer.newLine();
 
 		} catch (IOException e) {

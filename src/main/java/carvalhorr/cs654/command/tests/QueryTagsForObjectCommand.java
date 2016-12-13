@@ -1,23 +1,18 @@
-package carvalhorr.cs654.command;
+package carvalhorr.cs654.command.tests;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
-import carvalhorr.cs654.business.QueryAllEditsPerformedByUserBusinessLogic;
+import carvalhorr.cs654.business.QueryAllTagsForObjectBusinessLogic;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
-import carvalhorr.cs654.files.ExportFormatType;
+import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
-/**
- * 9.4
- * @author carvalhorr
- *
- */
-public class QueryUserEditsCommand {
+public class QueryTagsForObjectCommand {
 
 	public static void main(String[] args) throws FailedToCompleteQueryException, SQLException,
 			PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException, FileNotFoundException {
@@ -31,12 +26,9 @@ public class QueryUserEditsCommand {
 		OshQueryPersistence persistence = new OshQueryPersistence(config.getConfigurationForKey("jdbcString"),
 				config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
 
-		QueryAllEditsPerformedByUserBusinessLogic business = new QueryAllEditsPerformedByUserBusinessLogic(persistence,
-				workingDirectory);
+		QueryAllTagsForObjectBusinessLogic business = new QueryAllTagsForObjectBusinessLogic(persistence, workingDirectory);
 
-		business.exportAllEditsPerformedByUSer(ExportFormatType.JSON, 12671);
-		business.exportAllEditsPerformedByUSer(ExportFormatType.GEOJSON, 12671);
-		business.exportAllEditsPerformedByUSer(ExportFormatType.CSV, 12671);
+		business.queryAllTagsForAllVersionsOfObject(OsmObjectType.WAY, 2877892);
 	}
 
 }

@@ -3,6 +3,8 @@ package carvalhorr.cs654.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import carvalhorr.cs654.osh.PropertiesExtractor;
+
 public abstract class OsmObject {
 	
 	private long id;
@@ -17,7 +19,9 @@ public abstract class OsmObject {
 
 	protected String coordinates = "";
 
-	public void processOpenTag(String lineString) {
+	/*
+	@Deprecated
+	private void processOpenTag(String lineString) {
 		Map<String, String> properties = extractPropertiesFromLine(lineString);
 		// TODO Validate properties
 		//setProperties(properties);
@@ -38,8 +42,9 @@ public abstract class OsmObject {
 
 	public void processCloseTag(String lineString) {
 		validateTags();
-	}
+	}*/
 
+	/*
 	public void addTagFromString(String lineString) {
 		Map<String, String> tagProperties = extractPropertiesFromLine(lineString);
 		if (tagProperties.size() > 2) {
@@ -51,6 +56,10 @@ public abstract class OsmObject {
 			// TODO raise exception
 		}
 		tags.put(key, value);
+	}*/
+	
+	public void addTag(String key, String value) {
+		tags.put(key, value);
 	}
 	
 	public Map<String, String> getTags() {
@@ -61,13 +70,9 @@ public abstract class OsmObject {
 		this.tags = tags;
 	}
 
-	protected Map<String, String> extractPropertiesFromLine(String lineString) {
-		return PropertiesExtractor.extractPropertiesFromLine(lineString);
-	}
+	//protected abstract void validateProperties();
 
-	protected abstract void validateProperties();
-
-	protected abstract void validateTags();
+	//protected abstract void validateTags();
 
 	public String getCoordinates() {
 		return coordinates;

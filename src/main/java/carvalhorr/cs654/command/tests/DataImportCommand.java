@@ -1,4 +1,4 @@
-package carvalhorr.cs654.command;
+package carvalhorr.cs654.command.tests;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

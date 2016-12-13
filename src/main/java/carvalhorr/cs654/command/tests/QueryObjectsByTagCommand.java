@@ -1,10 +1,10 @@
-package carvalhorr.cs654.command;
+package carvalhorr.cs654.command.tests;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
-import carvalhorr.cs654.business.QueryLatestVersionObjectsBusinessLogic;
 import carvalhorr.cs654.business.QueryObjectsByIdBusinessLogic;
+import carvalhorr.cs654.business.QueryObjectsByTagBusinessLogic;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
@@ -15,10 +15,12 @@ import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 /**
+ * FR 9.7
  * 
- * FR 9.8
+ * @author carvalhorr
+ *
  */
-public class QueryLatestVersionAllObjectsCommand {
+public class QueryObjectsByTagCommand {
 
 	public static void main(String[] args) throws FailedToCompleteQueryException, SQLException,
 			PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException, FileNotFoundException {
@@ -32,14 +34,11 @@ public class QueryLatestVersionAllObjectsCommand {
 		OshQueryPersistence persistence = new OshQueryPersistence(config.getConfigurationForKey("jdbcString"),
 				config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
 
-		QueryLatestVersionObjectsBusinessLogic business = new QueryLatestVersionObjectsBusinessLogic(persistence, workingDirectory);
+		QueryObjectsByTagBusinessLogic business = new QueryObjectsByTagBusinessLogic(persistence, workingDirectory);
 
-		business.queryLatestVersionAllObjects(ExportFormatType.CSV);
-		business.queryLatestVersionAllObjects(ExportFormatType.GEOJSON);
-		business.queryLatestVersionAllObjects(ExportFormatType.JSON);
-
-		
-		//business.queryObjectsById(ExportFormatType.GEOJSON, OsmObjectType.WAY, 2877892);
+		business.queryObjectsByTag(ExportFormatType.JSON, "highway", "footway");
+		business.queryObjectsByTag(ExportFormatType.GEOJSON, "highway", "footway");
+		business.queryObjectsByTag(ExportFormatType.CSV, "highway", "footway");
 	}
 
 }
