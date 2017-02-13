@@ -25,7 +25,9 @@ public class QueryFirstAndLastObjectsByIdCommand {
 			PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException, FileNotFoundException {
 
 		String schemaName = "nottingham";
-		String workingDirectory = "/home/carvalhorr/maynooth-dissertation/output/";
+		//String workingDirectory = "/home/carvalhorr/maynooth-dissertation/output/";
+		
+		String workingDirectory = "//home//carvalhorr//carvalhorr@gmail.com//DESEM//Maynooth//CS645 - Dissertation//output//";
 
 		Configuration config = new Configuration();
 		config.readConfigurationFromFile("database.properties");
@@ -35,9 +37,9 @@ public class QueryFirstAndLastObjectsByIdCommand {
 
 		QueryFirstAndLastVersionOfObjectBusinessLogic business = new QueryFirstAndLastVersionOfObjectBusinessLogic(persistence, workingDirectory);
 
-		business.queryFirstAndLastVersionsOfObject(ExportFormatType.GEOJSON, OsmObjectType.NODE, 14564609);
-		business.queryFirstAndLastVersionsOfObject(ExportFormatType.JSON, OsmObjectType.NODE, 14564609);
-		business.queryFirstAndLastVersionsOfObject(ExportFormatType.CSV, OsmObjectType.NODE, 14564609);
+		business.queryFirstAndLastVersionsOfObject(ExportFormatType.GEOJSON, OsmObjectType.NODE, 204149);
+		business.queryFirstAndLastVersionsOfObject(ExportFormatType.JSON, OsmObjectType.NODE, 204149);
+		business.queryFirstAndLastVersionsOfObject(ExportFormatType.CSV, OsmObjectType.NODE, 204149);
 	}
 
 }

@@ -10,7 +10,7 @@ import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 
 @Deprecated
-public class ObjectTagsJsonWriter implements OsmObjectFileWriter {
+public class ObjectTagsJsonWriter extends OsmObjectFileWriterImpl {
 
 	private String fileName = "";
 
@@ -55,7 +55,7 @@ public class ObjectTagsJsonWriter implements OsmObjectFileWriter {
 
 		try {
 			file = new File(fileName);
-
+			mFullFileName = file.getAbsolutePath();
 			writer = new BufferedWriter(new FileWriter(file));
 
 		} catch (IOException e) {

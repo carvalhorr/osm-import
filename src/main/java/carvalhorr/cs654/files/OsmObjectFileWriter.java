@@ -7,4 +7,5 @@ public interface OsmObjectFileWriter {
 	public void writeObject(Object object, boolean isFirst) throws ErrorProcessingReadObjectException;
 	public void finishWritingFile() throws ErrorWritingToFileException;
 	public void startWritinFile() throws ErrorWritingToFileException;
+	public String getFullFileName();
 }

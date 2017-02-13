@@ -37,7 +37,6 @@ public class DataImportPass1CountLines extends DataImportPass {
 			line = reader.readLine();
 		} while (line != null);
 		reader.close();
-		System.out.println("number of lines on file: " + lineCount);
 
 		objectReadCallback.numberObjectsDetermined(totalNodes, totalWays);
 	}

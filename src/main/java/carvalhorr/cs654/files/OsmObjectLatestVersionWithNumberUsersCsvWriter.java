@@ -10,7 +10,7 @@ import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.model.OsmObject;
 
-public class OsmObjectLatestVersionWithNumberUsersCsvWriter implements OsmObjectFileWriter {
+public class OsmObjectLatestVersionWithNumberUsersCsvWriter extends OsmObjectFileWriterImpl {
 
 	private String fileName = "";
 
@@ -43,6 +43,7 @@ public class OsmObjectLatestVersionWithNumberUsersCsvWriter implements OsmObject
 
 		try {
 			file = new File(fileName);
+			mFullFileName = file.getAbsolutePath();
 
 			writer = new BufferedWriter(new FileWriter(file));
 			writer.write("ID, Version, Type, Number of editors");

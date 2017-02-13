@@ -24,7 +24,9 @@ public class QueryObjectsByIdCommand {
 			PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException, FileNotFoundException {
 
 		String schemaName = "nottingham";
-		String workingDirectory = "/home/carvalhorr/maynooth-dissertation/output/";
+		//String workingDirectory = "/home/carvalhorr/maynooth-dissertation/output/";
+		
+		String workingDirectory = "//home//carvalhorr//carvalhorr@gmail.com//DESEM//Maynooth//CS645 - Dissertation//output//";
 
 		Configuration config = new Configuration();
 		config.readConfigurationFromFile("database.properties");

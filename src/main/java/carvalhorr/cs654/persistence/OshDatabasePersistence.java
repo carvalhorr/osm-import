@@ -61,5 +61,9 @@ public abstract class OshDatabasePersistence {
 
 		return exists;
 	}
+	
+	public String getSchemaName() {
+		return schemaName;
+	}
 
 }

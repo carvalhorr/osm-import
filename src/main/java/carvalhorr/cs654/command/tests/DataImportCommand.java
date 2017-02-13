@@ -19,13 +19,13 @@ public class DataImportCommand implements ProgressIndicator {
 
 	public static void main(String[] args)
 			throws FileNotFoundException, SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase {
-		
-		//TODO Handle exceptions
-		//TODO Receive file name and schema as parameters
-		//TODO Optionally, receive configuration file as parameter
-		
-		String fileName = "//home//carvalhorr//maynooth-dissertation//nottingham_history_file.osh";
-		String schemaName = "nottingham";
+
+		// TODO Handle exceptions
+		// TODO Receive file name and schema as parameters
+		// TODO Optionally, receive configuration file as parameter
+
+		String fileName = "//home//carvalhorr//carvalhorr@gmail.com//DESEM//Maynooth//CS645 - Dissertation//data//nottingham//nottingham_history_file.osh";
+		String schemaName = "nottin";
 		// String fileName =
 		// "//home//carvalhorr//carvalhorr@gmail.com//DESEM//Maynooth//CS645 -
 		// Dissertation//data//nottingham//nottingham_university.osh";
@@ -58,8 +58,8 @@ public class DataImportCommand implements ProgressIndicator {
 	}
 
 	@Override
-	public void updateProgress(String type, int progress) {
-		if (progress == 1) {
+	public void updateProgress(String type, float progress) {
+		if (progress == 1f) {
 			System.out.println("finished " + type);
 		}
 
@@ -69,6 +69,12 @@ public class DataImportCommand implements ProgressIndicator {
 	public void finished() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void printMessage(String message) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

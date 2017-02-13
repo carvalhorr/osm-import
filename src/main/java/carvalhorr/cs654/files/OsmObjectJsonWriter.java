@@ -9,7 +9,7 @@ import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.model.OsmObject;
 
-public class OsmObjectJsonWriter implements OsmObjectFileWriter {
+public class OsmObjectJsonWriter extends OsmObjectFileWriterImpl {
 
 	private String fileName = "";
 
@@ -81,6 +81,7 @@ public class OsmObjectJsonWriter implements OsmObjectFileWriter {
 
 		try {
 			file = new File(fileName);
+			mFullFileName = file.getAbsolutePath();
 
 			writer = new BufferedWriter(new FileWriter(file));
 			writer.write("{ \"objects\": [");

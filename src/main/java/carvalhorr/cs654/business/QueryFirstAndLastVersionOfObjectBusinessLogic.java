@@ -26,6 +26,8 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
  *
  */
 public class QueryFirstAndLastVersionOfObjectBusinessLogic {
+	
+	// TODO Add logic to check if the directory exist and create if it doesn't
 
 	private OsmObject firstVersion = null;
 	private OsmObject lastVersion = null;

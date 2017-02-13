@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import carvalhorr.cs654.business.BaseBusinessLogic;
 import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.exception.CouldNotCreateSchemaException;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
@@ -20,7 +21,7 @@ import carvalhorr.cs654.persistence.OsmDataPersistence;
 import exception.UnexpectedTokenException;
 import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;;
 
-public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
+public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObjectsReadFromFileCallback {
 
 	private long totalNodes = 0;
 	private long totalWays = 0;
@@ -28,18 +29,14 @@ public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
 	private long countProcessedNodes = 0;
 	private long countProcessedWays = 0;
 
-	private ProgressIndicator progressIndicator;
-
 	private OsmDataPersistence persistence = null;
 
-	public static String PROGRESS_TYPE_NODES = "progress_nodes";
-	public static String PROGRESS_TYPE_WAYS = "progress_ways";
+	public static String PROGRESS_TYPE_NODES = "Processing nodes";
+	public static String PROGRESS_TYPE_WAYS = "Processing ways";
 
 	public DataImportBusinessLogic(OsmDataPersistence persistence, ProgressIndicator progressIndicator) {
-		this.progressIndicator = progressIndicator;
+		super(progressIndicator);
 		this.persistence = persistence;
-		// TODO implement calls to progress indicator.
-
 	}
 
 	public void importFile(String fileName) throws IOException, UnexpectedTokenException, NotConnectedToDatabase,
@@ -47,21 +44,23 @@ public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
 
 		try {
 			persistence.createSchema();
+			sendMessage("Database schema created: " + persistence.getSchemaName());
 		} catch (SQLException e) {
 			throw new CouldNotCreateSchemaException(e);
 		}
 
-		// insert initial data
 		userObjectReadFromFile(new OsmUser(-1, "unknown user"));
 
 		long startTime = System.currentTimeMillis();
 
 		DataImportPass1CountLines pass1 = new DataImportPass1CountLines(fileName, this);
 		pass1.countObjects();
+		
+		sendMessage("File contains " + totalNodes + " nodes and " + totalWays + " ways");
 
 		long endTime = System.currentTimeMillis();
 
-		System.out.println("time to count: " + ((endTime - startTime) / 1000));
+		sendMessage("Time spent to count objects " + ((endTime - startTime) / 1000) + " seconds");
 
 		startTime = System.currentTimeMillis();
 
@@ -70,22 +69,25 @@ public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
 
 		try {
 			persistence.createOsmObjectTableIndexes();
+			sendMessage("Finished importing nodes.");
 		} catch (SQLException e) {
 			throw new CouldNotCreateSchemaException(e);
 		}
 
 		endTime = System.currentTimeMillis();
 
-		System.out.println("time to import nodes: " + ((endTime - startTime) / 1000));
+		sendMessage("Time spent to import nodes: " + ((endTime - startTime) / 1000) + " seconds");
 
 		startTime = System.currentTimeMillis();
 
 		DataImportPass3WaysImport pass3 = new DataImportPass3WaysImport(fileName, this);
 		pass3.importFile();
+		sendMessage("Finished importing ways.");
 
 		endTime = System.currentTimeMillis();
 
 		System.out.println("time to import ways: " + ((endTime - startTime) / 1000));
+		sendMessage("Time spent to import ways: " + ((endTime - startTime) / 1000) + " seconds");
 
 	}
 
@@ -107,16 +109,12 @@ public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
 			throw new ErrorInsertingDataToDatabase("Error inserting node ID: " + node.getId(), e);
 		}
 		countProcessedNodes = countProcessedNodes + 1;
-		progressIndicator.updateProgress(PROGRESS_TYPE_NODES, (int) Math.floor(countProcessedNodes / totalNodes));
+		mProgressIndicator.updateProgress(PROGRESS_TYPE_NODES, ((countProcessedNodes * 1f) / totalNodes));
 	}
 
 	@Override
 	public void wayObjectReadFromFile(WayOsmObject way) throws ErrorInsertingDataToDatabase {
 		try {
-
-			if (way.getId() == 3109801 && way.getVersion() == 30) {
-				System.out.println("here");
-			}
 
 			List<String> coordinates = new ArrayList<String>();
 			for (LinkedList<String> coordinatesSegmentIds : way.getNodeIds()) {
@@ -128,11 +126,6 @@ public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
 					coordinates.add(partialCoordinates);
 				}
 			}
-			// String coordinates =
-			// persistence.readCoordinatesForNodes(way.getNodeIds(),
-			// way.getTimestamp()).toString();
-			// String coordinates = persistence.readCoordinatesForNodes(new
-			// ArrayList<String>()).toString();
 			way.setCoordinates(coordinates.toString());
 			way.setGeoJsonType(way.determineGeoJsonType());
 			long wayId = persistence.insertWay(way);
@@ -146,13 +139,12 @@ public class DataImportBusinessLogic implements OsmObjectsReadFromFileCallback {
 		}
 
 		countProcessedWays = countProcessedWays + 1;
-		progressIndicator.updateProgress(PROGRESS_TYPE_WAYS, (int) Math.floor(countProcessedWays / totalWays));
+		mProgressIndicator.updateProgress(PROGRESS_TYPE_WAYS, (countProcessedWays / totalWays));
 	}
 
 	@Override
 	public void userObjectReadFromFile(OsmUser user) throws ErrorInsertingDataToDatabase {
 		try {
-			//System.out.println(user.getUserName());
 			persistence.insertUser(user);
 		} catch (SQLException e) {
 			if (!e.getMessage().startsWith("ERROR: duplicate key value violates unique constraint \"osm_user_pkey\"")) {

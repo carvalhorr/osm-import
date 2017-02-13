@@ -9,6 +9,7 @@ import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
+import carvalhorr.cs654.files.FileUtils;
 import carvalhorr.cs654.files.SummaryEditsCsvWriter;
 import carvalhorr.cs654.files.UserEditsRankingCsvWriter;
 import carvalhorr.cs654.model.DataReadFromDatabaseCallback;
@@ -22,13 +23,19 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
  *
  */
 
-public class QueryEditingSummaryBusinessLogic {
+public class QueryEditingSummaryBusinessLogic extends BaseBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
 
 	private String defaultWorkingDirectory = "";
 
-	public QueryEditingSummaryBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
+	public QueryEditingSummaryBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator) {
+		super(progressIndicator);
+		this.persistence = persistence;
+	}
+
+	public QueryEditingSummaryBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator, String defaultWorkingDirectory) {
+		super(progressIndicator);
 		this.persistence = persistence;
 		this.defaultWorkingDirectory = defaultWorkingDirectory;
 	}
@@ -60,12 +67,13 @@ public class QueryEditingSummaryBusinessLogic {
 			properties.put("total_edits_multipolygon", totalMultiPolygonsEdited);
 			properties.put("total_edits_users", numberUsersEdited);
 			
-			
 			writer.startWritinFile();
 			
 			writer.writeObject(properties, true);
 
 			writer.finishWritingFile();
+			sendMessage("Finished query.");
+			sendMessage("File saved in:" + writer.getFullFileName());
 
 		} catch (ErrorProcessingReadObjectException e) {
 			throw new FailedToCompleteQueryException(e);
@@ -81,6 +89,9 @@ public class QueryEditingSummaryBusinessLogic {
 	public void queryRankingUserEdits(Date startDate, Date finishDate) throws FailedToCompleteQueryException {
 		String fileName = defaultWorkingDirectory + "editing-summary-" + startDate.toString() + "-to-"
 				+ finishDate.toString() + ".csv";
+		if (!FileUtils.directoryExists(defaultWorkingDirectory)) {
+			FileUtils.createDirectoryIfDontExists(defaultWorkingDirectory);
+		}
 		queryRankingUserEdits(startDate, finishDate, fileName);
 	}
 

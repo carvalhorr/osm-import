@@ -3,6 +3,8 @@ package carvalhorr.cs654.command;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -28,6 +30,7 @@ public class ImportCommand implements ProgressIndicator {
 	private String schemaName = "";
 	private String oshFileName = "";
 	private String dbConfig = "database.properties";
+	private Map<String, Float> progressMap = new HashMap<String, Float>();
 
 	public static void main(String[] args) {
 		ImportCommand command = new ImportCommand();
@@ -36,18 +39,29 @@ public class ImportCommand implements ProgressIndicator {
 	}
 
 	@Override
-	public void updateProgress(String type, int progress) {
-		if (progress == 1) {
-			System.out.println("finished " + type);
+	public void updateProgress(String type, float progress) {
+		//System.out.print("\b\b\b\b\b\b\b\b\b\b\b");
+		//System.out.flush();
+		if (progressMap.containsKey(type)) {
+			int currentPercent = (int) Math.floor(progressMap.get(type));
+			int newPercent = (int) Math.floor(progress);
+			if (newPercent > currentPercent) {
+				System.out.printf(type + " : %3.0f%%\r", progress);
+			}
 		}
-
+		progressMap.put(type, progress);
 	}
 
 	@Override
 	public void finished() {
-		// TODO Auto-generated method stub
 
 	}
+	
+	@Override
+	public void printMessage(String message) {
+		System.out.println(message);
+	}
+
 
 	public void parseParameters(String[] args) {
 		Options options = new Options();
@@ -60,7 +74,7 @@ public class ImportCommand implements ProgressIndicator {
 		file.setRequired(true);
 		options.addOption(file);
 
-		Option dbConfig = new Option("db", "database-properties", true, "database configuration properties file");
+		Option dbConfig = new Option("db", "database-properties", true, "(OPTIONAL) database configuration properties file (if not provided the default database.properties will be used)");
 		dbConfig.setRequired(false);
 		options.addOption(dbConfig);
 
@@ -71,9 +85,8 @@ public class ImportCommand implements ProgressIndicator {
 		try {
 			cmd = parser.parse(options, args);
 		} catch (ParseException e) {
-			System.out.println(e.getMessage());
 			formatter.printHelp("java -jar import.jar", options);
-
+			System.out.println(e.getMessage());
 			System.exit(1);
 			return;
 		}
@@ -89,9 +102,10 @@ public class ImportCommand implements ProgressIndicator {
 		
 		parseParameters(args);
 		
-		System.out.println("area " + schemaName);
-		System.out.println("osh file " + oshFileName);
-		System.out.println("database properties " + dbConfig);
+		System.out.println("PROCESSING FILE");
+		System.out.println("Area name :" + schemaName);
+		System.out.println("OSH file :" + oshFileName);
+		System.out.println("Database properties file :" + dbConfig);
 		
 		
 		
@@ -108,6 +122,7 @@ public class ImportCommand implements ProgressIndicator {
 					config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
 		} catch (SQLException | PostgresqlDriverNotFound | ErrorConnectingToDatabase e1) {
 			System.out.println("Error connecting to the database: " + e1.getMessage());
+			System.exit(1);
 		}
 
 		try {
@@ -116,19 +131,19 @@ public class ImportCommand implements ProgressIndicator {
 		} catch (FileNotFoundException ex) {
 			System.out.println("File does not exist: " + oshFileName);
 		} catch (IOException e) {
-			System.out.println("IOException");
+			System.out.println("An error occurred while trying to read the file: " + oshFileName);
+			System.out.println(e.getMessage());
 		} catch (UnexpectedTokenException e) {
+			System.out.println("An error was found while processing the OSH file");
 			System.out.println(e.getMessage());
 		} catch (NotConnectedToDatabase e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("The system is not connected to the database.");
 		} catch (ErrorInsertingDataToDatabase e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("An error occurred while inserting data to the database: " + e.getMessage());
 		} catch (CouldNotCreateSchemaException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("An error occurred while creating the database schema : " + e.getMessage());
 		}
 	}
+
 
 }

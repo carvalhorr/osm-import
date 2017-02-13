@@ -16,7 +16,7 @@ import carvalhorr.cs654.model.OsmObject;
  * @author carvalhorr
  *
  */
-public class SummaryEditsCsvWriter implements OsmObjectFileWriter {
+public class SummaryEditsCsvWriter extends OsmObjectFileWriterImpl {
 
 	private String fileName = "";
 
@@ -59,6 +59,7 @@ public class SummaryEditsCsvWriter implements OsmObjectFileWriter {
 
 		try {
 			file = new File(fileName);
+			mFullFileName = file.getAbsolutePath();
 
 			writer = new BufferedWriter(new FileWriter(file));
 
