@@ -25,7 +25,7 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
  * @author carvalhorr
  *
  */
-public class QueryFirstAndLastVersionOfObjectBusinessLogic {
+public class QueryFirstAndLastVersionOfObjectBusinessLogic extends BaseBusinessLogic  {
 	
 	// TODO Add logic to check if the directory exist and create if it doesn't
 
@@ -34,12 +34,9 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
 
-	private String defaultWorkingDirectory = "";
-
-	public QueryFirstAndLastVersionOfObjectBusinessLogic(OshQueryPersistence persistence,
-			String defaultWorkingDirectory) {
+	public QueryFirstAndLastVersionOfObjectBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator) {
+		super(progressIndicator);
 		this.persistence = persistence;
-		this.defaultWorkingDirectory = defaultWorkingDirectory;
 	}
 
 	/**
@@ -100,6 +97,9 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic {
 			}
 
 			fileWriter.finishWritingFile();
+			sendMessage("Query finished.");
+			sendMessage("File saved in:" + fileWriter.getFullFileName());
+
 		} catch (ErrorProcessingReadObjectException e) {
 			throw new FailedToCompleteQueryException(e);
 		} catch (ErrorWritingToFileException e) {
@@ -129,11 +129,11 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic {
 		String fileName = "";
 		switch (type) {
 		case NODE: {
-			fileName = defaultWorkingDirectory + "node-" + id + "-first-and-last";
+			fileName = "node-" + id + "-first-and-last";
 			break;
 		}
 		case WAY: {
-			fileName = defaultWorkingDirectory + "way-" + id + "-first-and-last";
+			fileName = "way-" + id + "-first-and-last";
 			break;
 		}
 		default:

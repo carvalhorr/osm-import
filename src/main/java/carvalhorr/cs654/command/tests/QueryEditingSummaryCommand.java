@@ -45,8 +45,7 @@ public class QueryEditingSummaryCommand implements ProgressIndicator {
 		OshQueryPersistence persistence = new OshQueryPersistence(config.getConfigurationForKey("jdbcString"),
 				config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
 
-		QueryEditingSummaryBusinessLogic business = new QueryEditingSummaryBusinessLogic(persistence, this,
-				workingDirectory);
+		QueryEditingSummaryBusinessLogic business = new QueryEditingSummaryBusinessLogic(persistence, this);
 
 		String DEFAULT_PATTERN = "yyyy-MM-dd hh:mm:ss";
 		DateFormat formatter = new SimpleDateFormat(DEFAULT_PATTERN);

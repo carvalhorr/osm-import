@@ -1,10 +1,15 @@
 package carvalhorr.cs654.command;
 
-public abstract class BaseCommand {
-	protected void printMessage(String message) {
+import carvalhorr.cs654.business.ProgressIndicator;
+
+public abstract class BaseCommand implements ProgressIndicator {
+	
+	public void printMessage(String message) {
 		System.out.println(message);
 	}
-	protected void printFatalError(String errorMessage) {
+	public void printFatalError(String errorMessage) {
 		System.out.println("FATAL ERROR: " + errorMessage);
 	}
+	
+	public abstract void printHeader();
 }

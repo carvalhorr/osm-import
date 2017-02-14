@@ -16,6 +16,9 @@ import org.apache.commons.cli.ParseException;
 
 import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.business.QueryEditingSummaryBusinessLogic;
+import carvalhorr.cs654.command.query.QueryEditingSummarySubCommand;
+import carvalhorr.cs654.command.query.QueryFirstAndLastObjectSubCommand;
+import carvalhorr.cs654.command.query.QueryObjectsByIdSubCommand;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
@@ -23,7 +26,7 @@ import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
-public class QueryCommand extends BaseCommand implements ProgressIndicator {
+public class QueryCommand extends BaseCommand implements QueryParams {
 
 	public static void main(String[] args) {
 		QueryCommand queryCommand = new QueryCommand();
@@ -45,6 +48,8 @@ public class QueryCommand extends BaseCommand implements ProgressIndicator {
 		} catch (FailedToCompleteQueryException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (IllegalArgumentException e ) {
+			
 		}
 	}
 
@@ -52,9 +57,11 @@ public class QueryCommand extends BaseCommand implements ProgressIndicator {
 	private String mFileName = "";
 	private String mDbConfig = "database.properties";
 	private String mQueryType = "";
-	private String mOutputType = "";
 	private String mStartDate = "";
 	private String mEndDate = "";
+	private String mObjectType = "";
+	private String mObjectId = "";
+	private String mOutputFormat = "";
 
 	private OshQueryPersistence persistence = null;
 
@@ -93,7 +100,17 @@ public class QueryCommand extends BaseCommand implements ProgressIndicator {
 				"(mandatory for editing-summary query) The end date to query in the format yyyy-MM-dd hh:mm:ss");
 		endDate.setRequired(false);
 		options.addOption(endDate);
+		
+		Option objectType = new Option("ot", "object-type",true,
+				"Type of the object to query.");
+		objectType.setRequired(false);
+		options.addOption(objectType);
 
+		Option objectId = new Option("id", "object-id",true,
+				"ID of the object to query.");
+		objectId.setRequired(false);
+		options.addOption(objectId);
+		
 		CommandLineParser parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLine cmd;
@@ -114,13 +131,16 @@ public class QueryCommand extends BaseCommand implements ProgressIndicator {
 			this.mDbConfig = cmd.getOptionValue("database-properties");
 		}
 		this.mQueryType = cmd.getOptionValue("query-type");
-		this.mOutputType = cmd.getOptionValue("output-format");
+		this.mOutputFormat = cmd.getOptionValue("output-format");
 		this.mStartDate = cmd.getOptionValue("start-date");
 		this.mEndDate = cmd.getOptionValue("end-date");
+		this.mObjectType = cmd.getOptionValue("object-type");
+		this.mObjectId = cmd.getOptionValue("object-id");
+		
 	}
 
-	public void exportFile()
-			throws SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException, FailedToCompleteQueryException {
+	public void exportFile() throws SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase,
+			SchemaDoesNotExistException, FailedToCompleteQueryException {
 
 		Configuration config = new Configuration();
 		try {
@@ -135,15 +155,18 @@ public class QueryCommand extends BaseCommand implements ProgressIndicator {
 
 		switch (mQueryType) {
 		case "editing-summary": {
-			queryEditingSummary();
+			QueryEditingSummarySubCommand subCommand = new QueryEditingSummarySubCommand();
+			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "first-and-last": {
-			queryFirstAndLast();
+			QueryFirstAndLastObjectSubCommand subCommand = new QueryFirstAndLastObjectSubCommand();
+			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "objects-by-id": {
-			queryObjectsById();
+			QueryObjectsByIdSubCommand subCommand = new QueryObjectsByIdSubCommand();
+			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "objects-by-tag": {
@@ -162,8 +185,9 @@ public class QueryCommand extends BaseCommand implements ProgressIndicator {
 			break;
 		}
 	}
-	
-	private void printHeader() {
+
+	@Override
+	public void printHeader() {
 		printMessage("PROCESSING FILE");
 		printMessage("Area name : " + mSchemaName);
 		printMessage("Query type : " + mQueryType);
@@ -172,47 +196,8 @@ public class QueryCommand extends BaseCommand implements ProgressIndicator {
 		} else {
 			printMessage("Output file name : " + mFileName);
 		}
-		printMessage("Output format : " + mOutputType);
+		printMessage("Output format : " + mOutputFormat);
 		printMessage("Database properties file : " + mDbConfig);
-	}
-
-	private void queryEditingSummary() throws FailedToCompleteQueryException {
-		if (mOutputType == null || mOutputType.equals("")) {
-			mOutputType = "CSV";
-		}
-		String summaryUsageMessage = "USAGE: java -jar QueryOsh --query-type editing-summary --area <area_name> --start-date \"<start_date>\" --end-date \"<end_date>\" (OPTIONAL) --file \"<file_name>\"";
-		if (mStartDate == null || mStartDate.equals("") || mEndDate == null || mEndDate.equals("")) {
-			printFatalError(
-					"It is mandatory to provide both the start and end dates for querying the editing summary.");
-			printMessage(summaryUsageMessage);
-			System.exit(1);
-		}
-
-		QueryEditingSummaryBusinessLogic business = new QueryEditingSummaryBusinessLogic(persistence, this);
-
-		String DEFAULT_PATTERN = "yyyy-MM-dd hh:mm:ss";
-		DateFormat formatter = new SimpleDateFormat(DEFAULT_PATTERN);
-
-		try {
-			Date startDate = formatter.parse(mStartDate);
-			Date endDate = formatter.parse(mEndDate);
-			printHeader();
-			printMessage("Start date : " + mStartDate);
-			printMessage("End date : " + mEndDate);
-			printMessage("");
-			if (mFileName == null || mFileName.equals("")) {
-				business.queryRankingUserEdits(startDate, endDate);
-			} else {
-				business.queryRankingUserEdits(startDate, endDate, mFileName);
-			}
-		} catch (java.text.ParseException e) {
-			printFatalError("The start and end date must be in the format yyyy-MM-dd hh:mm:ss.");
-			printMessage(summaryUsageMessage);
-		}
-	}
-
-	private void queryFirstAndLast() {
-
 	}
 
 	private void queryObjectsById() {
@@ -246,6 +231,51 @@ public class QueryCommand extends BaseCommand implements ProgressIndicator {
 	public void finished() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public String getSchemaName() {
+		return mSchemaName;
+	}
+
+	@Override
+	public String getFileName() {
+		return mFileName;
+	}
+
+	@Override
+	public String getDbConfig() {
+		return mDbConfig;
+	}
+
+	@Override
+	public String getQueryType() {
+		return mQueryType;
+	}
+
+	@Override
+	public String getStartDate() {
+		return mStartDate;
+	}
+
+	@Override
+	public String getEndDate() {
+		return mEndDate;
+	}
+
+	@Override
+	public String getObjectType() {
+		return mObjectType;
+	}
+
+	@Override
+	public String getObjectId() {
+		return mObjectId;
+	}
+
+	@Override
+	public String getOutputFormat() {
+		return mOutputFormat;
 	}
 
 }

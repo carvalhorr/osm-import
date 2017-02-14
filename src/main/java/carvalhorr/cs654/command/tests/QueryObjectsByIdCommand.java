@@ -3,6 +3,7 @@ package carvalhorr.cs654.command.tests;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
+import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.business.QueryObjectsByIdBusinessLogic;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
@@ -18,10 +19,15 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
  * @author carvalhorr
  *
  */
-public class QueryObjectsByIdCommand {
+public class QueryObjectsByIdCommand implements ProgressIndicator {
 
 	public static void main(String[] args) throws FailedToCompleteQueryException, SQLException,
 			PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException, FileNotFoundException {
+		QueryObjectsByIdCommand command =  new QueryObjectsByIdCommand();
+		command.process();
+	}
+	
+	public void process() throws FileNotFoundException, FailedToCompleteQueryException, SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException {
 
 		String schemaName = "nottingham";
 		//String workingDirectory = "/home/carvalhorr/maynooth-dissertation/output/";
@@ -34,11 +40,30 @@ public class QueryObjectsByIdCommand {
 		OshQueryPersistence persistence = new OshQueryPersistence(config.getConfigurationForKey("jdbcString"),
 				config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
 
-		QueryObjectsByIdBusinessLogic business = new QueryObjectsByIdBusinessLogic(persistence, workingDirectory);
+		QueryObjectsByIdBusinessLogic business = new QueryObjectsByIdBusinessLogic(persistence, this);
 
 		business.queryObjectsById(ExportFormatType.JSON, OsmObjectType.NODE, 306119848);
 		business.queryObjectsById(ExportFormatType.GEOJSON, OsmObjectType.NODE, 306119848);
 		business.queryObjectsById(ExportFormatType.CSV, OsmObjectType.NODE, 306119848);
+		
+	}
+
+	@Override
+	public void updateProgress(String type, float progress) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void printMessage(String message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void finished() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

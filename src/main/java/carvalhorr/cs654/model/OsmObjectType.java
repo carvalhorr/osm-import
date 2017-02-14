@@ -1,5 +1,7 @@
 package carvalhorr.cs654.model;
 
+import carvalhorr.cs654.files.ExportFormatType;
+
 public enum OsmObjectType {
 	NODE("N"), WAY("W");
 	
@@ -12,6 +14,21 @@ public enum OsmObjectType {
     public boolean equalsName(String otherCode) {
         return (otherCode == null) ? false : code.equals(otherCode);
     }
+    
+    public static OsmObjectType fromString(String type) {
+    	String formatLowerCase = type.toLowerCase();
+    	switch (formatLowerCase) {
+		case "way": {
+			return WAY;
+		} 
+		case "node": {
+			return NODE;
+		}
+		default:
+			throw new IllegalArgumentException("Objecty type not supperted: " + type);
+		}
+    }
+
 
     public String toString() {
        return this.code;

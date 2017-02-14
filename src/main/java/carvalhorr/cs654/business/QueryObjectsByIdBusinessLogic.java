@@ -25,15 +25,13 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
  * @author carvalhorr
  *
  */
-public class QueryObjectsByIdBusinessLogic {
+public class QueryObjectsByIdBusinessLogic extends BaseBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
 	
-	private String defaultWorkingDirectory = "";
-
-	public QueryObjectsByIdBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
+	public QueryObjectsByIdBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator) {
+		super(progressIndicator);
 		this.persistence = persistence;
-		this.defaultWorkingDirectory = defaultWorkingDirectory;
 	}
 
 	/**
@@ -78,6 +76,9 @@ public class QueryObjectsByIdBusinessLogic {
 			});
 
 			writer.finishWritingFile();
+			sendMessage("Query finished.");
+			sendMessage("File saved in:" + writer.getFullFileName());
+
 		} catch (ErrorProcessingReadObjectException e) {
 			throw new FailedToCompleteQueryException(e);
 		} catch (ErrorWritingToFileException e) {
@@ -106,11 +107,11 @@ public class QueryObjectsByIdBusinessLogic {
 		String fileName = "";
 		switch (type) {
 		case NODE: {
-			fileName = defaultWorkingDirectory + "node-" + id + "-all-versions";
+			fileName = "node-" + id + "-all-versions";
 			break;
 		}
 		case WAY: {
-			fileName = defaultWorkingDirectory + "way-" + id + "-all-versions";
+			fileName = "way-" + id + "-all-versions";
 			break;
 		}
 		default:

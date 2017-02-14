@@ -1,5 +1,7 @@
 package carvalhorr.cs654.business;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,19 +27,14 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 public class QueryEditingSummaryBusinessLogic extends BaseBusinessLogic {
 
-	private OshQueryPersistence persistence = null;
+	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-	private String defaultWorkingDirectory = "";
+	
+	private OshQueryPersistence persistence = null;
 
 	public QueryEditingSummaryBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator) {
 		super(progressIndicator);
 		this.persistence = persistence;
-	}
-
-	public QueryEditingSummaryBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator, String defaultWorkingDirectory) {
-		super(progressIndicator);
-		this.persistence = persistence;
-		this.defaultWorkingDirectory = defaultWorkingDirectory;
 	}
 
 	public void queryRankingUserEdits(Date startDate, Date finishDate, String fileName)
@@ -72,7 +69,7 @@ public class QueryEditingSummaryBusinessLogic extends BaseBusinessLogic {
 			writer.writeObject(properties, true);
 
 			writer.finishWritingFile();
-			sendMessage("Finished query.");
+			sendMessage("Query finished.");
 			sendMessage("File saved in:" + writer.getFullFileName());
 
 		} catch (ErrorProcessingReadObjectException e) {
@@ -87,11 +84,9 @@ public class QueryEditingSummaryBusinessLogic extends BaseBusinessLogic {
 	}
 
 	public void queryRankingUserEdits(Date startDate, Date finishDate) throws FailedToCompleteQueryException {
-		String fileName = defaultWorkingDirectory + "editing-summary-" + startDate.toString() + "-to-"
-				+ finishDate.toString() + ".csv";
-		if (!FileUtils.directoryExists(defaultWorkingDirectory)) {
-			FileUtils.createDirectoryIfDontExists(defaultWorkingDirectory);
-		}
+		DateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+		String fileName = "editing-summary-" + formatter.format(startDate) + "-to-"
+				+ formatter.format(finishDate) + ".csv";
 		queryRankingUserEdits(startDate, finishDate, fileName);
 	}
 
