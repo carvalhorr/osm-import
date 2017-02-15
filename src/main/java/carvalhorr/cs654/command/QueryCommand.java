@@ -25,6 +25,7 @@ import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
+import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 public class QueryCommand extends BaseCommand implements QueryParams {
@@ -282,6 +283,11 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 	@Override
 	public String getOutputFormat() {
 		return mOutputFormat;
+	}
+	
+	@Override
+	public void setOutputFormat(String format) {
+		mOutputFormat = format;
 	}
 
 }

@@ -10,4 +10,5 @@ public interface QueryParams {
 	String getObjectType();
 	String getObjectId();
 	String getOutputFormat();
+	void setOutputFormat(String format);
 }

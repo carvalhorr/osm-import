@@ -22,15 +22,13 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
  *
  */
 
-public class QueryRankingUserEditsBusinessLogic {
+public class QueryRankingUserEditsBusinessLogic extends BaseBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
 	
-	private String defaultWorkingDirectory = "";
-
-	public QueryRankingUserEditsBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
+	public QueryRankingUserEditsBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator) {
+		super(progressIndicator);
 		this.persistence = persistence;
-		this.defaultWorkingDirectory = defaultWorkingDirectory;
 	}
 
 	public void queryRankingUserEdits(String fileName)
@@ -61,7 +59,7 @@ public class QueryRankingUserEditsBusinessLogic {
 	}
 
 	public void queryRankingUserEdits() throws FailedToCompleteQueryException {
-		String fileName = defaultWorkingDirectory + "ranking-user-edits.csv";
+		String fileName = "ranking-user-edits.csv";
 		queryRankingUserEdits(fileName);
 	}
 

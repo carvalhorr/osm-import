@@ -7,18 +7,19 @@ import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.command.QueryParams;
 import carvalhorr.cs654.command.QueryParamsParser;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
+import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 public class QueryEditingSummarySubCommand extends BaseSubCommand {
 
+	private ExportFormatType defaultExportFormat = ExportFormatType.GEOJSON;
 	private static final String mUsageMessage = "USAGE: java -jar QueryOsh --query-type editing-summary --area <area_name> --start-date \"<start_date>\" --end-date \"<end_date>\" (OPTIONAL) --file \"<file_name>\"";
 
 	@Override
 	public void executeSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence)
 			throws FailedToCompleteQueryException {
-		String outputType = params.getOutputFormat();
-		if (outputType == null || outputType.equals("")) {
-			outputType = "GEOJSON";
+		if (params.getOutputFormat() == null || params.getOutputFormat().equals("")) {
+			params.setOutputFormat(defaultExportFormat.toString());
 		}
 
 		QueryEditingSummaryBusinessLogic business = new QueryEditingSummaryBusinessLogic(persistence, command);

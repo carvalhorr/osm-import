@@ -17,6 +17,9 @@ public class QueryObjectsByIdSubCommand extends BaseSubCommand {
 	@Override
 	public void executeSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence)
 			throws FailedToCompleteQueryException {
+		if (params.getOutputFormat() == null || params.getOutputFormat().equals("")) {
+			params.setOutputFormat(defaultExportFormat.toString());
+		}
 		
 		ExportFormatType outputFormat = QueryParamsParser.parseExportFormatType(command, params, defaultExportFormat, mUsageMessage);
 		OsmObjectType objectType = QueryParamsParser.parseObjectType(command, params, mUsageMessage);
