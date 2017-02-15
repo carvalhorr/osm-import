@@ -26,15 +26,13 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
  * @author carvalhorr
  *
  */
-public class QueryLatestVersionObjectsBusinessLogic {
+public class QueryLatestVersionObjectsBusinessLogic extends BaseBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
 
-	private String defaultWorkingDirectory = "";
-
-	public QueryLatestVersionObjectsBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
+	public QueryLatestVersionObjectsBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator) {
+		super(progressIndicator);
 		this.persistence = persistence;
-		this.defaultWorkingDirectory = defaultWorkingDirectory;
 	}
 
 	/**
@@ -92,6 +90,9 @@ public class QueryLatestVersionObjectsBusinessLogic {
 			});
 
 			writer.finishWritingFile();
+			sendMessage("Query finished.");
+			sendMessage("File saved in:" + writer.getFullFileName());
+
 		} catch (ErrorProcessingReadObjectException e) {
 			throw new FailedToCompleteQueryException(e);
 		} catch (ErrorWritingToFileException e) {
@@ -115,7 +116,7 @@ public class QueryLatestVersionObjectsBusinessLogic {
 	 * @throws ErrorWritingToFileException
 	 */
 	public void queryLatestVersionAllObjects(ExportFormatType format) throws FailedToCompleteQueryException {
-		String fileName = defaultWorkingDirectory + "all-objects-latest-version";
+		String fileName = "all-objects-latest-version";
 		queryLatestVersionAllObjects(format, fileName);
 	}
 

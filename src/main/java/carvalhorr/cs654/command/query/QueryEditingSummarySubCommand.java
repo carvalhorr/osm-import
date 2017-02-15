@@ -1,12 +1,11 @@
 package carvalhorr.cs654.command.query;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import carvalhorr.cs654.business.QueryEditingSummaryBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.command.QueryParams;
+import carvalhorr.cs654.command.QueryParamsParser;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
@@ -21,21 +20,12 @@ public class QueryEditingSummarySubCommand extends BaseSubCommand {
 		if (outputType == null || outputType.equals("")) {
 			outputType = "GEOJSON";
 		}
-		if (params.getStartDate() == null || params.getStartDate().equals("") || params.getEndDate() == null
-				|| params.getEndDate().equals("")) {
-			command.printFatalError(
-					"It is mandatory to provide both the start and end dates for querying the editing summary.");
-			command.printMessage(mUsageMessage);
-			System.exit(1);
-		}
 
 		QueryEditingSummaryBusinessLogic business = new QueryEditingSummaryBusinessLogic(persistence, command);
 
-		DateFormat formatter = new SimpleDateFormat(QueryEditingSummaryBusinessLogic.DATE_FORMAT);
-
 		try {
-			Date startDate = formatter.parse(params.getStartDate());
-			Date endDate = formatter.parse(params.getEndDate());
+			Date startDate = QueryParamsParser.parseStartDate(command, params, mUsageMessage);
+			Date endDate = QueryParamsParser.parseEndDate(command, params, mUsageMessage);
 			command.printHeader();
 			command.printMessage("Start date : " + params.getStartDate());
 			command.printMessage("End date : " + params.getEndDate());

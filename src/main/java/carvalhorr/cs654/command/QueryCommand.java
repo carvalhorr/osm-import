@@ -18,6 +18,7 @@ import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.business.QueryEditingSummaryBusinessLogic;
 import carvalhorr.cs654.command.query.QueryEditingSummarySubCommand;
 import carvalhorr.cs654.command.query.QueryFirstAndLastObjectSubCommand;
+import carvalhorr.cs654.command.query.QueryLatestVersionAllObjectsSubCommand;
 import carvalhorr.cs654.command.query.QueryObjectsByIdSubCommand;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
@@ -73,7 +74,7 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 		options.addOption(area);
 
 		Option queryType = new Option("t", "query-type", true,
-				"Type of the query: editing-summary, first-and-last, objects-by-id, objects-by-tag, user-edit-ranking, all-edits-for-user.");
+				"Type of the query: editing-summary, first-and-last, latest-version-all-objects, objects-by-id, objects-by-tag, user-edit-ranking, all-edits-for-user.");
 		queryType.setRequired(true);
 		options.addOption(queryType);
 
@@ -162,6 +163,11 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 		case "first-and-last": {
 			QueryFirstAndLastObjectSubCommand subCommand = new QueryFirstAndLastObjectSubCommand();
 			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
+			break;
+		}
+		case "latest-version-all-objects": {
+			QueryLatestVersionAllObjectsSubCommand subCommand = new QueryLatestVersionAllObjectsSubCommand();
+			subCommand.executeSubCommand((BaseCommand) this,(QueryParams) this, persistence);
 			break;
 		}
 		case "objects-by-id": {

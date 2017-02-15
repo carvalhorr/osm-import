@@ -3,6 +3,7 @@ package carvalhorr.cs654.command.query;
 import carvalhorr.cs654.business.QueryFirstAndLastVersionOfObjectBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.command.QueryParams;
+import carvalhorr.cs654.command.QueryParamsParser;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.model.OsmObjectType;
@@ -17,9 +18,9 @@ public class QueryFirstAndLastObjectSubCommand extends BaseSubCommand {
 	public void executeSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence)
 			throws FailedToCompleteQueryException {
 
-		ExportFormatType outputFormat = QueryObjectsByIdSubCommand.parseExportFormatType(command, params, defaultExportFormat, mUsageMessage);
-		OsmObjectType objectType = QueryObjectsByIdSubCommand.parseObjectType(command, params, mUsageMessage);
-		long objectId = QueryObjectsByIdSubCommand.parseObjectId(command, params, mUsageMessage);
+		ExportFormatType outputFormat = QueryParamsParser.parseExportFormatType(command, params, defaultExportFormat, mUsageMessage);
+		OsmObjectType objectType = QueryParamsParser.parseObjectType(command, params, mUsageMessage);
+		long objectId = QueryParamsParser.parseObjectId(command, params, mUsageMessage);
 
 
 		QueryFirstAndLastVersionOfObjectBusinessLogic business = new QueryFirstAndLastVersionOfObjectBusinessLogic(
