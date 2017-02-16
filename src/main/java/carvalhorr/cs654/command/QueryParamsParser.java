@@ -10,16 +10,19 @@ import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.model.OsmObjectType;
 
 public class QueryParamsParser {
-	
-	public static Date parseStartDate(BaseCommand command, QueryParams params, String usageMessage) throws ParseException {
+
+	public static Date parseStartDate(BaseCommand command, QueryParams params, String usageMessage)
+			throws ParseException {
 		return parseDate(command, params, usageMessage, params.getStartDate());
 	}
-	
-	public static Date parseEndDate(BaseCommand command, QueryParams params, String usageMessage) throws ParseException {
+
+	public static Date parseEndDate(BaseCommand command, QueryParams params, String usageMessage)
+			throws ParseException {
 		return parseDate(command, params, usageMessage, params.getEndDate());
 	}
-	
-	private static Date parseDate(BaseCommand command, QueryParams params, String usageMessage, String dateString) throws ParseException {
+
+	private static Date parseDate(BaseCommand command, QueryParams params, String usageMessage, String dateString)
+			throws ParseException {
 		if (dateString == null || dateString.equals("")) {
 			command.printFatalError(
 					"It is mandatory to provide both the start and end dates for querying the editing summary.");
@@ -30,8 +33,8 @@ public class QueryParamsParser {
 		Date startDate = formatter.parse(dateString);
 		return startDate;
 	}
-	
-	public static ExportFormatType parseExportFormatType(BaseCommand command, QueryParams params, 
+
+	public static ExportFormatType parseExportFormatType(BaseCommand command, QueryParams params,
 			ExportFormatType defaultExportFormat, String usageMessage) {
 		ExportFormatType returnValue = null;
 		if (params.getOutputFormat() == null || params.getOutputFormat().equals("")) {
@@ -47,7 +50,7 @@ public class QueryParamsParser {
 		}
 		return returnValue;
 	}
-	
+
 	public static OsmObjectType parseObjectType(BaseCommand command, QueryParams params, String usageMessage) {
 		OsmObjectType objectType = null;
 
@@ -60,7 +63,7 @@ public class QueryParamsParser {
 		}
 		return objectType;
 	}
-	
+
 	public static long parseObjectId(BaseCommand command, QueryParams params, String usageMessage) {
 		long objectId = 0;
 
@@ -72,6 +75,18 @@ public class QueryParamsParser {
 			System.exit(1);
 		}
 		return objectId;
+	}
+
+	public static long parseUserId(BaseCommand command, QueryParams params, String usageMessage) {
+		long userId = 0;
+		try {
+			userId = Long.parseLong(params.getUserId());
+		} catch (NumberFormatException e) {
+			command.printFatalError("User id must be numeric");
+			command.printMessage(usageMessage);
+			System.exit(1);
+		}
+		return userId;
 	}
 
 }

@@ -21,15 +21,13 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
  * @author carvalhorr
  *
  */
-public class QueryAllEditsPerformedByUserBusinessLogic {
+public class QueryAllEditsPerformedByUserBusinessLogic extends BaseBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
 
-	private String defaultWorkingDirectory = "";
-
-	public QueryAllEditsPerformedByUserBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
+	public QueryAllEditsPerformedByUserBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator) {
+		super(progressIndicator);
 		this.persistence = persistence;
-		this.defaultWorkingDirectory = defaultWorkingDirectory;
 	}
 
 	/**
@@ -49,7 +47,7 @@ public class QueryAllEditsPerformedByUserBusinessLogic {
 
 	public void exportAllEditsPerformedByUSer(ExportFormatType format, long userId)
 			throws FailedToCompleteQueryException {
-		String fileName = defaultWorkingDirectory + "changes-by-user-" + userId + "." + format.toString();
+		String fileName = "changes-by-user-" + userId + "." + format.toString();
 		exportAllEditsPerformedByUSer(format, userId, fileName);
 	}
 

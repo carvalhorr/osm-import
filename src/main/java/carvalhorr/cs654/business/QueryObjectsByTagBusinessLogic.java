@@ -21,15 +21,13 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
  * @author carvalhorr
  *
  */
-public class QueryObjectsByTagBusinessLogic {
+public class QueryObjectsByTagBusinessLogic extends BaseBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
 	
-	private String defaultWorkingDirectory = "";
-
-	public QueryObjectsByTagBusinessLogic(OshQueryPersistence persistence, String defaultWorkingDirectory) {
+	public QueryObjectsByTagBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator) {
+		super(progressIndicator);
 		this.persistence = persistence;
-		this.defaultWorkingDirectory = defaultWorkingDirectory;
 	}
 
 	/**
@@ -100,7 +98,7 @@ public class QueryObjectsByTagBusinessLogic {
 	 * @throws ErrorWritingToFileException
 	 */
 	public void queryObjectsByTag(ExportFormatType format, String tagName, String tagValue) throws FailedToCompleteQueryException {
-		String fileName = defaultWorkingDirectory + "tag-" + tagName + "-" + tagValue + "." + format.toString();
+		String fileName = "tag-" + tagName + "-" + tagValue + "." + format.toString();
 		queryObjectsByTag(format, tagName, tagValue, fileName);
 	}
 	

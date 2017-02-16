@@ -16,6 +16,7 @@ import org.apache.commons.cli.ParseException;
 
 import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.business.QueryEditingSummaryBusinessLogic;
+import carvalhorr.cs654.command.query.QueryAllEditsByUserSubCommand;
 import carvalhorr.cs654.command.query.QueryEditingSummarySubCommand;
 import carvalhorr.cs654.command.query.QueryFirstAndLastObjectSubCommand;
 import carvalhorr.cs654.command.query.QueryLatestVersionAllObjectsSubCommand;
@@ -65,6 +66,9 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 	private String mObjectType = "";
 	private String mObjectId = "";
 	private String mOutputFormat = "";
+	private String mTagName = "";
+	private String mTagValue = "";
+	private String mUserId = "";
 
 	private OshQueryPersistence persistence = null;
 
@@ -114,6 +118,21 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 		objectId.setRequired(false);
 		options.addOption(objectId);
 		
+		Option tagName = new Option("tn", "tag-name", true,
+				"Tag name");
+		tagName.setRequired(false);
+		options.addOption(tagName);
+		
+		Option tagValue = new Option("tv", "tag-value", true,
+				"Tag value");
+		tagValue.setRequired(false);
+		options.addOption(tagValue);
+		
+		Option userId = new Option("u", "user-id", true,
+				"User id");
+		userId.setRequired(false);
+		options.addOption(userId);
+		
 		CommandLineParser parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLine cmd;
@@ -139,7 +158,9 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 		this.mEndDate = cmd.getOptionValue("end-date");
 		this.mObjectType = cmd.getOptionValue("object-type");
 		this.mObjectId = cmd.getOptionValue("object-id");
-		
+		this.mTagName = cmd.getOptionValue("tag-name");
+		this.mTagValue = cmd.getOptionValue("tag-value");
+		this.mUserId = cmd.getOptionValue("user-id");
 	}
 
 	public void exportFile() throws SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase,
@@ -178,7 +199,8 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 			break;
 		}
 		case "objects-by-tag": {
-			queryObjectsByTag();
+			QueryObjectsByIdSubCommand subCommand = new QueryObjectsByIdSubCommand();
+			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "user-edit-ranking": {
@@ -187,7 +209,8 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 			break;
 		}
 		case "all-edits-for-user": {
-			queryAllEditsForUser();
+			QueryAllEditsByUserSubCommand subCommand = new QueryAllEditsByUserSubCommand();
+			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		default:
@@ -207,22 +230,6 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 		}
 		printMessage("Output format : " + mOutputFormat);
 		printMessage("Database properties file : " + mDbConfig);
-	}
-
-	private void queryObjectsById() {
-
-	}
-
-	private void queryObjectsByTag() {
-
-	}
-
-	private void queryUserEditRanking() {
-
-	}
-
-	private void queryAllEditsForUser() {
-
 	}
 
 	@Override
@@ -290,6 +297,21 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 	@Override
 	public void setOutputFormat(String format) {
 		mOutputFormat = format;
+	}
+
+	@Override
+	public String getTagName() {
+		return mTagName;
+	}
+
+	@Override
+	public String getTagValue() {
+		return mTagValue;
+	}
+
+	@Override
+	public String getUserId() {
+		return mUserId;
 	}
 
 }
