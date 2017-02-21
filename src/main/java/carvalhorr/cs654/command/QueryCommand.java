@@ -39,19 +39,14 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 		try {
 			queryCommand.exportFile();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (PostgresqlDriverNotFound e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ErrorConnectingToDatabase e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SchemaDoesNotExistException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FailedToCompleteQueryException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e ) {
 			
