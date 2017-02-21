@@ -10,7 +10,7 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
 public class QueryUserEditsRankingSubCommand extends BaseSubCommand {
 
 	private ExportFormatType defaultExportFormat = ExportFormatType.CSV;
-	private static final String mUsageMessage = "USAGE: java -jar QueryOsh --query-type user-edit-ranking --area <area_name> (OPTIONAL) --output-format <(default) CSV | JSON | GEOJSON> (OPTIONAL) --file \"<file_name>\"";
+	private static final String mUsageMessage = "USAGE: java -jar QueryOsh --query-type user-edit-ranking --area <area_name> (OPTIONAL) (OPTIONAL) --file \"<file_name>\"";
 
 	@Override
 	public void executeSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence)

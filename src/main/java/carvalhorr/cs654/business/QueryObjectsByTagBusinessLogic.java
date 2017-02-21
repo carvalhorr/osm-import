@@ -73,6 +73,9 @@ public class QueryObjectsByTagBusinessLogic extends BaseBusinessLogic {
 			});
 
 			writer.finishWritingFile();
+			sendMessage("Query finished.");
+			sendMessage("File saved in:" + writer.getFullFileName());
+
 		} catch (ErrorProcessingReadObjectException e) {
 			throw new FailedToCompleteQueryException(e);
 		} catch (ErrorWritingToFileException e) {

@@ -21,6 +21,7 @@ import carvalhorr.cs654.command.query.QueryEditingSummarySubCommand;
 import carvalhorr.cs654.command.query.QueryFirstAndLastObjectSubCommand;
 import carvalhorr.cs654.command.query.QueryLatestVersionAllObjectsSubCommand;
 import carvalhorr.cs654.command.query.QueryObjectsByIdSubCommand;
+import carvalhorr.cs654.command.query.QueryObjectsByTagSubCommand;
 import carvalhorr.cs654.command.query.QueryUserEditsRankingSubCommand;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
@@ -199,7 +200,7 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 			break;
 		}
 		case "objects-by-tag": {
-			QueryObjectsByIdSubCommand subCommand = new QueryObjectsByIdSubCommand();
+			QueryObjectsByTagSubCommand subCommand = new QueryObjectsByTagSubCommand();
 			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}

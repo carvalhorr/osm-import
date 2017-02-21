@@ -72,6 +72,9 @@ public class QueryAllEditsPerformedByUserBusinessLogic extends BaseBusinessLogic
 			});
 
 			fileWriter.finishWritingFile();
+			sendMessage("Query finished.");
+			sendMessage("File saved in:" + fileWriter.getFullFileName());
+			
 		} catch (ErrorProcessingReadObjectException e) {
 			throw new FailedToCompleteQueryException(e);
 		} catch (ErrorWritingToFileException e) {
