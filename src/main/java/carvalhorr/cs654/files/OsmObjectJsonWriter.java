@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.model.OsmObject;
@@ -28,15 +30,15 @@ public class OsmObjectJsonWriter extends OsmObjectFileWriterImpl {
 
 	private String getGeoJsonStringForOsmObject(OsmObject object) {
 		String jsonStr = "{";
-
-		jsonStr += "\"id\":" + "\"" + object.getId() + "\"";
-		jsonStr += ", \"version\":" + "\"" + object.getVersion() + "\"";
-		jsonStr += ", \"timestamp\":" + "\"" + object.getTimestamp() + "\"";
-		jsonStr += ", \"user_id\":" + "\"" + object.getUser().getUid() + "\"";
-		jsonStr += ", \"user_name\":" + "\"" + object.getUser().getUserName() + "\"";
-		jsonStr += ", \"visible\":" + "\"" + object.getVisible() + "\"";
-		jsonStr += ", \"coordinates\": " + object.getCoordinates();
-		jsonStr += ", \"type\": " + object.getGeoJsonType().toString();
+		
+		jsonStr += "\"id\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getId().toString()) + "\"";
+		jsonStr += ", \"version\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getVersion().toString()) + "\"";
+		jsonStr += ", \"timestamp\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getTimestamp()) + "\"";
+		jsonStr += ", \"user_id\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getUser().getUid().toString()) + "\"";
+		jsonStr += ", \"user_name\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getUser().getUserName()) + "\"";
+		jsonStr += ", \"visible\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getVisible().toString()) + "\"";
+		jsonStr += ", \"coordinates\": " + StringEscapeUtils.unescapeHtml4(object.getCoordinates());
+		jsonStr += ", \"type\": " + StringEscapeUtils.unescapeHtml4(object.getGeoJsonType().toString());
 		jsonStr += ", \"tags\": [";
 
 		boolean firstTag = true;
@@ -44,7 +46,7 @@ public class OsmObjectJsonWriter extends OsmObjectFileWriterImpl {
 			if (!firstTag) {
 				jsonStr += ", ";
 			}
-			jsonStr += "\"" + key + "\":" + "\"" + object.getTags().get(key) + "\"";
+			jsonStr += "\"" + StringEscapeUtils.unescapeHtml4(key) + "\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getTags().get(key)) + "\"";
 			firstTag = false;
 		}
 		jsonStr += "]}";

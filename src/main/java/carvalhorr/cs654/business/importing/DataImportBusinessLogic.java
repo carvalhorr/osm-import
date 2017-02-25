@@ -102,9 +102,10 @@ public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObj
 		try {
 			long nodeId = persistence.insertNode(node);
 			Map<String, String> tags = node.getTags();
-			for (String key : tags.keySet()) {
+			persistence.insertTags(nodeId, tags);
+			/*for (String key : tags.keySet()) {
 				persistence.insertTag(nodeId, key, tags.get(key));
-			}
+			}*/
 		} catch (SQLException e) {
 			throw new ErrorInsertingDataToDatabase("Error inserting node ID: " + node.getId(), e);
 		}
@@ -131,9 +132,10 @@ public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObj
 			long wayId = persistence.insertWay(way);
 
 			Map<String, String> tags = way.getTags();
-			for (String key : tags.keySet()) {
+			persistence.insertTags(wayId, tags);
+			/*for (String key : tags.keySet()) {
 				persistence.insertTag(wayId, key, tags.get(key));
-			}
+			}*/
 		} catch (SQLException e) {
 			throw new ErrorInsertingDataToDatabase("Error inserting way ID: " + way.getId(), e);
 		}

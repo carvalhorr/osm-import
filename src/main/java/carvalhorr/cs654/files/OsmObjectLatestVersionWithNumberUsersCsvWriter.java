@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.model.OsmObject;
@@ -30,7 +32,8 @@ public class OsmObjectLatestVersionWithNumberUsersCsvWriter extends OsmObjectFil
 		OsmObject object = (OsmObject)((Map<String, Object>) obj).get("osmObject");
 		Integer countUsers = (Integer)((Map<String, Object>) obj).get("totalUsers");
 		try {
-			writer.write(object.getId() + "," + object.getVersion() + ", " + object.getGeoJsonType().toString() + ", "
+			writer.write(object.getId() + "," + StringEscapeUtils.unescapeHtml4(object.getVersion().toString()) + ", " 
+					+ StringEscapeUtils.unescapeHtml4(object.getGeoJsonType().toString()) + ", "
 					+ countUsers);
 			writer.newLine();
 		} catch (IOException ex) {

@@ -2,9 +2,6 @@ package carvalhorr.cs654.command;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -14,8 +11,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import carvalhorr.cs654.business.ProgressIndicator;
-import carvalhorr.cs654.business.QueryEditingSummaryBusinessLogic;
 import carvalhorr.cs654.command.query.QueryAllEditsByUserSubCommand;
 import carvalhorr.cs654.command.query.QueryEditingSummarySubCommand;
 import carvalhorr.cs654.command.query.QueryFirstAndLastObjectSubCommand;
@@ -28,7 +23,6 @@ import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
-import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 public class QueryCommand extends BaseCommand implements QueryParams {
@@ -42,6 +36,7 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 			e.printStackTrace();
 		} catch (PostgresqlDriverNotFound e) {
 			e.printStackTrace();
+			
 		} catch (ErrorConnectingToDatabase e) {
 			e.printStackTrace();
 		} catch (SchemaDoesNotExistException e) {
@@ -175,36 +170,43 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 
 		switch (mQueryType) {
 		case "editing-summary": {
+			// OK
 			QueryEditingSummarySubCommand subCommand = new QueryEditingSummarySubCommand();
 			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "first-and-last": {
+			// OK
 			QueryFirstAndLastObjectSubCommand subCommand = new QueryFirstAndLastObjectSubCommand();
 			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "latest-version-all-objects": {
+			// OK
 			QueryLatestVersionAllObjectsSubCommand subCommand = new QueryLatestVersionAllObjectsSubCommand();
 			subCommand.executeSubCommand((BaseCommand) this,(QueryParams) this, persistence);
 			break;
 		}
 		case "objects-by-id": {
+			// OK
 			QueryObjectsByIdSubCommand subCommand = new QueryObjectsByIdSubCommand();
 			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "objects-by-tag": {
+			// OK
 			QueryObjectsByTagSubCommand subCommand = new QueryObjectsByTagSubCommand();
 			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "user-edit-ranking": {
+			// OK
 			QueryUserEditsRankingSubCommand subCommand = new QueryUserEditsRankingSubCommand();
 			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "all-edits-for-user": {
+			// OK
 			QueryAllEditsByUserSubCommand subCommand = new QueryAllEditsByUserSubCommand();
 			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;

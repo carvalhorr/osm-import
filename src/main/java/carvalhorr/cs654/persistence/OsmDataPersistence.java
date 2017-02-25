@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
@@ -71,9 +72,21 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 		return result.getLong(1);
 	}
 
+	@Deprecated
 	public void insertTag(long object_id, String key, String value) throws SQLException {
 		statement.execute("insert into " + schemaName + ".osm_tag(object_key, tag_key, tag_value) values( " + object_id
 				+ ", '" + key + "', '" + value + "');");
+	}
+	
+	public void insertTags(long object_id, Map<String, String> tags) throws SQLException {
+		StringBuffer tagsSQL = new StringBuffer();
+		for(String key: tags.keySet()) {
+			if (key != null)
+				tagsSQL.append("insert into " + schemaName + ".osm_tag(object_key, tag_key, tag_value) values( " + object_id
+						+ ", '" + key + "', '" + tags.get(key) + "');");
+		}
+		if (!tagsSQL.toString().equals(""))
+			statement.execute(tagsSQL.toString());
 	}
 
 	public void updateBounds(OsmBounds bounds) throws SQLException {

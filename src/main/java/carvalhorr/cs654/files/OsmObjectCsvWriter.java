@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.model.OsmObject;
@@ -30,8 +32,10 @@ public class OsmObjectCsvWriter extends OsmObjectFileWriterImpl {
 	public void writeObject(Object obj, boolean isFirst) throws ErrorProcessingReadObjectException {
 		OsmObject object = (OsmObject) obj;
 		try {
-			writer.write(object.getId() + "," + object.getVersion() + ", " + object.getGeoJsonType().toString() + ", "
-					+ object.getTimestamp());
+			writer.write(StringEscapeUtils.unescapeHtml4(object.getId().toString()) + ","
+					+ StringEscapeUtils.unescapeHtml4(object.getVersion().toString()) + ", "
+					+ StringEscapeUtils.unescapeHtml4(object.getGeoJsonType().toString()) + ", "
+					+ StringEscapeUtils.unescapeHtml4(object.getTimestamp().toString()));
 			writer.newLine();
 
 		} catch (IOException ex) {
@@ -45,7 +49,6 @@ public class OsmObjectCsvWriter extends OsmObjectFileWriterImpl {
 		try {
 			file = new File(fileName);
 			mFullFileName = file.getAbsolutePath();
-
 
 			writer = new BufferedWriter(new FileWriter(file));
 

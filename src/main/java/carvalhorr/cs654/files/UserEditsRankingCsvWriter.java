@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.model.OsmObject;
@@ -44,7 +46,7 @@ public class UserEditsRankingCsvWriter extends OsmObjectFileWriterImpl {
 			Integer total_edits_polygons = (Integer) ((Map<String, Object>) obj).get("total_edits_polygons");
 			Integer total_edits_multilines = (Integer) ((Map<String, Object>) obj).get("total_edits_multilines");
 
-			writer.write(userId + ", " + userName + ", " + total_edits + ", " + total_edits_points + ", "
+			writer.write(userId + ", " + StringEscapeUtils.unescapeHtml4(userName) + ", " + total_edits + ", " + total_edits_points + ", "
 					+ total_edits_linestrings + ", " + total_edits_polygons + ", " + total_edits_multilines);
 
 			writer.newLine();

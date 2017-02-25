@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.model.OsmObject;
@@ -30,15 +32,15 @@ public class OsmObjectGeoJsonWriter extends OsmObjectFileWriterImpl {
 	private String getGeoJsonStringForOsmObject(OsmObject object) {
 		String propertiesStr = "{";
 
-		propertiesStr += "\"id\":" + "\"" + object.getId() + "\"";
-		propertiesStr += ", \"version\":" + "\"" + object.getVersion() + "\"";
-		propertiesStr += ", \"timestamp\":" + "\"" + object.getTimestamp() + "\"";
-		propertiesStr += ", \"user_id\":" + "\"" + object.getUser().getUid() + "\"";
-		propertiesStr += ", \"user_name\":" + "\"" + object.getUser().getUserName() + "\"";
-		propertiesStr += ", \"visible\":" + "\"" + object.getVisible() + "\"";
+		propertiesStr += "\"id\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getId().toString()) + "\"";
+		propertiesStr += ", \"version\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getVersion().toString()) + "\"";
+		propertiesStr += ", \"timestamp\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getTimestamp()) + "\"";
+		propertiesStr += ", \"user_id\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getUser().getUid().toString()) + "\"";
+		propertiesStr += ", \"user_name\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getUser().getUserName()) + "\"";
+		propertiesStr += ", \"visible\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getVisible().toString()) + "\"";
 
 		for (String key : object.getTags().keySet()) {
-			propertiesStr += ", \"" + key + "\":" + "\"" + object.getTags().get(key) + "\"";
+			propertiesStr += ", \"" + StringEscapeUtils.unescapeHtml4(key) + "\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getTags().get(key)) + "\"";
 		}
 		propertiesStr += "}";
 		String geoJsonString = "{ \"type\": \"Feature\", \"geometry\": { \"type\": \""
