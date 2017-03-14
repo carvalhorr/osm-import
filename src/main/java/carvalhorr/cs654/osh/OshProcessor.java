@@ -16,6 +16,7 @@ public class OshProcessor {
 		object.setId(Long.parseLong(properties.get("id")));
 		object.setVersion(Integer.parseInt(properties.get("version")));
 		object.setTimestamp(properties.get("timestamp"));
+		object.setChangeset(Long.parseLong(properties.get("changeset")));
 		OsmUser user = null;
 		if (properties.get("uid") == null) {
 			user = new OsmUser(-1, "unknown user");

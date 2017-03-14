@@ -2,10 +2,8 @@ package carvalhorr.cs654.persistence;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
@@ -13,92 +11,149 @@ import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
 import carvalhorr.cs654.model.OsmObject;
-import carvalhorr.cs654.model.OsmUser;
-import carvalhorr.cs654.model.WayOsmObject;
 
+/**
+ * Persistence class to insert data into the database. It includes an instance
+ * of a schema creation persistence.
+ * 
+ * @author carvalhorr
+ *
+ */
 public class OsmDataPersistence extends OshDatabasePersistence {
 
+	// Holds a list of OsmObjects to be inserted in batch in order to to get
+	// better performance
+	private List<OsmObject> objectsToInsert = new ArrayList<OsmObject>();
+
+	// Schema creation persistence object
+	private OshSchemaCreationPersistence schemaCreationPersistence = null;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param jdbcString
+	 * @param user
+	 * @param password
+	 * @param schemaName
+	 * @throws SQLException
+	 * @throws PostgresqlDriverNotFound
+	 * @throws ErrorConnectingToDatabase
+	 */
 	public OsmDataPersistence(String jdbcString, String user, String password, String schemaName)
 			throws SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase {
+
 		super(jdbcString, user, password, schemaName);
+
+		// Creates an instance of the schema creation persistence object.
+		schemaCreationPersistence = new OshSchemaCreationPersistence();
+
 	}
 
 	/**
-	 * Creates a schema for the given name with all the tables. If the schema
-	 * already exists it will be deleted first.
-	 * 
-	 * To check if a schema already exists use the method
-	 * schameExists(schemaName);
+	 * Creates a schema
 	 * 
 	 * @throws SQLException
 	 * @throws NotConnectedToDatabase
 	 */
 	public void createSchema() throws SQLException, NotConnectedToDatabase {
-		if (connection == null) {
-			throw new NotConnectedToDatabase();
+		schemaCreationPersistence.createSchema(connection, schemaName);
+	}
+
+	/**
+	 * Creates indexes for tables
+	 * 
+	 * @throws SQLException
+	 */
+	public void createOsmObjectTableIndexes() throws SQLException {
+		schemaCreationPersistence.createOsmObjectTableIndexes(schemaName);
+	}
+
+	/**
+	 * 
+	 * Add an OsmObject to the list of objected to be added in batch. When the
+	 * list reaches 500 objects it writes in batch to the database by calling
+	 * the flushOsmObjectsBatch() method.
+	 * 
+	 * @param object
+	 * @throws SQLException
+	 */
+	public void batchInsertOsmObject(OsmObject object) throws SQLException {
+		objectsToInsert.add(object);
+		if (objectsToInsert.size() == 500) {
+			flushOsmObjectsBatch();
 		}
-		Statement statement = connection.createStatement();
-		statement.execute("DROP SCHEMA IF EXISTS " + schemaName + " CASCADE; CREATE SCHEMA " + schemaName + ";");
-
-		createBoundsTable(schemaName);
-		createUserTable(schemaName);
-		createOsmObjectTable(schemaName);
-		createTagTable(schemaName);
 	}
 
-	public void insertUser(OsmUser user) throws SQLException {
-		// Statement statement = connection.createStatement();
-		statement.execute("INSERT INTO " + schemaName + ".osm_user(user_id, user_name) VALUES(" + user.getUid() + ", '"
-				+ user.getUserName() + "')");
-	}
+	/**
+	 * Write the list of OsmObjects to the database in batch. This method should
+	 * be called at the end of processing an OSH file in order to flush the list
+	 * of objects when the list is smaller than 500 objects.
+	 * 
+	 * @throws SQLException
+	 */
+	public void flushOsmObjectsBatch() throws SQLException {
+		StringBuffer sqlString = new StringBuffer();
+		for (OsmObject object : objectsToInsert) {
 
-	public long insertNode(NodeOsmObject node) throws SQLException {
-		return insertOsmObject(node);
-	}
+			String objectType = (object instanceof NodeOsmObject) ? "N" : "W";
 
-	public long insertWay(WayOsmObject way) throws SQLException {
-		return insertOsmObject(way);
-	}
+			// Add sql to insert user if not exists yet
+			sqlString.append(
+					" INSERT INTO " + schemaName + ".osm_user(user_id, user_name) select " + object.getUser().getUid()
+							+ ", '" + object.getUser().getUserName() + "' WHERE not exists (select 1 from " + schemaName
+							+ ".osm_user where user_id = " + object.getUser().getUid() + ");");
 
-	private long insertOsmObject(OsmObject object) throws SQLException {
-		String objectType = (object instanceof NodeOsmObject) ? "N" : "W";
-		ResultSet result = statement.executeQuery("INSERT INTO " + schemaName
-				+ ".osm_object(osm_type, osm_id, osm_version, coordinates, timestamp, user_id, visible, geojson_type) "
-				+ "VALUES('" + objectType + "', " + object.getId() + ", " + object.getVersion() + ", '"
-				+ object.getCoordinates() + "', '" + object.getTimestamp() + "', " + object.getUser().getUid() + ", "
-				+ object.getVisible() + ", '" + object.getGeoJsonType().getDatabaseType() + "'"
-				+ ") RETURNING object_key;");
-		result.next();
-		return result.getLong(1);
-	}
+			// Add sql to insert osm_object
+			sqlString.append("INSERT INTO " + schemaName
+					+ ".osm_object(osm_type, osm_id, osm_version, coordinates, timestamp, user_id, visible, geojson_type, changeset) "
+					+ "VALUES('" + objectType + "', " + object.getId() + ", " + object.getVersion() + ", '"
+					+ object.getCoordinates() + "', '" + object.getTimestamp() + "', " + object.getUser().getUid()
+					+ ", " + object.getVisible() + ", '" + object.getGeoJsonType().getDatabaseType() + "'" + ", "
+					+ object.getChangeset() + ");");
 
-	@Deprecated
-	public void insertTag(long object_id, String key, String value) throws SQLException {
-		statement.execute("insert into " + schemaName + ".osm_tag(object_key, tag_key, tag_value) values( " + object_id
-				+ ", '" + key + "', '" + value + "');");
-	}
-	
-	public void insertTags(long object_id, Map<String, String> tags) throws SQLException {
-		StringBuffer tagsSQL = new StringBuffer();
-		for(String key: tags.keySet()) {
-			if (key != null)
-				tagsSQL.append("insert into " + schemaName + ".osm_tag(object_key, tag_key, tag_value) values( " + object_id
-						+ ", '" + key + "', '" + tags.get(key) + "');");
+			// Add sql to insert tags
+			for (String key : object.getTags().keySet()) {
+				if (key != null)
+					sqlString.append(
+							"insert into " + schemaName + ".osm_tag(object_key, tag_key, tag_value) values( LASTVAL()"
+									+ ", '" + key + "', '" + object.getTags().get(key) + "');");
+			}
 		}
-		if (!tagsSQL.toString().equals(""))
-			statement.execute(tagsSQL.toString());
+		// Execute the insert statemets
+		statement.execute(sqlString.toString());
+
+		// Clear the list of objects just inserted
+		objectsToInsert.clear();
 	}
 
-	public void updateBounds(OsmBounds bounds) throws SQLException {
+	/**
+	 * Store the area bounds in the database.
+	 * 
+	 * @param bounds
+	 * @throws SQLException
+	 */
+	public void insertBounds(OsmBounds bounds) throws SQLException {
+
 		statement.execute("DELETE FROM " + schemaName + ".OSM_BOUNDS");
 		statement.execute(
 				"insert into " + schemaName + ".osm_bounds(minlat, minlon, maxlat, maxlon) values(" + bounds.getMinLat()
 						+ ", " + bounds.getMinLon() + ", " + bounds.getMaxLat() + ", " + bounds.getMaxLon() + ");");
+
 	}
 
+	/**
+	 * retrieve the coordinates for a list of nodes from the database and return
+	 * in the format to be stored in a way object.
+	 * 
+	 * @param nodeIds
+	 * @param timestamp
+	 * @return
+	 * @throws SQLException
+	 */
 	public List<String> readCoordinatesForNodes(String nodeIds, String timestamp) throws SQLException {
+
+		// Read and store the coordinates
 		List<String> coordinates = new ArrayList<String>();
-		// if (nodes.size() > 0) {
 		ResultSet result = statement.executeQuery("select coordinates from " + schemaName
 				+ ".osm_object where (osm_id, osm_version) in (select osm_id, max(osm_version) from " + schemaName
 				+ ".osm_object where osm_id in (" + nodeIds + ") and timestamp <= '" + timestamp
@@ -107,58 +162,18 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 		while (result.next()) {
 			coordinates.add(result.getString(1));
 		}
-		// Hack to add the the initial coordinates to the end of the list for
-		// circular lists.
-		//TODO find better way to retrieve all the coordinates in order from database
+		
+		// In case of circular list of nodes (first node equals last node), the
+		// SQL return the coordinates for the node only once. This hack add the
+		// first object coordinates to the end of the list in case of a circular
+		// list of objects.
 		String[] ids = nodeIds.split(",");
 		if (ids[0].trim().equals(ids[ids.length - 1].trim())) {
 			if (coordinates.size() > 0) {
 				coordinates.add(coordinates.get(0));
 			}
 		}
-		// }
+		
 		return coordinates;
 	}
-
-	private void createBoundsTable(String schemaName) throws SQLException {
-		// Statement statement = connection.createStatement();
-		statement.execute("CREATE TABLE " + schemaName + ".osm_bounds(" + "minlat DECIMAL(9,6), "
-				+ "minlon DECIMAL(9,6), " + "maxlat DECIMAL(9,6), " + "maxlon DECIMAL(9,6));");
-	}
-
-	private void createUserTable(String schemaName) throws SQLException {
-		// Statement statement = connection.createStatement();
-		statement.execute("CREATE TABLE " + schemaName + ".osm_user(" + "user_id integer NOT NULL, "
-				+ "user_name character varying(30), " + "CONSTRAINT osm_user_pkey PRIMARY KEY (user_id));");
-
-	}
-
-	private void createOsmObjectTable(String schemaName) throws SQLException {
-		// Statement statement = connection.createStatement();
-		statement.execute("CREATE TABLE " + schemaName + ".osm_object(" + "object_key BIGSERIAL PRIMARY KEY, "
-				+ "osm_type CHAR(1), " + "osm_id BIGINT, " + "osm_version INTEGER, " + "coordinates TEXT, "
-				+ "timestamp TIMESTAMP, " + "user_id INTEGER REFERENCES " + schemaName + ".osm_user(user_id), "
-				+ "visible boolean, geojson_type CHAR(1), "
-				+ "CONSTRAINT osm_object_unique UNIQUE (osm_type, osm_id, osm_version));");
-		// createOsmObjectTableIndexes(schemaName);
-	}
-
-	private void createTagTable(String schemaName) throws SQLException {
-		// Statement statement = connection.createStatement();
-		statement.execute("CREATE TABLE " + schemaName + ".osm_tag(" + "object_key BIGINT REFERENCES " + schemaName
-				+ ".osm_object(object_key), " + "tag_key VARCHAR(100), " + "tag_value VARCHAR(300), "
-				+ "CONSTRAINT osm_tag_primary_key PRIMARY KEY (object_key, tag_key, tag_value));");
-	}
-
-	private void createOsmObjectTableIndexes(String schemaName) throws SQLException {
-		statement.execute("CREATE INDEX osm_object_type ON " + schemaName + ".osm_object(osm_type);");
-		statement.execute("CREATE INDEX osm_object_timestamp ON " + schemaName + ".osm_object(timestamp);");
-		statement.execute("CREATE INDEX osm_object_id_version ON " + schemaName + ".osm_object(osm_id, osm_version);");
-		statement.execute("CREATE INDEX user_id ON " + schemaName + ".osm_object(user_id);");
-	}
-
-	public void createOsmObjectTableIndexes() throws SQLException {
-		createOsmObjectTableIndexes(schemaName);
-	}
-
 }

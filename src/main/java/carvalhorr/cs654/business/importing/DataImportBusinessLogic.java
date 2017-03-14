@@ -5,21 +5,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import carvalhorr.cs654.business.BaseBusinessLogic;
 import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.exception.CouldNotCreateSchemaException;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
-import carvalhorr.cs654.model.GeoJsonObjectType;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
-import carvalhorr.cs654.model.OsmUser;
+import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
 import carvalhorr.cs654.model.WayOsmObject;
+import carvalhorr.cs654.persistence.OshSchemaCreationPersistence;
 import carvalhorr.cs654.persistence.OsmDataPersistence;
-import exception.UnexpectedTokenException;
-import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;;
+import exception.UnexpectedTokenException;;
 
 public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObjectsReadFromFileCallback {
 
@@ -49,13 +47,11 @@ public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObj
 			throw new CouldNotCreateSchemaException(e);
 		}
 
-		userObjectReadFromFile(new OsmUser(-1, "unknown user"));
-
 		long startTime = System.currentTimeMillis();
 
 		DataImportPass1CountLines pass1 = new DataImportPass1CountLines(fileName, this);
 		pass1.countObjects();
-		
+
 		sendMessage("File contains " + totalNodes + " nodes and " + totalWays + " ways");
 
 		long endTime = System.currentTimeMillis();
@@ -66,6 +62,11 @@ public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObj
 
 		DataImportPass2NodesAndUsersImport pass2 = new DataImportPass2NodesAndUsersImport(fileName, this);
 		pass2.importFile();
+		try {
+			persistence.flushOsmObjectsBatch();
+		} catch (SQLException e1) {
+			throw new ErrorInsertingDataToDatabase(e1);
+		}
 
 		try {
 			persistence.createOsmObjectTableIndexes();
@@ -82,6 +83,13 @@ public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObj
 
 		DataImportPass3WaysImport pass3 = new DataImportPass3WaysImport(fileName, this);
 		pass3.importFile();
+
+		try {
+			persistence.flushOsmObjectsBatch();
+		} catch (SQLException e1) {
+			throw new ErrorInsertingDataToDatabase(e1);
+		}
+
 		sendMessage("Finished importing ways.");
 
 		endTime = System.currentTimeMillis();
@@ -100,12 +108,7 @@ public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObj
 	@Override
 	public void nodeObjectReadFromFile(NodeOsmObject node) throws ErrorInsertingDataToDatabase {
 		try {
-			long nodeId = persistence.insertNode(node);
-			Map<String, String> tags = node.getTags();
-			persistence.insertTags(nodeId, tags);
-			/*for (String key : tags.keySet()) {
-				persistence.insertTag(nodeId, key, tags.get(key));
-			}*/
+			persistence.batchInsertOsmObject(node);
 		} catch (SQLException e) {
 			throw new ErrorInsertingDataToDatabase("Error inserting node ID: " + node.getId(), e);
 		}
@@ -129,13 +132,8 @@ public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObj
 			}
 			way.setCoordinates(coordinates.toString());
 			way.setGeoJsonType(way.determineGeoJsonType());
-			long wayId = persistence.insertWay(way);
+			persistence.batchInsertOsmObject(way);
 
-			Map<String, String> tags = way.getTags();
-			persistence.insertTags(wayId, tags);
-			/*for (String key : tags.keySet()) {
-				persistence.insertTag(wayId, key, tags.get(key));
-			}*/
 		} catch (SQLException e) {
 			throw new ErrorInsertingDataToDatabase("Error inserting way ID: " + way.getId(), e);
 		}
@@ -145,20 +143,9 @@ public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObj
 	}
 
 	@Override
-	public void userObjectReadFromFile(OsmUser user) throws ErrorInsertingDataToDatabase {
-		try {
-			persistence.insertUser(user);
-		} catch (SQLException e) {
-			if (!e.getMessage().startsWith("ERROR: duplicate key value violates unique constraint \"osm_user_pkey\"")) {
-				throw new ErrorInsertingDataToDatabase(e);
-			}
-		}
-	}
-
-	@Override
 	public void boundsObjectReadfFromFile(OsmBounds bounds) throws ErrorInsertingDataToDatabase {
 		try {
-			persistence.updateBounds(bounds);
+			persistence.insertBounds(bounds);
 		} catch (SQLException e) {
 			if (!e.getMessage().startsWith("ERROR: duplicate key value violates unique constraint \"osm_user_pkey\"")) {
 				throw new ErrorInsertingDataToDatabase(e);

@@ -3,8 +3,6 @@ package carvalhorr.cs654.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import carvalhorr.cs654.osh.PropertiesExtractor;
-
 public abstract class OsmObject {
 	
 	private long id;
@@ -12,6 +10,7 @@ public abstract class OsmObject {
 	private String timestamp;
 	private OsmUser user;
 	private boolean visible;
+	private long changeset;
 
 	protected Map<String, String> tags = new HashMap<String, String>();
 	
@@ -19,45 +18,6 @@ public abstract class OsmObject {
 
 	protected String coordinates = "";
 
-	/*
-	@Deprecated
-	private void processOpenTag(String lineString) {
-		Map<String, String> properties = extractPropertiesFromLine(lineString);
-		// TODO Validate properties
-		//setProperties(properties);
-		setId(Long.parseLong(properties.get("id")));
-		setVersion(Integer.parseInt(properties.get("version")));
-		setTimestamp(properties.get("timestamp"));
-		OsmUser user = null;
-		if (properties.get("uid") == null) {
-			user = new OsmUser(-1, "unknown user");
-		} else {
-			user = new OsmUser(Integer.parseInt(properties.get("uid")), properties.get("user"));
-		}
-		setUser(user);
-		setVisible(Boolean.parseBoolean(properties.get("visible")));
-		setCoordinates("[" + properties.get("lon") + "," + properties.get("lat") + "]");
-		validateProperties();
-	}
-
-	public void processCloseTag(String lineString) {
-		validateTags();
-	}*/
-
-	/*
-	public void addTagFromString(String lineString) {
-		Map<String, String> tagProperties = extractPropertiesFromLine(lineString);
-		if (tagProperties.size() > 2) {
-			// TODO raise exception
-		}
-		String key = tagProperties.get("k");
-		String value = tagProperties.get("v");
-		if (key == null || value == null) {
-			// TODO raise exception
-		}
-		tags.put(key, value);
-	}*/
-	
 	public void addTag(String key, String value) {
 		tags.put(key, value);
 	}
@@ -70,18 +30,20 @@ public abstract class OsmObject {
 		this.tags = tags;
 	}
 
-	//protected abstract void validateProperties();
-
-	//protected abstract void validateTags();
-
 	public String getCoordinates() {
 		return coordinates;
 	}
 	
-	public abstract void computeCoordinates();
-
 	public void setCoordinates(String coordinates) {
 		this.coordinates = coordinates;
+	}
+	
+	public Long getChangeset() {
+		return changeset;
+	}
+	
+	public void setChangeset(Long changeset) {
+		this.changeset = changeset;
 	}
 	
 	public Long getId() {
