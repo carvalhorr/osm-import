@@ -35,7 +35,6 @@ public class ImportCommand implements ProgressIndicator {
 	public static void main(String[] args) {
 		ImportCommand command = new ImportCommand();
 		command.importFile(args);
-
 	}
 
 	@Override

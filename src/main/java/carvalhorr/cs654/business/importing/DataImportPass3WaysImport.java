@@ -11,7 +11,7 @@ import carvalhorr.cs654.osh.OshProcessor;
 import exception.UnexpectedTokenException;
 
 public class DataImportPass3WaysImport extends DataImportPass {
-	
+
 	public DataImportPass3WaysImport(String fileName, OsmObjectsReadFromFileCallback objectReadCallback) {
 		super(fileName, objectReadCallback);
 	}
@@ -20,7 +20,6 @@ public class DataImportPass3WaysImport extends DataImportPass {
 		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		String line = reader.readLine();
 
-		long startTime = System.currentTimeMillis();
 		do {
 			lineCount++;
 
@@ -52,13 +51,10 @@ public class DataImportPass3WaysImport extends DataImportPass {
 				break;
 			}
 			default:
-				//throw new UnexpectedTokenException(
-				//		lineCount + ": unexpected token " + lineStartsWith.toUpperCase() + "found");
 			}
 
 			line = reader.readLine();
 		} while (line != null);
-		long endTime = System.currentTimeMillis();
 
 	}
 
@@ -90,10 +86,6 @@ public class DataImportPass3WaysImport extends DataImportPass {
 					lineCount + ": closing <way> tag found without corresponding opening <way> tag");
 		}
 		OshProcessor.addTagFromString(objectBeingImported, tag);
-		//objectBeingImported.processCloseTag(tag);
-		objectBeingImported.computeCoordinates();
-		//extractUser();
-		objectReadCallback.userObjectReadFromFile(objectBeingImported.getUser());
 		objectReadCallback.wayObjectReadFromFile((WayOsmObject) objectBeingImported);
 		objectBeingImported = null;
 	}
@@ -108,7 +100,6 @@ public class DataImportPass3WaysImport extends DataImportPass {
 	private void addTag(String tag) throws UnexpectedTokenException {
 		if (objectBeingImported instanceof WayOsmObject)
 			OshProcessor.addTagFromString(objectBeingImported, tag);
-			//objectBeingImported.addTagFromString(tag);
 	}
 
 }
