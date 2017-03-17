@@ -16,7 +16,7 @@ import carvalhorr.cs654.model.OsmBounds;
 import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
 import carvalhorr.cs654.model.WayOsmObject;
 import carvalhorr.cs654.persistence.OshSchemaCreationPersistence;
-import carvalhorr.cs654.persistence.OsmDataPersistence;
+import carvalhorr.cs654.persistence.OshDataPersistence;
 import exception.UnexpectedTokenException;;
 
 public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObjectsReadFromFileCallback {
@@ -27,12 +27,12 @@ public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObj
 	private long countProcessedNodes = 0;
 	private long countProcessedWays = 0;
 
-	private OsmDataPersistence persistence = null;
+	private OshDataPersistence persistence = null;
 
 	public static String PROGRESS_TYPE_NODES = "Processing nodes";
 	public static String PROGRESS_TYPE_WAYS = "Processing ways";
 
-	public DataImportBusinessLogic(OsmDataPersistence persistence, ProgressIndicator progressIndicator) {
+	public DataImportBusinessLogic(OshDataPersistence persistence, ProgressIndicator progressIndicator) {
 		super(progressIndicator);
 		this.persistence = persistence;
 	}

@@ -22,7 +22,7 @@ import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
-import carvalhorr.cs654.persistence.OsmDataPersistence;
+import carvalhorr.cs654.persistence.OshDataPersistence;
 import exception.UnexpectedTokenException;
 
 public class ImportCommand implements ProgressIndicator {
@@ -115,9 +115,9 @@ public class ImportCommand implements ProgressIndicator {
 			System.out.println("Could not find database properties file " + dbConfig);
 		}
 
-		OsmDataPersistence persistence = null;
+		OshDataPersistence persistence = null;
 		try {
-			persistence = new OsmDataPersistence(config.getConfigurationForKey("jdbcString"),
+			persistence = new OshDataPersistence(config.getConfigurationForKey("jdbcString"),
 					config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
 		} catch (SQLException | PostgresqlDriverNotFound | ErrorConnectingToDatabase e1) {
 			System.out.println("Error connecting to the database: " + e1.getMessage());

@@ -19,11 +19,15 @@ import carvalhorr.cs654.model.OsmObject;
  * @author carvalhorr
  *
  */
-public class OsmDataPersistence extends OshDatabasePersistence {
+public class OshDataPersistence extends OshDatabasePersistence {
 
 	// Holds a list of OsmObjects to be inserted in batch in order to to get
 	// better performance
 	private List<OsmObject> objectsToInsert = new ArrayList<OsmObject>();
+
+	private static final int DEFAULT_BATCH_SIZE = 500;
+
+	private int batchSize;
 
 	// Schema creation persistence object
 	private OshSchemaCreationPersistence schemaCreationPersistence = null;
@@ -39,14 +43,25 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 	 * @throws PostgresqlDriverNotFound
 	 * @throws ErrorConnectingToDatabase
 	 */
-	public OsmDataPersistence(String jdbcString, String user, String password, String schemaName)
+	public OshDataPersistence(String jdbcString, String user, String password, String schemaName)
 			throws SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase {
 
 		super(jdbcString, user, password, schemaName);
 
 		// Creates an instance of the schema creation persistence object.
 		schemaCreationPersistence = new OshSchemaCreationPersistence();
+		batchSize = DEFAULT_BATCH_SIZE;
 
+	}
+
+	/**
+	 * Allows changing the batch size for inserting OSM objects into the
+	 * database.
+	 * 
+	 * @param batchSize
+	 */
+	public void setBatchSize(int batchSize) {
+		this.batchSize = batchSize;
 	}
 
 	/**
@@ -79,7 +94,10 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 	 */
 	public void batchInsertOsmObject(OsmObject object) throws SQLException {
 		objectsToInsert.add(object);
-		if (objectsToInsert.size() == 500) {
+
+		// If the batch of objects to be inserted into the database is full,
+		// insert the objects in the database.
+		if (objectsToInsert.size() == batchSize) {
 			flushOsmObjectsBatch();
 		}
 	}
@@ -122,7 +140,7 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 		// Execute the insert statemets
 		statement.execute(sqlString.toString());
 
-		// Clear the list of objects just inserted
+		// Clear the list of objects just inserted in the database
 		objectsToInsert.clear();
 	}
 
@@ -162,7 +180,7 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 		while (result.next()) {
 			coordinates.add(result.getString(1));
 		}
-		
+
 		// In case of circular list of nodes (first node equals last node), the
 		// SQL return the coordinates for the node only once. This hack add the
 		// first object coordinates to the end of the list in case of a circular
@@ -173,7 +191,7 @@ public class OsmDataPersistence extends OshDatabasePersistence {
 				coordinates.add(coordinates.get(0));
 			}
 		}
-		
+
 		return coordinates;
 	}
 }

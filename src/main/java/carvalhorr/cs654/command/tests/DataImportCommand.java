@@ -12,7 +12,7 @@ import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
-import carvalhorr.cs654.persistence.OsmDataPersistence;
+import carvalhorr.cs654.persistence.OshDataPersistence;
 import exception.UnexpectedTokenException;
 
 public class DataImportCommand implements ProgressIndicator {
@@ -33,7 +33,7 @@ public class DataImportCommand implements ProgressIndicator {
 		Configuration config = new Configuration();
 		config.readConfigurationFromFile("database.properties");
 
-		OsmDataPersistence persistence = new OsmDataPersistence(config.getConfigurationForKey("jdbcString"),
+		OshDataPersistence persistence = new OshDataPersistence(config.getConfigurationForKey("jdbcString"),
 				config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
 
 		try {
