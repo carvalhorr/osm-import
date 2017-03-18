@@ -5,7 +5,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.BeforeClass;
@@ -32,11 +35,21 @@ import carvalhorr.cs654.model.OsmUser;
  */
 public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromDatabaseCallback {
 
-	private static String dbConfig = "database.properties";
-	private static String schemaName = "test_schema_creation";
+	// Name of the database properties file
+	private static final String DB_CONFIG = "database.properties";
 
+	// Name of the schema to be used in the schema tests
+	private static final String SCHEMA_NAME = "test_schema_creation";
+
+	// Persistence object for creating schema and inserting data into the
+	// database
 	private static OshDataPersistence insertOshDataPersistence;
+
+	// Persistence object for querying data from the database
 	private static OshQueryPersistence queryOshDataPersistence;
+
+	// Persistence object for executing special queries for test purposes
+	private static OshTestsPersistence oshTestsPersistence;
 
 	int readObjectsCount = 0;
 
@@ -46,19 +59,24 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 		// Load database configurations
 		Configuration config = new Configuration();
 		try {
-			config.readConfigurationFromFile(dbConfig);
+			config.readConfigurationFromFile(DB_CONFIG);
 		} catch (FileNotFoundException e1) {
-			System.out.println("Could not find database properties file " + dbConfig);
+			System.out.println("Could not find database properties file " + DB_CONFIG);
 		}
 
 		try {
 			// Create OSH data insertion persistence object
 			insertOshDataPersistence = new OshDataPersistence(config.getConfigurationForKey("jdbcString"),
-					config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
+					config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), SCHEMA_NAME);
 
-			// Create OSM data query persistence object
+			// Create OSH data query persistence object
 			queryOshDataPersistence = new OshQueryPersistence(config.getConfigurationForKey("jdbcString"),
-					config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), schemaName);
+					config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), SCHEMA_NAME);
+
+			// Create OSH test persistence object
+			oshTestsPersistence = new OshTestsPersistence(config.getConfigurationForKey("jdbcString"),
+					config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), SCHEMA_NAME);
+
 		} catch (SQLException | PostgresqlDriverNotFound | ErrorConnectingToDatabase e1) {
 			System.out.println("Error connecting to the database: " + e1.getMessage());
 		} catch (SchemaDoesNotExistException e) {
@@ -70,6 +88,11 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 	public void createSchemaTest() throws SQLException, NotConnectedToDatabase {
 		insertOshDataPersistence.createSchema();
 		assertTrue(insertOshDataPersistence.schemaExists());
+		assertTrue(isAllTablesCreated());
+		assertTrue(isOsmObjectTableCreated());
+		assertTrue(isOsmBoundsTableCreated());
+		assertTrue(isOsmTagTableCreated());
+		assertTrue(isOsmUserTableCreated());
 	}
 
 	@Test
@@ -116,5 +139,99 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 			throws ErrorProcessingReadObjectException {
 		readObjectsCount++;
 	}
+	
+	private boolean isAllTablesCreated() throws SQLException {
+		List<String> tableNames = getTableNames(SCHEMA_NAME);
+		return (tableNames.size() == 4) &&
+				tableNames.contains("osm_bounds") &&
+				tableNames.contains("osm_tag") &&
+				tableNames.contains("osm_user") &&
+				tableNames.contains("osm_object");
+	}
 
+	/**
+	 * Verify if the table OSM_OBJECT exists and all its columns also exist
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	private boolean isOsmObjectTableCreated() throws SQLException {
+		List<String> columns = getColumnsForTable(SCHEMA_NAME, "osm_object");
+		return (columns.size() == 10) && columns.contains("object_key") && columns.contains("osm_type")
+				&& columns.contains("osm_id") && columns.contains("osm_version") && columns.contains("coordinates")
+				&& columns.contains("timestamp") && columns.contains("user_id") && columns.contains("visible")
+				&& columns.contains("geojson_type") && columns.contains("changeset");
+	}
+
+	/**
+	 * Verify if the table OSM_BOUNDS exists and all its columns also exist
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	private boolean isOsmBoundsTableCreated() throws SQLException {
+		List<String> columns = getColumnsForTable(SCHEMA_NAME, "osm_bounds");
+		return (columns.size() == 4) && columns.contains("minlat") && columns.contains("minlon")
+				&& columns.contains("maxlat") && columns.contains("maxlon");
+	}
+
+	/**
+	 * Verify if the table OSM_TAG exists and all its columns also exist
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	private boolean isOsmTagTableCreated() throws SQLException {
+		List<String> columns = getColumnsForTable(SCHEMA_NAME, "osm_tag");
+		return (columns.size() == 3) && columns.contains("object_key") && columns.contains("tag_key")
+				&& columns.contains("tag_value");
+	}
+
+	/**
+	 * Verify if the table OSM_USER exists and all its columns also exist
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	private boolean isOsmUserTableCreated() throws SQLException {
+		List<String> columns = getColumnsForTable(SCHEMA_NAME, "osm_user");
+		return (columns.size() == 2) && columns.contains("user_id") && columns.contains("user_name");
+	}
+
+	/**
+	 * Get the name of columns in a table in the database schema
+	 * 
+	 * @param schemaName
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 */
+	private List<String> getColumnsForTable(String schemaName, String tableName) throws SQLException {
+		return getListOfPropertiesFromSqlQuery("select column_name from INFORMATION_SCHEMA.COLUMNS where table_name = '"
+				+ tableName + "' and table_schema = '" + schemaName + "';", 1);
+	}
+
+	/**
+	 * Get the names of tables existing in the database schema
+	 * @param schemaName
+	 * @return
+	 * @throws SQLException
+	 */
+	private List<String> getTableNames(String schemaName) throws SQLException {
+		return getListOfPropertiesFromSqlQuery(
+				"select distinct table_name from INFORMATION_SCHEMA.COLUMNS where table_schema = '" + schemaName + "';",
+				1);
+
+	}
+
+	private List<String> getListOfPropertiesFromSqlQuery(String sql, Integer columnIndex) throws SQLException {
+		List<String> columnNames = new ArrayList<String>();
+		ResultSet results = oshTestsPersistence.getStatement().executeQuery(sql);
+		results.next();
+		while (!results.isAfterLast()) {
+			columnNames.add(results.getString(columnIndex));
+			results.next();
+		}
+		return columnNames;
+	}
 }
