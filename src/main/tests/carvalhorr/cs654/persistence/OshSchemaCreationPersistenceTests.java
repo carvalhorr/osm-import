@@ -1,8 +1,6 @@
 package carvalhorr.cs654.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
 import java.sql.ResultSet;
@@ -11,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -51,37 +50,37 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 	// Persistence object for executing special queries for test purposes
 	private static OshTestsPersistence oshTestsPersistence;
 
-	int readObjectsCount = 0;
+	// Counter used by the callbacks from the query osh data persistence to
+	// verify correct working
+	private int readObjectsCount = 0;
+	
+	private static Configuration dbConfig = null;
 
 	@BeforeClass
-	public static void setup() {
+	public static void setup() throws FileNotFoundException, SQLException, PostgresqlDriverNotFound,
+			ErrorConnectingToDatabase, SchemaDoesNotExistException {
 
 		// Load database configurations
-		Configuration config = new Configuration();
-		try {
-			config.readConfigurationFromFile(DB_CONFIG);
-		} catch (FileNotFoundException e1) {
-			System.out.println("Could not find database properties file " + DB_CONFIG);
-		}
+		dbConfig = new Configuration();
+		dbConfig.readConfigurationFromFile(DB_CONFIG);
 
-		try {
-			// Create OSH data insertion persistence object
-			insertOshDataPersistence = new OshDataPersistence(config.getConfigurationForKey("jdbcString"),
-					config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), SCHEMA_NAME);
+		// Create OSH data insertion persistence object
+		insertOshDataPersistence = new OshDataPersistence(dbConfig.getConfigurationForKey("jdbcString"),
+				dbConfig.getConfigurationForKey("user"), dbConfig.getConfigurationForKey("password"), SCHEMA_NAME);
 
-			// Create OSH data query persistence object
-			queryOshDataPersistence = new OshQueryPersistence(config.getConfigurationForKey("jdbcString"),
-					config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), SCHEMA_NAME);
+		// Create OSH test persistence object
+		oshTestsPersistence = new OshTestsPersistence(dbConfig.getConfigurationForKey("jdbcString"),
+				dbConfig.getConfigurationForKey("user"), dbConfig.getConfigurationForKey("password"), SCHEMA_NAME);
 
-			// Create OSH test persistence object
-			oshTestsPersistence = new OshTestsPersistence(config.getConfigurationForKey("jdbcString"),
-					config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), SCHEMA_NAME);
-
-		} catch (SQLException | PostgresqlDriverNotFound | ErrorConnectingToDatabase e1) {
-			System.out.println("Error connecting to the database: " + e1.getMessage());
-		} catch (SchemaDoesNotExistException e) {
-			fail("Failed to create database schema " + e.getMessage());
-		}
+	}
+	
+	@AfterClass
+	public static void cleanup() throws SQLException {
+		// delete schema
+		oshTestsPersistence.getStatement().execute("DROP SCHEMA IF EXISTS " + SCHEMA_NAME + " CASCADE;");
+		
+		// Verify the schema does not exist
+		assertFalse(insertOshDataPersistence.schemaExists());
 	}
 
 	@Test
@@ -97,7 +96,7 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 
 	@Test
 	public void createExistingSchemaDeletesPreviousDataTest() throws SQLException, NotConnectedToDatabase,
-			ErrorReadingDataFromDatabase, ErrorProcessingReadObjectException {
+			ErrorReadingDataFromDatabase, ErrorProcessingReadObjectException, PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException {
 		// Create schema
 		insertOshDataPersistence.createSchema();
 		assertTrue(insertOshDataPersistence.schemaExists());
@@ -105,6 +104,11 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 		// insert object node object
 		insertOshDataPersistence.batchInsertOsmObject(createObject(1, 1));
 		insertOshDataPersistence.flushOsmObjectsBatch();
+		
+		// Create OSH data query persistence object
+		queryOshDataPersistence = new OshQueryPersistence(dbConfig.getConfigurationForKey("jdbcString"),
+				dbConfig.getConfigurationForKey("user"), dbConfig.getConfigurationForKey("password"), SCHEMA_NAME);
+
 
 		// check it was inserted
 		queryOshDataPersistence.queryAllObjectCurrentVersion(this);
@@ -139,14 +143,11 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 			throws ErrorProcessingReadObjectException {
 		readObjectsCount++;
 	}
-	
+
 	private boolean isAllTablesCreated() throws SQLException {
 		List<String> tableNames = getTableNames(SCHEMA_NAME);
-		return (tableNames.size() == 4) &&
-				tableNames.contains("osm_bounds") &&
-				tableNames.contains("osm_tag") &&
-				tableNames.contains("osm_user") &&
-				tableNames.contains("osm_object");
+		return (tableNames.size() == 4) && tableNames.contains("osm_bounds") && tableNames.contains("osm_tag")
+				&& tableNames.contains("osm_user") && tableNames.contains("osm_object");
 	}
 
 	/**
@@ -213,6 +214,7 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 
 	/**
 	 * Get the names of tables existing in the database schema
+	 * 
 	 * @param schemaName
 	 * @return
 	 * @throws SQLException
