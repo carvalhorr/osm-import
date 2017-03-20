@@ -95,8 +95,8 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 			throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
 		try {
 			String sql = "select o.object_key, o.osm_type, o.osm_id, o.osm_version, o.coordinates, o.timestamp, " + ""
-					+ "o.user_id, o.visible, o.geojson_type, u.user_name, "
-					+ "(select count(distinct o3.user_id) from nottingham.osm_object o3 where o3.osm_id = o.osm_id) editors from "
+					+ "o.user_id, o.visible, o.geojson_type, u.user_name, o.changeset, "
+					+ "(select count(distinct o3.user_id) from " + schemaName + ".osm_object o3 where o3.osm_id = o.osm_id) editors from "
 					+ schemaName + ".osm_object o, " + schemaName
 					+ ".osm_user u where o.user_id = u.user_id and (osm_id, osm_version) in (select o2.osm_id, max(o2.osm_version) from "
 					+ schemaName + ".osm_object o2 group by o2.osm_id)" + " order by timestamp;";
@@ -238,6 +238,7 @@ public class OshQueryPersistence extends OshDatabasePersistence {
 			object.setVisible(result.getBoolean(8));
 			object.setCoordinates(result.getString(5));
 			object.setGeoJsonType(GeoJsonObjectType.getGeoJsonTypeFromDatabaseType(result.getString(9)));
+			object.setChangeset(result.getLong(11));
 
 			ResultSet resultTags = statementTags.executeQuery("select tag_key, tag_value from " + schemaName
 					+ ".osm_tag where object_key = " + result.getLong(1) + ";");
