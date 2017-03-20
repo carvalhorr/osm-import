@@ -7,4 +7,13 @@ public class NodeOsmObject extends OsmObject {
 		return GeoJsonObjectType.POINT;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (!super.equals(obj))
+			return false;
+		if (obj == null || !(obj instanceof NodeOsmObject))
+			return false;
+		return true;
+	}
+
 }
