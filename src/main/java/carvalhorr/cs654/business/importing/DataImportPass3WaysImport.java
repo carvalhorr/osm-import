@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
-import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
 import carvalhorr.cs654.model.WayOsmObject;
 import carvalhorr.cs654.osh.OshProcessor;
 import exception.UnexpectedTokenException;

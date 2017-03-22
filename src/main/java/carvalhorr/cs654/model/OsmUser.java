@@ -1,7 +1,17 @@
 package carvalhorr.cs654.model;
 
+/**
+ * Osm user.
+ * 
+ * @author carvalhorr
+ *
+ */
 public class OsmUser {
+
+	// user id
 	private Integer uid;
+
+	// user name
 	private String userName;
 
 	public OsmUser(Integer uid, String userName) {
@@ -25,6 +35,9 @@ public class OsmUser {
 		this.userName = userName;
 	}
 
+	/**
+	 * Compare two user object for equality basedon their properties.
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || !(obj instanceof OsmUser))

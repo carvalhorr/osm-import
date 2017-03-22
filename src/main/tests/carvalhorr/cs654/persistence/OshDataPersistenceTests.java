@@ -22,10 +22,15 @@ import carvalhorr.cs654.exception.SchemaDoesNotExistException;
 import carvalhorr.cs654.model.GeoJsonObjectType;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmObject;
-import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.model.OsmUser;
 import carvalhorr.cs654.model.WayOsmObject;
 
+/**
+ * Test insertion of data into database.
+ * 
+ * @author carvalhorr
+ *
+ */
 public class OshDataPersistenceTests {
 
 	// Name of the database properties file
@@ -44,6 +49,7 @@ public class OshDataPersistenceTests {
 	// Persistence object for executing special queries for test purposes
 	private static OshTestsPersistence oshTestsPersistence;
 
+	// Database configurations
 	private static Configuration dbConfig = null;
 
 	@BeforeClass
@@ -88,7 +94,7 @@ public class OshDataPersistenceTests {
 	}
 
 	@Test
-	public void insertNodeSuccessfull() throws SQLException, ErrorReadingDataFromDatabase, NotConnectedToDatabase,
+	public void testInsertNodeSuccessfull() throws SQLException, ErrorReadingDataFromDatabase, NotConnectedToDatabase,
 			ErrorProcessingReadObjectException {
 
 		// create node object
@@ -103,23 +109,17 @@ public class OshDataPersistenceTests {
 		queryOshDataPersistence.queryAllObjectCurrentVersion(new OsmObjectsReadFromDatabaseCallback() {
 
 			@Override
-			public void osmObjectReadWithAdditionalInfo(OsmObject o, Map<String, Object> additionalInfo,
-					boolean isFirst) throws ErrorProcessingReadObjectException {
-
+			public void osmObjectRead(OsmObject object, Map<String, Object> additionalInfo, boolean isFirst)
+					throws ErrorProcessingReadObjectException {
 				// check if read object is equals the object inserted
-				assertTrue("Node object obtained from database is different from inserted object", object.equals(o));
-
-			}
-
-			@Override
-			public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
-				fail("wrong callback called when retrieving inserted node");
+				assertTrue("Node object obtained from database is different from inserted object",
+						object.equals(object));
 			}
 		});
 	}
 
 	@Test
-	public void insertWaySuccessfull() throws SQLException, ErrorReadingDataFromDatabase, NotConnectedToDatabase,
+	public void testInsertWaySuccessfull() throws SQLException, ErrorReadingDataFromDatabase, NotConnectedToDatabase,
 			ErrorProcessingReadObjectException {
 		// create way object
 		final WayOsmObject object = createWayObject();
@@ -133,17 +133,11 @@ public class OshDataPersistenceTests {
 		queryOshDataPersistence.queryAllObjectCurrentVersion(new OsmObjectsReadFromDatabaseCallback() {
 
 			@Override
-			public void osmObjectReadWithAdditionalInfo(OsmObject o, Map<String, Object> additionalInfo,
-					boolean isFirst) throws ErrorProcessingReadObjectException {
-
+			public void osmObjectRead(OsmObject object, Map<String, Object> additionalInfo, boolean isFirst)
+					throws ErrorProcessingReadObjectException {
 				// check if read object is equals the object inserted
-				assertTrue("Way object obtained from database is different from inserted object", object.equals(o));
-
-			}
-
-			@Override
-			public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
-				fail("wrong callback called when retrieving inserted way");
+				assertTrue("Way object obtained from database is different from inserted object",
+						object.equals(object));
 			}
 		});
 

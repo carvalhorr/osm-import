@@ -10,7 +10,6 @@ import java.util.Map;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
-import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
 import carvalhorr.cs654.osh.OshProcessor;
 import carvalhorr.cs654.osh.PropertiesExtractor;
 import exception.UnexpectedTokenException;

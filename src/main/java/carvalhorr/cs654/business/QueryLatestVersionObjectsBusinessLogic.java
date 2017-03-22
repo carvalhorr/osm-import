@@ -14,8 +14,8 @@ import carvalhorr.cs654.files.OsmObjectLatestVersionWithNumberUsersCsvWriter;
 import carvalhorr.cs654.files.OsmObjectFileWriter;
 import carvalhorr.cs654.files.OsmObjectWriterFactory;
 import carvalhorr.cs654.model.OsmObject;
-import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
+import carvalhorr.cs654.persistence.OsmObjectsReadFromDatabaseCallback;
 
 /**
  * FR 9.8
@@ -71,12 +71,7 @@ public class QueryLatestVersionObjectsBusinessLogic extends BaseBusinessLogic {
 			persistence.queryAllObjectCurrentVersion(new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override
-				public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
-				}
-
-				@Override
-				public void osmObjectReadWithAdditionalInfo(OsmObject object, Map<String, Object> additionalInfo,
-						boolean isFirst) throws ErrorProcessingReadObjectException {
+				public void osmObjectRead(OsmObject object, Map<String, Object> additionalInfo, boolean isFirst) throws ErrorProcessingReadObjectException {
 					if (writer instanceof OsmObjectLatestVersionWithNumberUsersCsvWriter) {
 						Map<String, Object> osmObjectWithExtraInfo = new HashMap<String, Object>();
 						osmObjectWithExtraInfo.put("osmObject", object);

@@ -3,20 +3,40 @@ package carvalhorr.cs654.model;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Base osm object model.
+ * 
+ * @author carvalhorr
+ *
+ */
 public abstract class OsmObject {
 
+	// object id
 	private long id;
+
+	// object version
 	private int version;
+
+	// object creation timestamp
 	private String timestamp;
+
+	// user that created the object
 	private OsmUser user;
+
+	// indicate whether the object is visible
 	private boolean visible;
+
+	// object's changeset
 	private long changeset;
 
-	protected Map<String, String> tags = new HashMap<String, String>();
-
+	// object's geojson type
 	protected GeoJsonObjectType geoJsonType;
 
+	// object coordinates
 	protected String coordinates = "";
+
+	// object's tags
+	protected Map<String, String> tags = new HashMap<String, String>();
 
 	public void addTag(String key, String value) {
 		tags.put(key, value);
@@ -94,6 +114,9 @@ public abstract class OsmObject {
 		this.geoJsonType = geoJsonType;
 	}
 
+	/**
+	 * Compare two OsmObjects for equality based on their properties.
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || !(obj instanceof OsmObject))

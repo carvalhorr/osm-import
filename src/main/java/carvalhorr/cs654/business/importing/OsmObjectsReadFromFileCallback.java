@@ -1,6 +1,9 @@
-package carvalhorr.cs654.model;
+package carvalhorr.cs654.business.importing;
 
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
+import carvalhorr.cs654.model.NodeOsmObject;
+import carvalhorr.cs654.model.OsmBounds;
+import carvalhorr.cs654.model.WayOsmObject;
 
 public interface OsmObjectsReadFromFileCallback {
 	public void boundsObjectReadfFromFile(OsmBounds bounds) throws ErrorInsertingDataToDatabase;

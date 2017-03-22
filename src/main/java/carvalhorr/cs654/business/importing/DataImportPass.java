@@ -1,7 +1,6 @@
 package carvalhorr.cs654.business.importing;
 
 import carvalhorr.cs654.model.OsmObject;
-import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
 
 public class DataImportPass {
 

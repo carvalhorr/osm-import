@@ -1,8 +1,24 @@
 package carvalhorr.cs654.model;
 
+/**
+ * Bounds for the area contained in a OSH/OSM file.
+ * 
+ * @author carvalhorr
+ *
+ */
 public class OsmBounds {
-	private double minLat, minLon, maxLat, maxLon;
+	// area minimum latitude
+	private double minLat;
 	
+	// area minimum longiture
+	private double minLon;
+	
+	// are maximum latitude
+	private double maxLat;
+	
+	// are maximum longitude
+	private double maxLon;
+
 	public OsmBounds(double minLat, double minLon, double maxLat, double maxLon) {
 		this.minLat = minLat;
 		this.minLon = minLon;

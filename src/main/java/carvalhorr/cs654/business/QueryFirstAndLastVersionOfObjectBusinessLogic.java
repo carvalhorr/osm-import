@@ -13,8 +13,8 @@ import carvalhorr.cs654.files.OsmObjectFileWriter;
 import carvalhorr.cs654.files.OsmObjectWriterFactory;
 import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.OsmObjectType;
-import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
+import carvalhorr.cs654.persistence.OsmObjectsReadFromDatabaseCallback;
 
 /**
  * FR 9.2
@@ -25,8 +25,8 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
  * @author carvalhorr
  *
  */
-public class QueryFirstAndLastVersionOfObjectBusinessLogic extends BaseBusinessLogic  {
-	
+public class QueryFirstAndLastVersionOfObjectBusinessLogic extends BaseBusinessLogic {
+
 	// TODO Add logic to check if the directory exist and create if it doesn't
 
 	private OsmObject firstVersion = null;
@@ -34,7 +34,8 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic extends BaseBusinessL
 
 	private OshQueryPersistence persistence = null;
 
-	public QueryFirstAndLastVersionOfObjectBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator) {
+	public QueryFirstAndLastVersionOfObjectBusinessLogic(OshQueryPersistence persistence,
+			ProgressIndicator progressIndicator) {
 		super(progressIndicator);
 		this.persistence = persistence;
 	}
@@ -68,7 +69,7 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic extends BaseBusinessL
 			persistence.queryObjectsById(type, id, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override
-				public void osmObjectRead(OsmObject object, boolean isFirst) {
+				public void osmObjectRead(OsmObject object, Map<String, Object> additionalInfo, boolean isFirst) {
 
 					if (isFirst) {
 						firstVersion = object;
@@ -80,13 +81,6 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic extends BaseBusinessL
 							firstVersion = object;
 						}
 					}
-				}
-
-				@Override
-				public void osmObjectReadWithAdditionalInfo(OsmObject object, Map<String, Object> additionalInfo,
-						boolean isFirst) throws ErrorProcessingReadObjectException {
-					// TODO Auto-generated method stub
-
 				}
 			});
 			if (firstVersion != null) {

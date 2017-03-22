@@ -11,8 +11,8 @@ import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.files.ObjectTagsJsonWriter;
 import carvalhorr.cs654.files.UserEditsRankingCsvWriter;
-import carvalhorr.cs654.model.DataReadFromDatabaseCallback;
 import carvalhorr.cs654.model.OsmObjectType;
+import carvalhorr.cs654.persistence.DataReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 /**

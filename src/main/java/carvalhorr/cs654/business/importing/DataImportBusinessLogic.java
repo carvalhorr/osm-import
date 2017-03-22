@@ -13,7 +13,6 @@ import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
-import carvalhorr.cs654.model.OsmObjectsReadFromFileCallback;
 import carvalhorr.cs654.model.WayOsmObject;
 import carvalhorr.cs654.persistence.OshSchemaCreationPersistence;
 import carvalhorr.cs654.persistence.OshDataPersistence;

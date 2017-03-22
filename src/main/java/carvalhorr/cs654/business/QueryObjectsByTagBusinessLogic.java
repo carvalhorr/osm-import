@@ -12,8 +12,8 @@ import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.files.OsmObjectFileWriter;
 import carvalhorr.cs654.files.OsmObjectWriterFactory;
 import carvalhorr.cs654.model.OsmObject;
-import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
+import carvalhorr.cs654.persistence.OsmObjectsReadFromDatabaseCallback;
 
 /**
  * FR 9.7
@@ -59,15 +59,8 @@ public class QueryObjectsByTagBusinessLogic extends BaseBusinessLogic {
 			persistence.queryObjectsByTagValue(tagName, tagValue, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override
-				public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
+				public void osmObjectRead(OsmObject object, Map<String, Object> additionalInfo, boolean isFirst) throws ErrorProcessingReadObjectException {
 					writer.writeObject(object, isFirst);
-				}
-
-				@Override
-				public void osmObjectReadWithAdditionalInfo(OsmObject object, Map<String, Object> additionalInfo,
-						boolean isFirst) throws ErrorProcessingReadObjectException {
-					// TODO Auto-generated method stub
-					
 				}
 
 			});

@@ -13,8 +13,8 @@ import carvalhorr.cs654.files.OsmObjectFileWriter;
 import carvalhorr.cs654.files.OsmObjectWriterFactory;
 import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.OsmObjectType;
-import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
+import carvalhorr.cs654.persistence.OsmObjectsReadFromDatabaseCallback;
 
 /**
  * FR 9.1
@@ -28,7 +28,7 @@ import carvalhorr.cs654.persistence.OshQueryPersistence;
 public class QueryObjectsByIdBusinessLogic extends BaseBusinessLogic {
 
 	private OshQueryPersistence persistence = null;
-	
+
 	public QueryObjectsByIdBusinessLogic(OshQueryPersistence persistence, ProgressIndicator progressIndicator) {
 		super(progressIndicator);
 		this.persistence = persistence;
@@ -54,7 +54,7 @@ public class QueryObjectsByIdBusinessLogic extends BaseBusinessLogic {
 		OsmObjectFileWriter writer = OsmObjectWriterFactory.getOsmObjectWriter(format, fileName);
 		queryObjectsById(type, id, writer);
 	}
-	
+
 	private void queryObjectsById(OsmObjectType type, long id, final OsmObjectFileWriter writer)
 			throws FailedToCompleteQueryException {
 
@@ -63,14 +63,9 @@ public class QueryObjectsByIdBusinessLogic extends BaseBusinessLogic {
 			persistence.queryObjectsById(type, id, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override
-				public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
+				public void osmObjectRead(OsmObject object, Map<String, Object> additionalInfo, boolean isFirst)
+						throws ErrorProcessingReadObjectException {
 					writer.writeObject(object, isFirst);
-				}
-
-				@Override
-				public void osmObjectReadWithAdditionalInfo(OsmObject object, Map<String, Object> additionalInfo,
-						boolean isFirst) throws ErrorProcessingReadObjectException {
-					
 				}
 
 			});
@@ -103,7 +98,8 @@ public class QueryObjectsByIdBusinessLogic extends BaseBusinessLogic {
 	 * @throws NotConnectedToDatabase
 	 * @throws ErrorWritingToFileException
 	 */
-	public void queryObjectsById(ExportFormatType format, OsmObjectType type, long id) throws FailedToCompleteQueryException {
+	public void queryObjectsById(ExportFormatType format, OsmObjectType type, long id)
+			throws FailedToCompleteQueryException {
 		String fileName = "";
 		switch (type) {
 		case NODE: {

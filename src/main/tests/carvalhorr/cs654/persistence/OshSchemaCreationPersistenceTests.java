@@ -22,7 +22,6 @@ import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmObject;
-import carvalhorr.cs654.model.OsmObjectsReadFromDatabaseCallback;
 import carvalhorr.cs654.model.OsmUser;
 
 /**
@@ -53,7 +52,7 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 	// Counter used by the callbacks from the query osh data persistence to
 	// verify correct working
 	private int readObjectsCount = 0;
-	
+
 	private static Configuration dbConfig = null;
 
 	@BeforeClass
@@ -73,18 +72,18 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 				dbConfig.getConfigurationForKey("user"), dbConfig.getConfigurationForKey("password"), SCHEMA_NAME);
 
 	}
-	
+
 	@AfterClass
 	public static void cleanup() throws SQLException {
 		// delete schema
 		oshTestsPersistence.getStatement().execute("DROP SCHEMA IF EXISTS " + SCHEMA_NAME + " CASCADE;");
-		
+
 		// Verify the schema does not exist
 		assertFalse(insertOshDataPersistence.schemaExists());
 	}
 
 	@Test
-	public void createSchemaTest() throws SQLException, NotConnectedToDatabase {
+	public void testCreateSchema() throws SQLException, NotConnectedToDatabase {
 		insertOshDataPersistence.createSchema();
 		assertTrue(insertOshDataPersistence.schemaExists());
 		assertTrue(isAllTablesCreated());
@@ -95,8 +94,9 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 	}
 
 	@Test
-	public void createExistingSchemaDeletesPreviousDataTest() throws SQLException, NotConnectedToDatabase,
-			ErrorReadingDataFromDatabase, ErrorProcessingReadObjectException, PostgresqlDriverNotFound, ErrorConnectingToDatabase, SchemaDoesNotExistException {
+	public void testCreateExistingSchemaDeletesPreviousData() throws SQLException, NotConnectedToDatabase,
+			ErrorReadingDataFromDatabase, ErrorProcessingReadObjectException, PostgresqlDriverNotFound,
+			ErrorConnectingToDatabase, SchemaDoesNotExistException {
 		// Create schema
 		insertOshDataPersistence.createSchema();
 		assertTrue(insertOshDataPersistence.schemaExists());
@@ -104,11 +104,10 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 		// insert object node object
 		insertOshDataPersistence.batchInsertOsmObject(createObject(1, 1));
 		insertOshDataPersistence.flushOsmObjectsBatch();
-		
+
 		// Create OSH data query persistence object
 		queryOshDataPersistence = new OshQueryPersistence(dbConfig.getConfigurationForKey("jdbcString"),
 				dbConfig.getConfigurationForKey("user"), dbConfig.getConfigurationForKey("password"), SCHEMA_NAME);
-
 
 		// check it was inserted
 		queryOshDataPersistence.queryAllObjectCurrentVersion(this);
@@ -123,6 +122,13 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 		assertEquals(0, readObjectsCount);
 	}
 
+	/**
+	 * Creates an object to be inserted in the database
+	 * 
+	 * @param id
+	 * @param version
+	 * @return
+	 */
 	public OsmObject createObject(long id, int version) {
 		NodeOsmObject obj = new NodeOsmObject();
 		obj.setChangeset(1l);
@@ -133,17 +139,22 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 		return obj;
 	}
 
+	/**
+	 * Callback called when an object is read from the database.
+	 */
 	@Override
-	public void osmObjectRead(OsmObject object, boolean isFirst) throws ErrorProcessingReadObjectException {
-
-	}
-
-	@Override
-	public void osmObjectReadWithAdditionalInfo(OsmObject object, Map<String, Object> additionalInfo, boolean isFirst)
+	public void osmObjectRead(OsmObject object, Map<String, Object> additionalInfo, boolean isFirst)
 			throws ErrorProcessingReadObjectException {
 		readObjectsCount++;
+
 	}
 
+	/**
+	 * Verify that all tables are created.
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
 	private boolean isAllTablesCreated() throws SQLException {
 		List<String> tableNames = getTableNames(SCHEMA_NAME);
 		return (tableNames.size() == 4) && tableNames.contains("osm_bounds") && tableNames.contains("osm_tag")

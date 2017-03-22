@@ -14,8 +14,8 @@ import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.files.FileUtils;
 import carvalhorr.cs654.files.SummaryEditsCsvWriter;
 import carvalhorr.cs654.files.UserEditsRankingCsvWriter;
-import carvalhorr.cs654.model.DataReadFromDatabaseCallback;
 import carvalhorr.cs654.model.GeoJsonObjectType;
+import carvalhorr.cs654.persistence.DataReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 /**
