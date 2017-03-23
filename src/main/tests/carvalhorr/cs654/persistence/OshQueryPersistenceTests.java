@@ -4,7 +4,10 @@ import static org.junit.Assert.assertFalse;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +18,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import carvalhorr.cs654.business.QueryEditingSummaryBusinessLogic;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
@@ -26,8 +30,9 @@ import carvalhorr.cs654.model.GeoJsonObjectType;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.OsmObjectType;
+import carvalhorr.cs654.util.DateUtil;
 
-public class OshQueryPersistenceTests implements OsmObjectsReadFromDatabaseCallback {
+public class OshQueryPersistenceTests implements OsmObjectsReadFromDatabaseCallback, DataReadFromDatabaseCallback {
 
 	// Name of the database properties file
 	private static final String DB_CONFIG = "database.properties";
@@ -51,11 +56,18 @@ public class OshQueryPersistenceTests implements OsmObjectsReadFromDatabaseCallb
 	// Keep list of read objects for testing results of queries
 	private List<Object> objectsReadFromDatabase = null;
 
+	// Keep list of additional info for each read object from test results
+	private Map<Long, Object> additionalInfoReadFromDatabase = null;
+
 	// test parameters
 	private static final Long nodeIdForQueryById = 2l;
 	private static final Integer userIdForQueryByUserId = 2;
 	private static final String tagKeyForQuery = "tag2";
 	private static final String tagValueForQuery = "value2";
+	private static final Integer userIdForQueryEditsByUser = 3;
+	private static final String dateForQueryEditsByUser = "2009-12-11T14:21:24Z";
+	private static final String startDateForQueryEditsByUser = "2009-12-01T00:00:00Z";
+	private static final String endDateForQueryEdistsByUser = "2009-12-31T23:59:59Z";
 
 	// default values
 	private static final Long defaultObjectId = 1l;
@@ -107,6 +119,7 @@ public class OshQueryPersistenceTests implements OsmObjectsReadFromDatabaseCallb
 	@Before
 	public void clearListObjectsRead() {
 		objectsReadFromDatabase = new ArrayList<Object>();
+		additionalInfoReadFromDatabase = new HashMap<Long, Object>();
 	}
 
 	@Test
@@ -127,12 +140,13 @@ public class OshQueryPersistenceTests implements OsmObjectsReadFromDatabaseCallb
 	}
 
 	@Test
-	public void testQueryRankingEditsByUser() throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
+	public void testQueryEditsByUser()
+			throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
 
 		// execute query
 		queryOshDataPersistence.queryEditsByUser(userIdForQueryByUserId, this);
-		
-		// check the number of returned objects 
+
+		// check the number of returned objects
 		assertEquals(3, objectsReadFromDatabase.size());
 
 		// check all objects have correct user id
@@ -141,30 +155,65 @@ public class OshQueryPersistenceTests implements OsmObjectsReadFromDatabaseCallb
 			assertEquals(userIdForQueryByUserId, ((OsmObject) o).getUser().getUid());
 		}
 	}
-
+	
 	@Test
-	public void testQueryEditsByUser() {
-		fail("to implement");
+	public void testQueryRankingEdistByUser() throws NotConnectedToDatabase, ErrorReadingDataFromDatabase, ErrorProcessingReadObjectException {
+		
+		// execute query
+		queryOshDataPersistence.queryRankingEditsByUser(this);
+		
+		
 	}
 
 	@Test
-	public void testQueryEditingSummaryTotalObjectsByTypeAndPeriod() {
-		fail("to implement");
+	public void testQueryEditingSummaryTotalDistinctUsersByPeriod() throws ParseException, NotConnectedToDatabase, ErrorReadingDataFromDatabase {
+
+		// init params
+		String dateFormat = DateUtil.DATE_FORMAT_ISO8601;
+		Date startDate = DateUtil.convertStringToDate(dateFormat, startDateForQueryEditsByUser);
+		Date endDate = DateUtil.convertStringToDate(dateFormat, endDateForQueryEdistsByUser);
+
+		// execute query
+		long totalNumberOfUsers = queryOshDataPersistence.queryEditingSummaryTotalDistinctUsersByPeriod(startDate, endDate);
+
+		// check the number of objects returned
+		assertEquals(1l, totalNumberOfUsers);
 	}
 
 	@Test
-	public void testQueryEditingSummaryTotalDistinctUsersByPeriod() {
-		fail("to implement");
+	public void testQueryEditingSummaryTotalObjectsByTypeAndPeriod() throws ParseException, NotConnectedToDatabase, ErrorReadingDataFromDatabase {
+		
+		// init params
+		String dateFormat = DateUtil.DATE_FORMAT_ISO8601;
+		Date startDate = DateUtil.convertStringToDate(dateFormat, startDateForQueryEditsByUser);
+		Date endDate = DateUtil.convertStringToDate(dateFormat, endDateForQueryEdistsByUser);
+		
+		// execute query
+		long totalPoints = queryOshDataPersistence.queryEditingSummaryTotalObjectsByTypeAndPeriod(defaultGeoJsonType, startDate, endDate);
+
+		// check number of object found
+		assertEquals(2, totalPoints);
 	}
 
 	@Test
-	public void testQueryObjectsByTagValue() throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
+	public void testQueryAllObjectsCurrentVersion() throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
+		
+		// execute query
+		queryOshDataPersistence.queryAllObjectCurrentVersion(this);
+		
+		// check number of objects found
+		assertEquals(2, objectsReadFromDatabase.size());
+	}
+
+	@Test
+	public void testQueryObjectsByTagValue()
+			throws ErrorReadingDataFromDatabase, NotConnectedToDatabase, ErrorProcessingReadObjectException {
 		// execute query
 		queryOshDataPersistence.queryObjectsByTagValue(tagKeyForQuery, tagValueForQuery, this);
-		
+
 		// check the number of objects returned
 		assertEquals(3, objectsReadFromDatabase.size());
-		
+
 		// check all returned objects contain the tag
 		for (Object o : objectsReadFromDatabase) {
 			assertTrue(o instanceof OsmObject);
@@ -177,6 +226,7 @@ public class OshQueryPersistenceTests implements OsmObjectsReadFromDatabaseCallb
 		insertNodeId1();
 		insertObjectsForUser2();
 		insertObjectsForQueryByTag();
+		insertObjectsForQueryEdisByUser();
 		insertOshDataPersistence.flushOsmObjectsBatch();
 	}
 
@@ -219,10 +269,25 @@ public class OshQueryPersistenceTests implements OsmObjectsReadFromDatabaseCallb
 
 	}
 
+	private static void insertObjectsForQueryEdisByUser() throws SQLException {
+		insertOshDataPersistence.batchInsertOsmObject(OsmObjectTestsHelper.createWayObject(defaultGeoJsonType,
+				defaultChangeSet, defaultObjectId, 7, userIdForQueryEditsByUser, defaultUserName,
+				dateForQueryEditsByUser, defaultTagKey, defaultTagValue));
+		insertOshDataPersistence.batchInsertOsmObject(OsmObjectTestsHelper.createWayObject(defaultGeoJsonType,
+				defaultChangeSet, defaultObjectId, 8, userIdForQueryEditsByUser, defaultUserName,
+				dateForQueryEditsByUser, defaultTagKey, defaultTagValue));
+	}
+
 	@Override
 	public void osmObjectRead(OsmObject object, Map<String, Object> additionalInfo, boolean isFirst)
 			throws ErrorProcessingReadObjectException {
 		objectsReadFromDatabase.add(object);
+		additionalInfoReadFromDatabase.put(((OsmObject) object).getId(), additionalInfo);
+	}
+
+	@Override
+	public void dataRead(Map<String, Object> properties, boolean isFirst) throws ErrorProcessingReadObjectException {
+		System.out.println(properties);
 	}
 
 }

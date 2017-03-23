@@ -8,6 +8,7 @@ import java.util.Date;
 import carvalhorr.cs654.business.QueryEditingSummaryBusinessLogic;
 import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.model.OsmObjectType;
+import carvalhorr.cs654.util.DateUtil;
 
 public class QueryParamsParser {
 
@@ -29,8 +30,7 @@ public class QueryParamsParser {
 			command.printMessage(usageMessage);
 			System.exit(1);
 		}
-		DateFormat formatter = new SimpleDateFormat(QueryEditingSummaryBusinessLogic.DATE_FORMAT);
-		Date startDate = formatter.parse(dateString);
+		Date startDate = DateUtil.convertStringToDate(QueryEditingSummaryBusinessLogic.DATE_FORMAT, dateString);
 		return startDate;
 	}
 
