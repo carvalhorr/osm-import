@@ -24,6 +24,7 @@ import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
+import carvalhorr.cs654.util.Params;
 
 public class QueryCommand extends BaseCommand implements QueryParams {
 
@@ -157,16 +158,18 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 	public void exportFile() throws SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase,
 			SchemaDoesNotExistException, FailedToCompleteQueryException {
 
-		Configuration config = new Configuration();
+		Params.getInstance().setParam(Params.PARAM_DB_CONFIG_FILENAME, mDbConfig);
+
+		Configuration config = null;
 		try {
-			config.readConfigurationFromFile(mDbConfig);
+			config = Configuration.getInstance();
 		} catch (FileNotFoundException e1) {
 			printFatalError("Could not find database properties file " + mDbConfig);
 			System.exit(1);
 		}
 
-		persistence = new OshQueryPersistence(config.getConfigurationForKey("jdbcString"),
-				config.getConfigurationForKey("user"), config.getConfigurationForKey("password"), mSchemaName);
+		persistence = new OshQueryPersistence(config.getJdbcString(),
+				config.getUsername(), config.getPassword(), mSchemaName);
 
 		switch (mQueryType) {
 		case "editing-summary": {

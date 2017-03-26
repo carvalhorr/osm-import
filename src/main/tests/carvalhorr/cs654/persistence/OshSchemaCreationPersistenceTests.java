@@ -23,6 +23,7 @@ import carvalhorr.cs654.exception.SchemaDoesNotExistException;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.OsmUser;
+import carvalhorr.cs654.util.Params;
 
 /**
  * Tests to verify that a schema is created correctly and that data is deleted
@@ -60,16 +61,16 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 			ErrorConnectingToDatabase, SchemaDoesNotExistException {
 
 		// Load database configurations
-		dbConfig = new Configuration();
-		dbConfig.readConfigurationFromFile(DB_CONFIG);
+		Params.getInstance().setParam(Params.PARAM_DB_CONFIG_FILENAME, DB_CONFIG);
+		dbConfig = Configuration.getInstance();
 
 		// Create OSH data insertion persistence object
-		insertOshDataPersistence = new OshDataPersistence(dbConfig.getConfigurationForKey("jdbcString"),
-				dbConfig.getConfigurationForKey("user"), dbConfig.getConfigurationForKey("password"), SCHEMA_NAME);
+		insertOshDataPersistence = new OshDataPersistence(dbConfig.getJdbcString(),
+				dbConfig.getUsername(), dbConfig.getPassword(), SCHEMA_NAME);
 
 		// Create OSH test persistence object
-		oshTestsPersistence = new OshTestsPersistence(dbConfig.getConfigurationForKey("jdbcString"),
-				dbConfig.getConfigurationForKey("user"), dbConfig.getConfigurationForKey("password"), SCHEMA_NAME);
+		oshTestsPersistence = new OshTestsPersistence(dbConfig.getJdbcString(),
+				dbConfig.getUsername(), dbConfig.getPassword(), SCHEMA_NAME);
 
 	}
 
@@ -106,8 +107,8 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 		insertOshDataPersistence.flushOsmObjectsBatch();
 
 		// Create OSH data query persistence object
-		queryOshDataPersistence = new OshQueryPersistence(dbConfig.getConfigurationForKey("jdbcString"),
-				dbConfig.getConfigurationForKey("user"), dbConfig.getConfigurationForKey("password"), SCHEMA_NAME);
+		queryOshDataPersistence = new OshQueryPersistence(dbConfig.getJdbcString(),
+				dbConfig.getUsername(), dbConfig.getPassword(), SCHEMA_NAME);
 
 		// check it was inserted
 		queryOshDataPersistence.queryAllObjectCurrentVersion(this);
