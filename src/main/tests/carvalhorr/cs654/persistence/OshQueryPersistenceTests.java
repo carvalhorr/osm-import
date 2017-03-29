@@ -85,8 +85,9 @@ public class OshQueryPersistenceTests implements OsmObjectsReadFromDatabaseCallb
 			ErrorConnectingToDatabase, NotConnectedToDatabase, SchemaDoesNotExistException {
 
 		// Load database configurations
-		Params.getInstance().setParam(Params.PARAM_DB_CONFIG_FILENAME, DB_CONFIG);
-		dbConfig = Configuration.getInstance();
+		String fullDbConfigPath = OshQueryPersistenceTests.class.getClassLoader().getResource(DB_CONFIG).getPath();
+		Params.getInstance().setParam(Params.PARAM_DB_CONFIG_FILENAME, fullDbConfigPath);
+		dbConfig = new Configuration();
 
 		// Create OSH data insertion persistence object
 		insertOshDataPersistence = new OshDataPersistence(dbConfig.getJdbcString(),

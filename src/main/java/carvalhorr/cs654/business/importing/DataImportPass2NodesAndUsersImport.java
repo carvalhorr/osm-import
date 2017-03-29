@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
+import carvalhorr.cs654.exception.UnexpectedTokenException;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
 import carvalhorr.cs654.osh.OshProcessor;
 import carvalhorr.cs654.osh.PropertiesExtractor;
-import exception.UnexpectedTokenException;
 
 public class DataImportPass2NodesAndUsersImport extends DataImportPass {
 

@@ -11,12 +11,12 @@ import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.exception.CouldNotCreateSchemaException;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
+import carvalhorr.cs654.exception.UnexpectedTokenException;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
 import carvalhorr.cs654.model.WayOsmObject;
 import carvalhorr.cs654.persistence.OshSchemaCreationPersistence;
-import carvalhorr.cs654.persistence.OshDataPersistence;
-import exception.UnexpectedTokenException;;
+import carvalhorr.cs654.persistence.OshDataPersistence;;
 
 public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObjectsReadFromFileCallback {
 

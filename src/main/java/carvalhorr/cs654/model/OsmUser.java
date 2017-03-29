@@ -9,10 +9,10 @@ package carvalhorr.cs654.model;
 public class OsmUser {
 
 	// user id
-	private Integer uid;
+	private final Integer uid;
 
 	// user name
-	private String userName;
+	private final String userName;
 
 	public OsmUser(Integer uid, String userName) {
 		this.uid = uid;
@@ -23,16 +23,8 @@ public class OsmUser {
 		return uid;
 	}
 
-	public void setUid(Integer uid) {
-		this.uid = uid;
-	}
-
 	public String getUserName() {
 		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
 	}
 
 	/**

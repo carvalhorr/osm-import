@@ -1,4 +1,4 @@
-package exception;
+package carvalhorr.cs654.exception;
 
 public class UnexpectedTokenException extends Exception {
 

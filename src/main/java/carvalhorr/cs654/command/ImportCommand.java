@@ -22,9 +22,9 @@ import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
+import carvalhorr.cs654.exception.UnexpectedTokenException;
 import carvalhorr.cs654.persistence.OshDataPersistence;
 import carvalhorr.cs654.util.Params;
-import exception.UnexpectedTokenException;
 
 public class ImportCommand implements ProgressIndicator {
 
@@ -113,7 +113,7 @@ public class ImportCommand implements ProgressIndicator {
 		
 		Configuration config = null;
 		try {
-			config = Configuration.getInstance();
+			config = new Configuration();
 		} catch (FileNotFoundException e1) {
 			System.out.println("Could not find database properties file " + dbConfig);
 		}

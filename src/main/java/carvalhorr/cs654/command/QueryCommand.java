@@ -164,7 +164,7 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 
 		Configuration config = null;
 		try {
-			config = Configuration.getInstance();
+			config = new Configuration();
 		} catch (FileNotFoundException e1) {
 			printFatalError("Could not find database properties file " + mDbConfig);
 			System.exit(1);

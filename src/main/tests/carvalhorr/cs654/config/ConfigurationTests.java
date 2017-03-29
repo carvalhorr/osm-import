@@ -41,7 +41,7 @@ public class ConfigurationTests {
 		Params.getInstance().setParam(Params.PARAM_DB_CONFIG_FILENAME, fileName);
 
 		// Get configurations
-		Configuration c = Configuration.getInstance();
+		Configuration c = new Configuration();
 
 		// verify they are correct
 		assertEquals(jdbcString, c.getJdbcString());
