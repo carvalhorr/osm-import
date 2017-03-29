@@ -1,30 +1,15 @@
 package carvalhorr.cs654.files;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
-import carvalhorr.cs654.exception.ErrorWritingToFileException;
 
 @Deprecated
 public class ObjectTagsJsonWriter extends OsmObjectFileWriterImpl {
 
-	private String fileName = "";
-
-	private File file = null;
-
-	private BufferedWriter writer = null;
-
 	public ObjectTagsJsonWriter(String fileName) {
-		
-		if (!fileName.endsWith(".json")) {
-			fileName = fileName + ".json";
-		}
-
-		this.fileName = fileName;
+		super(fileName, "json");
 	}
 
 	@Override
@@ -35,33 +20,18 @@ public class ObjectTagsJsonWriter extends OsmObjectFileWriterImpl {
 					+ ", \"tags\": [" + properties.get("tags").toString() + "]}");
 
 		} catch (IOException ex) {
-			throw new ErrorProcessingReadObjectException("Error while writing to file: " + fileName, ex);
+			throw new ErrorProcessingReadObjectException("Error while writing to file: " + getFileName(), ex);
 		}
 	}
 
 	@Override
-	public void finishWritingFile() throws ErrorWritingToFileException {
-		try {
-			writer.close();
-
-		} catch (IOException e) {
-			throw new ErrorWritingToFileException(e);
-		}
-
+	protected void writeHeader() {
+		// the generated file does not contain any header
 	}
 
 	@Override
-	public void startWritinFile() throws ErrorWritingToFileException {
-
-		try {
-			file = new File(fileName);
-			mFullFileName = file.getAbsolutePath();
-			writer = new BufferedWriter(new FileWriter(file));
-
-		} catch (IOException e) {
-			throw new ErrorWritingToFileException(e);
-		}
-
+	protected void writeFooter() {
+		// the generated file does not contain any header
 	}
 
 }

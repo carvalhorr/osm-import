@@ -1,11 +1,12 @@
-package carvalhorr.cs654.files;
+package carvalhorr.cs654.util;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Paths;
 
-public class FileUtils {
+public class FileUtil {
+	
 	public static boolean directoryExists(String directoryPath) {
 		return Files.exists(Paths.get(directoryPath), LinkOption.NOFOLLOW_LINKS);
 	}

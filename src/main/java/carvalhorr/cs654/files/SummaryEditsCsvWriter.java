@@ -1,14 +1,9 @@
 package carvalhorr.cs654.files;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
-import carvalhorr.cs654.exception.ErrorWritingToFileException;
-import carvalhorr.cs654.model.OsmObject;
 
 /**
  * FR9.5
@@ -18,19 +13,8 @@ import carvalhorr.cs654.model.OsmObject;
  */
 public class SummaryEditsCsvWriter extends OsmObjectFileWriterImpl {
 
-	private String fileName = "";
-
-	private File file = null;
-
-	private BufferedWriter writer = null;
-
 	public SummaryEditsCsvWriter(String fileName) {
-
-		if (!fileName.endsWith(".csv")) {
-			fileName = fileName + ".csv";
-		}
-
-		this.fileName = fileName;
+		super(fileName, "csv");
 	}
 
 	@Override
@@ -50,36 +34,20 @@ public class SummaryEditsCsvWriter extends OsmObjectFileWriterImpl {
 			writer.newLine();
 
 		} catch (IOException ex) {
-			throw new ErrorProcessingReadObjectException("Error while writing to file: " + fileName, ex);
+			throw new ErrorProcessingReadObjectException("Error while writing to file: " + getFileName(), ex);
 		}
+	}
+	
+	@Override
+	protected void writeHeader() throws IOException {
+		writer.write("Total edits, Total points, Total linestrings, Total polygons, Total multilines, Total distinct users");
+		writer.newLine();
 	}
 
 	@Override
-	public void startWritinFile() throws ErrorWritingToFileException {
-
-		try {
-			file = new File(fileName);
-			mFullFileName = file.getAbsolutePath();
-
-			writer = new BufferedWriter(new FileWriter(file));
-
-			writer.write("Total edits, Total points, Total linestrings, Total polygons, Total multilines, Total distinct users");
-			writer.newLine();
-
-		} catch (IOException e) {
-			throw new ErrorWritingToFileException(e);
-		}
+	protected void writeFooter() throws IOException {
+		// the generated file does not contain any header
 	}
 
-	@Override
-	public void finishWritingFile() throws ErrorWritingToFileException {
-		try {
-			writer.close();
-
-		} catch (IOException e) {
-			throw new ErrorWritingToFileException(e);
-		}
-
-	}
 
 }

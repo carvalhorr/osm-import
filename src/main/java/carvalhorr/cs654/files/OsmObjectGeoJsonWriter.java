@@ -1,32 +1,16 @@
 package carvalhorr.cs654.files;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
-import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.model.OsmObject;
 
 public class OsmObjectGeoJsonWriter extends OsmObjectFileWriterImpl {
 
-	private String fileName = "";
-
-	private File file = null;
-
-	private BufferedWriter writer = null;
-
 	public OsmObjectGeoJsonWriter(String fileName) {
-
-		if (!fileName.endsWith(".geojson")) {
-			fileName = fileName + ".geojson";
-		}
-
-		this.fileName = fileName;
-
+		super(fileName, "geojson");
 	}
 
 	private String getGeoJsonStringForOsmObject(OsmObject object) {
@@ -59,36 +43,19 @@ public class OsmObjectGeoJsonWriter extends OsmObjectFileWriterImpl {
 			writer.write(getGeoJsonStringForOsmObject((OsmObject)object));
 
 		} catch (IOException ex) {
-			throw new ErrorProcessingReadObjectException("Error while writing to file: " + fileName, ex);
+			throw new ErrorProcessingReadObjectException("Error while writing to file: " + getFileName(), ex);
 		}
 	}
 
 	@Override
-	public void finishWritingFile() throws ErrorWritingToFileException {
-		try {
-			writer.write("]}");
-			writer.close();
-
-		} catch (IOException e) {
-			throw new ErrorWritingToFileException(e);
-		}
-
+	protected void writeHeader() throws IOException {
+		writer.write("{\"type\": \"FeatureCollection\", \"features\": [");
 	}
 
 	@Override
-	public void startWritinFile() throws ErrorWritingToFileException {
-
-		try {
-			file = new File(fileName);
-			mFullFileName = file.getAbsolutePath();
-
-			writer = new BufferedWriter(new FileWriter(file));
-
-			writer.write("{\"type\": \"FeatureCollection\", \"features\": [");
-
-		} catch (IOException e) {
-			throw new ErrorWritingToFileException(e);
-		}		
+	protected void writeFooter() throws IOException {
+		writer.write("]}");
 	}
+
 
 }

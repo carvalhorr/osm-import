@@ -1,11 +1,65 @@
 package carvalhorr.cs654.files;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import carvalhorr.cs654.exception.ErrorWritingToFileException;
+
 public abstract class OsmObjectFileWriterImpl implements OsmObjectFileWriter {
 	
-	protected String mFullFileName = "";
+	private String mFullFileName = "";
+
+	private File file = null;
+
+	protected BufferedWriter writer = null;
+
+
+
+	public OsmObjectFileWriterImpl(String fileName, String extension) {
+		this.mFullFileName = fileName;
+		if (!mFullFileName.endsWith("." + extension)) {
+			mFullFileName = mFullFileName + "." + extension;
+		}
+	}
+
 
 	@Override
+	public void startWritinFile() throws ErrorWritingToFileException {
+
+		try {
+			file = new File(getFileName());
+			mFullFileName = file.getAbsolutePath();
+
+			writer = new BufferedWriter(new FileWriter(file));
+			writeHeader();
+
+		} catch (IOException e) {
+			throw new ErrorWritingToFileException(e);
+		}
+	}
+
+	@Override
+	public void finishWritingFile() throws ErrorWritingToFileException {
+		try {
+			writeFooter();
+			writer.close();
+
+		} catch (IOException e) {
+			throw new ErrorWritingToFileException(e);
+		}
+	}
+	
+	protected abstract void writeHeader() throws IOException ;
+	protected abstract void writeFooter() throws IOException ;
+	
+	@Override
 	public String getFullFileName() {
+		return mFullFileName;
+	}
+
+	protected String getFileName() {
 		return mFullFileName;
 	}
 

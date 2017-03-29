@@ -11,11 +11,9 @@ import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
-import carvalhorr.cs654.files.FileUtils;
+import carvalhorr.cs654.files.OsmObjectFileWriter;
 import carvalhorr.cs654.files.SummaryEditsCsvWriter;
-import carvalhorr.cs654.files.UserEditsRankingCsvWriter;
 import carvalhorr.cs654.model.GeoJsonObjectType;
-import carvalhorr.cs654.persistence.DataReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 /**
@@ -41,7 +39,7 @@ public class QueryEditingSummaryBusinessLogic extends BaseBusinessLogic {
 			throws FailedToCompleteQueryException {
 		try {
 
-			final SummaryEditsCsvWriter writer = new SummaryEditsCsvWriter(fileName);
+			final OsmObjectFileWriter writer = new SummaryEditsCsvWriter(fileName);
 
 			Long totalPointsEdited = persistence.queryEditingSummaryTotalObjectsByTypeAndPeriod(GeoJsonObjectType.POINT,
 					startDate, finishDate);
