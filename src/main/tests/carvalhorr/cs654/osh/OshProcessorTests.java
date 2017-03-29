@@ -15,7 +15,7 @@ import java.util.Map;
 public class OshProcessorTests {
 
 	@Test
-	public void processOshNodeStringSuccessfully() {
+	public void processingALineOfNodeOshStringShouldFillTheCorrectPropertiesOfNodeOject() {
 
 		// Define values
 		Long id = 4221833l;
@@ -51,7 +51,7 @@ public class OshProcessorTests {
 	}
 
 	@Test
-	public void processOshTagStringSuccessfully() {
+	public void processingALineOfTagOshStringShouldInsertATagIntoAnOsmObject() {
 
 		// define tags
 		Map<String, String> tags = new HashMap<String, String>();
@@ -77,7 +77,7 @@ public class OshProcessorTests {
 	}
 
 	@Test
-	public void processAddOshNodeStringSuccessfully() {
+	public void processingALineOfNodeOshStringShouldAddANodeToAWayObject() {
 
 		List<String> nodes = new ArrayList<String>();
 		nodes.add("12345");

@@ -9,7 +9,7 @@ import org.junit.Test;
 public class PropertiesExtractorTests {
 
 	@Test
-	public void extractPropertiesFromOsmStringSuccessfull() {
+	public void extractingPropertiesFromAOshStringShouldReturnAllPropertiesContainedInTheString() {
 		
 		String osmString = "<node id=\"4221833\" version=\"2\" timestamp=\"2008-12-11T14:21:24Z\" uid=\"15535\" user=\"Blazejos\" changeset=\"315455\" visible=\"true\" lat=\"53.3826303\" lon=\"-6.5995123\"/>";
 		
