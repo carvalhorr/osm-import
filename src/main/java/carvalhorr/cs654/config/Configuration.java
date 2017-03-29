@@ -1,6 +1,8 @@
 package carvalhorr.cs654.config;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -26,8 +28,7 @@ public class Configuration {
 	
 	private void readConfigurationFromFile(String fileName) throws FileNotFoundException {
 
-
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+		FileReader inputStream = new FileReader(new File(fileName));
 
 		if (inputStream != null) {
 			try {

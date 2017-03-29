@@ -158,7 +158,9 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 	public void exportFile() throws SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase,
 			SchemaDoesNotExistException, FailedToCompleteQueryException {
 
-		Params.getInstance().setParam(Params.PARAM_DB_CONFIG_FILENAME, mDbConfig);
+		String fullDbConfigPath = getClass().getClassLoader().getResource(mDbConfig).getPath();
+
+		Params.getInstance().setParam(Params.PARAM_DB_CONFIG_FILENAME, fullDbConfigPath);
 
 		Configuration config = null;
 		try {

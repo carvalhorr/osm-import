@@ -107,8 +107,9 @@ public class ImportCommand implements ProgressIndicator {
 		System.out.println("OSH file :" + oshFileName);
 		System.out.println("Database properties file :" + dbConfig);
 		
+		String fullDbConfigPath = getClass().getClassLoader().getResource(dbConfig).getPath();
 		
-		Params.getInstance().setParam(Params.PARAM_DB_CONFIG_FILENAME, dbConfig);
+		Params.getInstance().setParam(Params.PARAM_DB_CONFIG_FILENAME, fullDbConfigPath);
 		
 		Configuration config = null;
 		try {
