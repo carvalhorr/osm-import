@@ -15,17 +15,15 @@ public class OsmObjectCsvWriter extends OsmObjectFileWriterImpl {
 
 	@Override
 	public void writeObject(Object obj, boolean isFirst) throws ErrorProcessingReadObjectException {
-		OsmObject object = (OsmObject) obj;
-		try {
-			writer.write(StringEscapeUtils.unescapeHtml4(object.getId().toString()) + ","
-					+ StringEscapeUtils.unescapeHtml4(object.getVersion().toString()) + ", "
-					+ StringEscapeUtils.unescapeHtml4(object.getGeoJsonType().toString()) + ", "
-					+ StringEscapeUtils.unescapeHtml4(object.getTimestamp().toString()));
-			writer.newLine();
+		if (!(obj instanceof OsmObject))
+			throw new RuntimeException("OsmObject expected but a different type was provided.");
 
-		} catch (IOException ex) {
-			throw new ErrorProcessingReadObjectException("Error while writing to file: " + getFileName(), ex);
-		}
+		OsmObject object = (OsmObject) obj;
+		writeToFile(StringEscapeUtils.unescapeHtml4(object.getId().toString()) + ","
+				+ StringEscapeUtils.unescapeHtml4(object.getVersion().toString()) + ", "
+				+ StringEscapeUtils.unescapeHtml4(object.getGeoJsonType().toString()) + ", "
+				+ StringEscapeUtils.unescapeHtml4(object.getTimestamp().toString()));
+		writeNewLine();
 	}
 
 	@Override

@@ -17,14 +17,19 @@ public class OsmObjectGeoJsonWriter extends OsmObjectFileWriterImpl {
 		String propertiesStr = "{";
 
 		propertiesStr += "\"id\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getId().toString()) + "\"";
-		propertiesStr += ", \"version\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getVersion().toString()) + "\"";
+		propertiesStr += ", \"version\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getVersion().toString())
+				+ "\"";
 		propertiesStr += ", \"timestamp\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getTimestamp()) + "\"";
-		propertiesStr += ", \"user_id\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getUser().getUid().toString()) + "\"";
-		propertiesStr += ", \"user_name\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getUser().getUserName()) + "\"";
-		propertiesStr += ", \"visible\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getVisible().toString()) + "\"";
+		propertiesStr += ", \"user_id\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getUser().getUid().toString())
+				+ "\"";
+		propertiesStr += ", \"user_name\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getUser().getUserName())
+				+ "\"";
+		propertiesStr += ", \"visible\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getVisible().toString())
+				+ "\"";
 
 		for (String key : object.getTags().keySet()) {
-			propertiesStr += ", \"" + StringEscapeUtils.unescapeHtml4(key) + "\":" + "\"" + StringEscapeUtils.unescapeHtml4(object.getTags().get(key)) + "\"";
+			propertiesStr += ", \"" + StringEscapeUtils.unescapeHtml4(key) + "\":" + "\""
+					+ StringEscapeUtils.unescapeHtml4(object.getTags().get(key)) + "\"";
 		}
 		propertiesStr += "}";
 		String geoJsonString = "{ \"type\": \"Feature\", \"geometry\": { \"type\": \""
@@ -36,15 +41,13 @@ public class OsmObjectGeoJsonWriter extends OsmObjectFileWriterImpl {
 
 	@Override
 	public void writeObject(Object object, boolean isFirst) throws ErrorProcessingReadObjectException {
-		try {
-			if (!isFirst) {
-				writer.write(", ");
-			}
-			writer.write(getGeoJsonStringForOsmObject((OsmObject)object));
-
-		} catch (IOException ex) {
-			throw new ErrorProcessingReadObjectException("Error while writing to file: " + getFileName(), ex);
+		if (!(object instanceof OsmObject))
+			throw new RuntimeException("OsmObject expected but a different type was provided.");
+		
+		if (!isFirst) {
+			writeToFile(", ");
 		}
+		writeToFile(getGeoJsonStringForOsmObject((OsmObject) object));
 	}
 
 	@Override
@@ -56,6 +59,5 @@ public class OsmObjectGeoJsonWriter extends OsmObjectFileWriterImpl {
 	protected void writeFooter() throws IOException {
 		writer.write("]}");
 	}
-
 
 }

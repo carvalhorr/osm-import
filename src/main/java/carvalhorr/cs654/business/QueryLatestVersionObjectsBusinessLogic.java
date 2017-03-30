@@ -66,7 +66,7 @@ public class QueryLatestVersionObjectsBusinessLogic extends BaseBusinessLogic {
 	private void queryLatestVersionAllObjects(final OsmObjectFileWriter writer) throws FailedToCompleteQueryException {
 
 		try {
-			writer.startWritinFile();
+			writer.startWritingFile();
 
 			persistence.queryAllObjectCurrentVersion(new OsmObjectsReadFromDatabaseCallback() {
 

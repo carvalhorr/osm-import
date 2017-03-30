@@ -19,28 +19,26 @@ public class SummaryEditsCsvWriter extends OsmObjectFileWriterImpl {
 
 	@Override
 	public void writeObject(Object obj, boolean isFirst) throws ErrorProcessingReadObjectException {
-		try {
+		if (!(obj instanceof Map))
+			throw new RuntimeException("Map expected but a different type was provided.");
 
-			Long totalEdits = (long) ((Map<String, Object>) obj).get("total_edits");
-			Long totalEditsPoints = (long) ((Map<String, Object>) obj).get("total_edits_points");
-			Long totalEditsLinestrings = (long) ((Map<String, Object>) obj).get("total_edits_linestring");
-			Long totalEditsPolygons = (long) ((Map<String, Object>) obj).get("total_edits_polygon");
-			Long totalEditsMultipolygons = (long) ((Map<String, Object>) obj).get("total_edits_multipolygon");
-			Long totalUsersEdited = (long) ((Map<String, Object>) obj).get("total_edits_users");
+		Long totalEdits = (long) ((Map<String, Object>) obj).get("total_edits");
+		Long totalEditsPoints = (long) ((Map<String, Object>) obj).get("total_edits_points");
+		Long totalEditsLinestrings = (long) ((Map<String, Object>) obj).get("total_edits_linestring");
+		Long totalEditsPolygons = (long) ((Map<String, Object>) obj).get("total_edits_polygon");
+		Long totalEditsMultipolygons = (long) ((Map<String, Object>) obj).get("total_edits_multipolygon");
+		Long totalUsersEdited = (long) ((Map<String, Object>) obj).get("total_edits_users");
 
-			writer.write(totalEdits + ", " + totalEditsPoints + ", " + totalEditsLinestrings + ", " + totalEditsPolygons
-					+ ", " + totalEditsMultipolygons + ", " + totalUsersEdited);
+		writeToFile(totalEdits + ", " + totalEditsPoints + ", " + totalEditsLinestrings + ", " + totalEditsPolygons
+				+ ", " + totalEditsMultipolygons + ", " + totalUsersEdited);
 
-			writer.newLine();
-
-		} catch (IOException ex) {
-			throw new ErrorProcessingReadObjectException("Error while writing to file: " + getFileName(), ex);
-		}
+		writeNewLine();
 	}
-	
+
 	@Override
 	protected void writeHeader() throws IOException {
-		writer.write("Total edits, Total points, Total linestrings, Total polygons, Total multilines, Total distinct users");
+		writer.write(
+				"Total edits, Total points, Total linestrings, Total polygons, Total multilines, Total distinct users");
 		writer.newLine();
 	}
 
@@ -48,6 +46,5 @@ public class SummaryEditsCsvWriter extends OsmObjectFileWriterImpl {
 	protected void writeFooter() throws IOException {
 		// the generated file does not contain any header
 	}
-
 
 }

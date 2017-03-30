@@ -62,7 +62,7 @@ public class QueryEditingSummaryBusinessLogic extends BaseBusinessLogic {
 			properties.put("total_edits_multipolygon", totalMultiPolygonsEdited);
 			properties.put("total_edits_users", numberUsersEdited);
 			
-			writer.startWritinFile();
+			writer.startWritingFile();
 			
 			writer.writeObject(properties, true);
 

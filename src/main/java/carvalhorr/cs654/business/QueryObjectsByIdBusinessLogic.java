@@ -59,7 +59,7 @@ public class QueryObjectsByIdBusinessLogic extends BaseBusinessLogic {
 			throws FailedToCompleteQueryException {
 
 		try {
-			writer.startWritinFile();
+			writer.startWritingFile();
 			persistence.queryObjectsById(type, id, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override

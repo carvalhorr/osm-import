@@ -1,9 +1,12 @@
 package carvalhorr.cs654.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 public class FileUtil {
 	
@@ -22,5 +25,19 @@ public class FileUtil {
 		} else {
 			return true;
 		}
+	}
+	
+	public static void deleteFile(String fileName) {
+		(new File(fileName)).delete();
+	}
+	
+	public static String readFileAsString(String fileName) throws FileNotFoundException {
+		
+		Scanner s = new Scanner(new File(fileName));
+		String fileContent = s.useDelimiter("\\Z").next();
+		
+		s.close();
+		
+		return fileContent;
 	}
 }

@@ -9,6 +9,7 @@ import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 
 /**
  * FR9.5
+ * 
  * @author carvalhorr
  *
  */
@@ -20,26 +21,24 @@ public class UserEditsRankingCsvWriter extends OsmObjectFileWriterImpl {
 
 	@Override
 	public void writeObject(Object obj, boolean isFirst) throws ErrorProcessingReadObjectException {
-		try {
+		if (!(obj instanceof Map))
+			throw new RuntimeException("Map expected but a different type was provided.");
 
-			Integer userId = (Integer) ((Map<String, Object>) obj).get("user_id");
-			String userName = (String) ((Map<String, Object>) obj).get("user_name");
-			Integer total_edits = (Integer) ((Map<String, Object>) obj).get("total_edits");
-			Integer total_edits_points = (Integer) ((Map<String, Object>) obj).get("total_edits_points");
-			Integer total_edits_linestrings = (Integer) ((Map<String, Object>) obj).get("total_edits_linestrings");
-			Integer total_edits_polygons = (Integer) ((Map<String, Object>) obj).get("total_edits_polygons");
-			Integer total_edits_multilines = (Integer) ((Map<String, Object>) obj).get("total_edits_multilines");
+		Integer userId = (Integer) ((Map<String, Object>) obj).get("user_id");
+		String userName = (String) ((Map<String, Object>) obj).get("user_name");
+		Integer total_edits = (Integer) ((Map<String, Object>) obj).get("total_edits");
+		Integer total_edits_points = (Integer) ((Map<String, Object>) obj).get("total_edits_points");
+		Integer total_edits_linestrings = (Integer) ((Map<String, Object>) obj).get("total_edits_linestrings");
+		Integer total_edits_polygons = (Integer) ((Map<String, Object>) obj).get("total_edits_polygons");
+		Integer total_edits_multilines = (Integer) ((Map<String, Object>) obj).get("total_edits_multilines");
 
-			writer.write(userId + ", " + StringEscapeUtils.unescapeHtml4(userName) + ", " + total_edits + ", " + total_edits_points + ", "
-					+ total_edits_linestrings + ", " + total_edits_polygons + ", " + total_edits_multilines);
+		writeToFile(userId + ", " + StringEscapeUtils.unescapeHtml4(userName) + ", " + total_edits + ", "
+				+ total_edits_points + ", " + total_edits_linestrings + ", " + total_edits_polygons + ", "
+				+ total_edits_multilines);
 
-			writer.newLine();
-
-		} catch (IOException ex) {
-			throw new ErrorProcessingReadObjectException("Error while writing to file: " + getFileName(), ex);
-		}
+		writeNewLine();
 	}
-	
+
 	@Override
 	protected void writeHeader() throws IOException {
 		writer.write(
@@ -51,6 +50,5 @@ public class UserEditsRankingCsvWriter extends OsmObjectFileWriterImpl {
 	protected void writeFooter() throws IOException {
 		// the generated file does not contain any header
 	}
-
 
 }

@@ -16,16 +16,15 @@ public class OsmObjectLatestVersionWithNumberUsersCsvWriter extends OsmObjectFil
 
 	@Override
 	public void writeObject(Object obj, boolean isFirst) throws ErrorProcessingReadObjectException {
-		OsmObject object = (OsmObject)((Map<String, Object>) obj).get("osmObject");
-		Integer countUsers = (Integer)((Map<String, Object>) obj).get("totalUsers");
-		try {
-			writer.write(object.getId() + "," + StringEscapeUtils.unescapeHtml4(object.getVersion().toString()) + ", " 
-					+ StringEscapeUtils.unescapeHtml4(object.getGeoJsonType().toString()) + ", "
-					+ countUsers);
-			writer.newLine();
-		} catch (IOException ex) {
-			throw new ErrorProcessingReadObjectException("Error while writing to file: " + getFileName(), ex);
-		}
+		if (!(obj instanceof Map))
+			throw new RuntimeException("Map expected but a different type was provided.");
+
+		OsmObject object = (OsmObject) ((Map<String, Object>) obj).get("osmObject");
+		Integer countUsers = (Integer) ((Map<String, Object>) obj).get("totalUsers");
+
+		writeToFile(object.getId() + ", " + StringEscapeUtils.unescapeHtml4(object.getVersion().toString()) + ", "
+				+ StringEscapeUtils.unescapeHtml4(object.getGeoJsonType().toString()) + ", " + countUsers);
+		writeNewLine();
 	}
 
 	@Override

@@ -65,7 +65,7 @@ public class QueryFirstAndLastVersionOfObjectBusinessLogic extends BaseBusinessL
 			throws FailedToCompleteQueryException {
 
 		try {
-			fileWriter.startWritinFile();
+			fileWriter.startWritingFile();
 			persistence.queryObjectsById(type, id, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override

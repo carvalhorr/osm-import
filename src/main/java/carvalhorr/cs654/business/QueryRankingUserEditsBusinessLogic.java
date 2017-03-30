@@ -1,7 +1,5 @@
 package carvalhorr.cs654.business;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
@@ -9,9 +7,7 @@ import carvalhorr.cs654.exception.ErrorReadingDataFromDatabase;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
-import carvalhorr.cs654.files.ObjectTagsJsonWriter;
 import carvalhorr.cs654.files.UserEditsRankingCsvWriter;
-import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.DataReadFromDatabaseCallback;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
@@ -37,7 +33,7 @@ public class QueryRankingUserEditsBusinessLogic extends BaseBusinessLogic {
 
 			final UserEditsRankingCsvWriter writer = new UserEditsRankingCsvWriter(fileName);
 			
-			writer.startWritinFile();
+			writer.startWritingFile();
 			persistence.queryRankingEditsByUser(new DataReadFromDatabaseCallback() {
 				
 				@Override

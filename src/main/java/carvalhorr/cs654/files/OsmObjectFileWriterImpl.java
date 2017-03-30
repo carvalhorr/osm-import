@@ -5,17 +5,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
+import carvalhorr.cs654.model.OsmObject;
 
 public abstract class OsmObjectFileWriterImpl implements OsmObjectFileWriter {
-	
+
 	private String mFullFileName = "";
 
 	private File file = null;
 
 	protected BufferedWriter writer = null;
-
-
 
 	public OsmObjectFileWriterImpl(String fileName, String extension) {
 		this.mFullFileName = fileName;
@@ -24,9 +24,8 @@ public abstract class OsmObjectFileWriterImpl implements OsmObjectFileWriter {
 		}
 	}
 
-
 	@Override
-	public void startWritinFile() throws ErrorWritingToFileException {
+	public void startWritingFile() throws ErrorWritingToFileException {
 
 		try {
 			file = new File(getFileName());
@@ -40,6 +39,22 @@ public abstract class OsmObjectFileWriterImpl implements OsmObjectFileWriter {
 		}
 	}
 
+	protected void writeToFile(String textToWrite) throws ErrorProcessingReadObjectException {
+		try {
+			writer.write(textToWrite);
+		} catch (IOException ex) {
+			throw new ErrorProcessingReadObjectException("Error while writing to file: " + getFileName(), ex);
+		}
+	}
+
+	protected void writeNewLine() throws ErrorProcessingReadObjectException {
+		try {
+			writer.newLine();
+		} catch (IOException ex) {
+			throw new ErrorProcessingReadObjectException("Error while writing to file: " + getFileName(), ex);
+		}
+	}
+
 	@Override
 	public void finishWritingFile() throws ErrorWritingToFileException {
 		try {
@@ -50,10 +65,11 @@ public abstract class OsmObjectFileWriterImpl implements OsmObjectFileWriter {
 			throw new ErrorWritingToFileException(e);
 		}
 	}
-	
-	protected abstract void writeHeader() throws IOException ;
-	protected abstract void writeFooter() throws IOException ;
-	
+
+	protected abstract void writeHeader() throws IOException;
+
+	protected abstract void writeFooter() throws IOException;
+
 	@Override
 	public String getFullFileName() {
 		return mFullFileName;

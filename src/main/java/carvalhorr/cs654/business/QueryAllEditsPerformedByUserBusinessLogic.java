@@ -55,7 +55,7 @@ public class QueryAllEditsPerformedByUserBusinessLogic extends BaseBusinessLogic
 			throws FailedToCompleteQueryException {
 
 		try {
-			fileWriter.startWritinFile();
+			fileWriter.startWritingFile();
 			persistence.queryEditsByUser(userId, new OsmObjectsReadFromDatabaseCallback() {
 
 				@Override

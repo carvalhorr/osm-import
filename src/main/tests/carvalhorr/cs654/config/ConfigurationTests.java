@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import carvalhorr.cs654.util.FileUtil;
 import carvalhorr.cs654.util.Params;
 
 public class ConfigurationTests {
@@ -52,7 +53,7 @@ public class ConfigurationTests {
 	@After
 	public void deleteConfigurationFile() {
 		// deletes the configuration file previously created
-		(new File(fileName)).delete();
+		FileUtil.deleteFile(fileName);
 	}
 
 }
