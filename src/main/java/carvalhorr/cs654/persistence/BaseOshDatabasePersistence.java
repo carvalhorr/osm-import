@@ -15,7 +15,7 @@ import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
  * @author carvalhorr
  *
  */
-public abstract class OshDatabasePersistence {
+public abstract class BaseOshDatabasePersistence {
 
 	// JDBC connection string
 	protected String jdbcString;
@@ -46,7 +46,7 @@ public abstract class OshDatabasePersistence {
 	 * @throws PostgresqlDriverNotFound
 	 * @throws ErrorConnectingToDatabase
 	 */
-	public OshDatabasePersistence(String jdbcString, String user, String password, String schemaName)
+	public BaseOshDatabasePersistence(String jdbcString, String user, String password, String schemaName)
 			throws SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase {
 		this.jdbcString = jdbcString;
 		this.user = user;
@@ -88,7 +88,7 @@ public abstract class OshDatabasePersistence {
 	 * @return true if the schema name provided already exists.
 	 * @throws SQLException
 	 */
-	protected boolean schemaExists() throws SQLException {
+	public boolean schemaExists() throws SQLException {
 		boolean exists = false;
 		ResultSet result = statement.executeQuery(
 				"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '" + schemaName + "';");

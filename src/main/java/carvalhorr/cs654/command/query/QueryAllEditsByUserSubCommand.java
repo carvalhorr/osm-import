@@ -1,11 +1,13 @@
 package carvalhorr.cs654.command.query;
 
-import carvalhorr.cs654.business.QueryAllEditsPerformedByUserBusinessLogic;
+import carvalhorr.cs654.business.query.QueryAllEditsPerformedByUserBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.command.QueryParams;
 import carvalhorr.cs654.command.QueryParamsParser;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.files.ExportFormatType;
+import carvalhorr.cs654.files.OsmObjectFileWriter;
+import carvalhorr.cs654.files.OsmObjectWriterFactory;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 public class QueryAllEditsByUserSubCommand extends BaseSubCommand {
@@ -24,17 +26,26 @@ public class QueryAllEditsByUserSubCommand extends BaseSubCommand {
 		ExportFormatType outputFormat = QueryParamsParser.parseExportFormatType(command, params, defaultExportFormat, mUsageMessage);
 		long userId = QueryParamsParser.parseUserId(command, params, mUsageMessage);
 		
-		QueryAllEditsPerformedByUserBusinessLogic business = new QueryAllEditsPerformedByUserBusinessLogic(persistence,
-				command);
 
 		command.printHeader();
 		command.printMessage("");
+
 		
+		String fileName = "";
+
 		if (params.getFileName() == null || params.getFileName().equals("")) {
-			business.exportAllEditsPerformedByUSer(outputFormat, userId);
+			fileName = "changes-by-user-" + userId + "." + outputFormat.toString();
 		} else {
-			business.exportAllEditsPerformedByUSer(outputFormat, userId, params.getFileName());
+			fileName = params.getFileName();
 		}
+		
+		OsmObjectFileWriter writer = OsmObjectWriterFactory.getOsmObjectWriter(outputFormat, fileName);
+
+		QueryAllEditsPerformedByUserBusinessLogic business = new QueryAllEditsPerformedByUserBusinessLogic(userId, writer, persistence,
+				command);
+		
+		business.queryDataAndExportToFile();
+
 	}
 
 }

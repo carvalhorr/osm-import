@@ -1,10 +1,12 @@
 package carvalhorr.cs654.command.query;
 
-import carvalhorr.cs654.business.QueryObjectsByIdBusinessLogic;
+import carvalhorr.cs654.business.query.QueryObjectsByIdBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.command.QueryParams;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.files.ExportFormatType;
+import carvalhorr.cs654.files.OsmObjectFileWriter;
+import carvalhorr.cs654.files.OsmObjectWriterFactory;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 import carvalhorr.cs654.command.QueryParamsParser;
@@ -25,19 +27,37 @@ public class QueryObjectsByIdSubCommand extends BaseSubCommand {
 		OsmObjectType objectType = QueryParamsParser.parseObjectType(command, params, mUsageMessage);
 		long objectId = QueryParamsParser.parseObjectId(command, params, mUsageMessage);
 
-		QueryObjectsByIdBusinessLogic business = new QueryObjectsByIdBusinessLogic(
-				persistence, command);
-
 		command.printHeader();
 		command.printMessage("Object type: " + params.getObjectType());
 		command.printMessage("Object ID: " + params.getObjectId());
 		command.printMessage("");
 		
+
+		String fileName = "";
+		
 		if (params.getFileName() == null || params.getFileName().equals("")) {
-			business.queryObjectsById(outputFormat, objectType, objectId);
+			switch (objectType) {
+			case NODE: {
+				fileName = "node-" + objectId + "-all-versions";
+				break;
+			}
+			case WAY: {
+				fileName = "way-" + objectId + "-all-versions";
+				break;
+			}
+			default:
+				break;
+			}
 		} else {
-			business.queryObjectsById(outputFormat, objectType, objectId, params.getFileName());
+			fileName = params.getFileName();
 		}
+		OsmObjectFileWriter writer = OsmObjectWriterFactory.getOsmObjectWriter(outputFormat, fileName);
+
+		QueryObjectsByIdBusinessLogic business = new QueryObjectsByIdBusinessLogic(objectType, objectId, writer, 
+				persistence, command);
+
+		business.queryDataAndExportToFile();
+
 	}
 
 }

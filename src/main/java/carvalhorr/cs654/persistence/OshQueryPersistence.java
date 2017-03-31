@@ -28,7 +28,7 @@ import carvalhorr.cs654.model.WayOsmObject;
  * @author carvalhorr
  *
  */
-public class OshQueryPersistence extends OshDatabasePersistence {
+public class OshQueryPersistence extends BaseOshDatabasePersistence {
 
 	/**
 	 * Constructor

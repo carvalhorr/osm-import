@@ -1,10 +1,13 @@
 package carvalhorr.cs654.command.query;
 
-import carvalhorr.cs654.business.QueryRankingUserEditsBusinessLogic;
+import java.io.Writer;
+
+import carvalhorr.cs654.business.query.QueryRankingUserEditsBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.command.QueryParams;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.files.ExportFormatType;
+import carvalhorr.cs654.files.UserEditsRankingCsvWriter;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 public class QueryUserEditsRankingSubCommand extends BaseSubCommand {
@@ -15,22 +18,27 @@ public class QueryUserEditsRankingSubCommand extends BaseSubCommand {
 	@Override
 	public void executeSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence)
 			throws FailedToCompleteQueryException {
-		
+
 		if (params.getOutputFormat() == null || params.getOutputFormat().equals("")) {
 			params.setOutputFormat(defaultExportFormat.toString());
 		}
-		
-		QueryRankingUserEditsBusinessLogic business = new QueryRankingUserEditsBusinessLogic(
-				persistence, command);
 
 		command.printHeader();
 		command.printMessage("");
-		
+
+		String fileName = "";
+
 		if (params.getFileName() == null || params.getFileName().equals("")) {
-			business.queryRankingUserEdits();
+			fileName = "ranking-user-edits.csv";
 		} else {
-			business.queryRankingUserEdits(params.getFileName());
+			fileName = params.getFileName();
 		}
+
+		UserEditsRankingCsvWriter writer = new UserEditsRankingCsvWriter(fileName);
+
+		QueryRankingUserEditsBusinessLogic business = new QueryRankingUserEditsBusinessLogic(writer, persistence,
+				command);
+
 	}
 
 }

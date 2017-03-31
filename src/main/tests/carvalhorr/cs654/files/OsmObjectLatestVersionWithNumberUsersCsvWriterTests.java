@@ -23,7 +23,7 @@ public class OsmObjectLatestVersionWithNumberUsersCsvWriterTests extends BaseObj
 	}
 
 	@Test
-	public void writeOsmObjectToCsvShouldCreateAFileWithTheObjectsContent()
+	public void writeNumberOfEditorsPerOsmObjectToCsvShouldCreateACsvFileWithTheObjectsContent()
 			throws ErrorWritingToFileException, ErrorProcessingReadObjectException, FileNotFoundException {
 
 		Map<String, Object> objectWithNumberOfUsers = new HashMap<String, Object>();

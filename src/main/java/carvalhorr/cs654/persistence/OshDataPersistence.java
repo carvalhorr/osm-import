@@ -19,7 +19,7 @@ import carvalhorr.cs654.model.OsmObject;
  * @author carvalhorr
  *
  */
-public class OshDataPersistence extends OshDatabasePersistence {
+public class OshDataPersistence extends BaseOshDatabasePersistence {
 
 	// Holds a list of OsmObjects to be inserted in batch in order to to get
 	// better performance

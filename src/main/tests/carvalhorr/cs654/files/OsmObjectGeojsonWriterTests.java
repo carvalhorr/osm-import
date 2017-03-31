@@ -20,7 +20,7 @@ public class OsmObjectGeojsonWriterTests extends BaseObjectWriterTests {
 	}
 
 	@Test
-	public void writeOsmObjectToJsonShouldCreateAFileWithTheObjectsContent()
+	public void writeOsmObjectToGeojsonShouldCreateAFileWithTheObjectsContent()
 			throws ErrorWritingToFileException, ErrorProcessingReadObjectException, FileNotFoundException {
 
 		addObject(createObject());

@@ -1,11 +1,9 @@
 package carvalhorr.cs654.command;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import carvalhorr.cs654.business.QueryEditingSummaryBusinessLogic;
+import carvalhorr.cs654.command.query.QueryEditingSummarySubCommand;
 import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.util.DateUtil;
@@ -30,7 +28,7 @@ public class QueryParamsParser {
 			command.printMessage(usageMessage);
 			System.exit(1);
 		}
-		Date startDate = DateUtil.convertStringToDate(QueryEditingSummaryBusinessLogic.DATE_FORMAT, dateString);
+		Date startDate = DateUtil.convertStringToDate(QueryEditingSummarySubCommand.DATE_FORMAT, dateString);
 		return startDate;
 	}
 

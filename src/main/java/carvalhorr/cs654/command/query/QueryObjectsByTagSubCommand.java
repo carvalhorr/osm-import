@@ -1,11 +1,13 @@
 package carvalhorr.cs654.command.query;
 
-import carvalhorr.cs654.business.QueryObjectsByTagBusinessLogic;
+import carvalhorr.cs654.business.query.QueryObjectsByTagBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.command.QueryParams;
 import carvalhorr.cs654.command.QueryParamsParser;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.files.ExportFormatType;
+import carvalhorr.cs654.files.OsmObjectFileWriter;
+import carvalhorr.cs654.files.OsmObjectWriterFactory;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
 public class QueryObjectsByTagSubCommand extends BaseSubCommand {
@@ -16,25 +18,36 @@ public class QueryObjectsByTagSubCommand extends BaseSubCommand {
 	@Override
 	public void executeSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence)
 			throws FailedToCompleteQueryException {
-		
+
 		if (params.getOutputFormat() == null || params.getOutputFormat().equals("")) {
 			params.setOutputFormat(defaultExportFormat.toString());
 		}
 
-		ExportFormatType outputFormat = QueryParamsParser.parseExportFormatType(command, params, defaultExportFormat, mUsageMessage);
-
-		QueryObjectsByTagBusinessLogic business = new QueryObjectsByTagBusinessLogic(persistence, command);
+		ExportFormatType outputFormat = QueryParamsParser.parseExportFormatType(command, params, defaultExportFormat,
+				mUsageMessage);
 
 		command.printHeader();
 		command.printMessage("Tag name:" + params.getTagName());
 		command.printMessage("Tag value:" + params.getTagValue());
 		command.printMessage("");
-	
+
+		String tagName = params.getTagName();
+		String tagValue = params.getTagValue();
+		String fileName = "";
+
 		if (params.getFileName() == null || params.getFileName().equals("")) {
-			business.queryObjectsByTag(outputFormat, params.getTagName(), params.getTagValue());
+			fileName = "tag-" + tagName + "-" + tagValue + "." + outputFormat.toString();
 		} else {
-			business.queryObjectsByTag(outputFormat, params.getTagName(), params.getTagValue(), params.getFileName());
+			fileName = params.getFileName();
 		}
+
+		OsmObjectFileWriter writer = OsmObjectWriterFactory.getOsmObjectWriter(outputFormat, fileName);
+
+		QueryObjectsByTagBusinessLogic business = new QueryObjectsByTagBusinessLogic(tagName, tagValue, writer,
+				persistence, command);
+		
+		business.queryDataAndExportToFile();
+
 	}
 
 }

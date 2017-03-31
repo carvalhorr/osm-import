@@ -24,6 +24,7 @@ import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.OsmUser;
 import carvalhorr.cs654.model.WayOsmObject;
+import carvalhorr.cs654.persistence.data.OshTestsPersistence;
 import carvalhorr.cs654.util.Params;
 
 /**
