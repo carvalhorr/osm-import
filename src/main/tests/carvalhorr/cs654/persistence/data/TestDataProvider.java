@@ -37,6 +37,10 @@ public class TestDataProvider {
 	public static final String defaultTagValue = "a value";
 	public static final GeoJsonObjectType defaultGeoJsonType = GeoJsonObjectType.LINE_STRING;
 
+	public static final String LATEST_VERSION_ALL_OBJECTS_CSV_RESULTS = "ID, Version, Type, Number of editors\n"
+			+ "2, 2, Point, 1\n" + "1, 8, LineString, 1";
+	public static final String LATEST_VERSION_ALL_OBJECTS_JSON_RESULTS = "{ \"objects\": [{\"id\":\"2\", \"version\":\"2\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"a tag\":\"a value\"]}, {\"id\":\"1\", \"version\":\"8\", \"timestamp\":\"2009-12-11 14:21:24\", \"user_id\":\"3\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": LineString, \"tags\": [\"a tag\":\"a value\"]}]}";
+
 	// Persistence object for creating schema and inserting data into the
 	// database
 	public OshDataPersistence insertOshDataPersistence;
@@ -82,7 +86,7 @@ public class TestDataProvider {
 		oshTestsPersistence = new OshTestsPersistence(dbConfig.getJdbcString(), dbConfig.getUsername(),
 				dbConfig.getPassword(), TestDataProvider.SCHEMA_NAME);
 	}
-	
+
 	public void deleteSchema() throws SQLException {
 		// delete schema
 		oshTestsPersistence.getStatement()

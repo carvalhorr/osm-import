@@ -28,7 +28,7 @@ public abstract class QueryBusinessLogic extends BaseBusinessLogic {
 			writer.finishWritingFile();
 
 			sendMessage("Query finished.");
-			sendMessage("File saved in:" + writer.getFullFileName());
+			sendMessage("File saved in: " + writer.getFullFileName());
 
 		} catch (ErrorProcessingReadObjectException e) {
 			throw new FailedToCompleteQueryException(e);

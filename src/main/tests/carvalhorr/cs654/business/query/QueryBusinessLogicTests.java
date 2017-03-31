@@ -1,4 +1,4 @@
-package carvalhorr.cs654.config.business;
+package carvalhorr.cs654.business.query;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,16 +37,19 @@ import carvalhorr.cs654.persistence.data.TestDataProvider;
 import carvalhorr.cs654.util.DateUtil;
 import carvalhorr.cs654.util.FileUtil;
 
-public class QueryOsmObjectsTests implements ProgressIndicator {
+public class QueryBusinessLogicTests implements ProgressIndicator {
 
 	private static TestDataProvider dataProvider;
 
 	private static final String fileName = "file_name";
 
+	private OsmObjectFileWriter writer;
+
 	@BeforeClass
 	public static void setup() throws FileNotFoundException, SQLException, PostgresqlDriverNotFound,
 			ErrorConnectingToDatabase, NotConnectedToDatabase, SchemaDoesNotExistException {
 
+		// Create data provider
 		dataProvider = new TestDataProvider();
 
 		// Insert data for queries to work
@@ -63,15 +67,17 @@ public class QueryOsmObjectsTests implements ProgressIndicator {
 
 	}
 
+	@After
+	public void deleteFile() {
+		FileUtil.deleteFile(writer.getFullFileName());
+	}
+
 	@Test
 	public void whenQueryingLatestVersionOfAllObjectsWithCsvWriterACsvFileShouldBeCreatedContainingListOfObjectsAndNumberOfUsersWhoEditedThem()
 			throws FailedToCompleteQueryException, FileNotFoundException {
 
-		String expextedFileContent = "ID, Version, Type, Number of editors\n" + "2, 2, Point, 1\n"
-				+ "1, 8, LineString, 1";
-
 		// Create json writer
-		OsmObjectFileWriter writer = new OsmObjectLatestVersionWithNumberUsersCsvWriter(fileName);
+		writer = new OsmObjectLatestVersionWithNumberUsersCsvWriter(fileName);
 
 		// create business logic
 		QueryLatestVersionObjectsBusinessLogic query = new QueryLatestVersionObjectsBusinessLogic(writer,
@@ -81,7 +87,7 @@ public class QueryOsmObjectsTests implements ProgressIndicator {
 		query.queryDataAndExportToFile();
 
 		// verify that file was created correctly
-		assertEquals(expextedFileContent, FileUtil.readFileAsString(writer.getFullFileName()));
+		assertEquals(TestDataProvider.LATEST_VERSION_ALL_OBJECTS_CSV_RESULTS, FileUtil.readFileAsString(writer.getFullFileName()));
 
 	}
 
@@ -92,7 +98,7 @@ public class QueryOsmObjectsTests implements ProgressIndicator {
 		String expextedFileContent = "{ \"objects\": [{\"id\":\"2\", \"version\":\"2\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"a tag\":\"a value\"]}, {\"id\":\"1\", \"version\":\"8\", \"timestamp\":\"2009-12-11 14:21:24\", \"user_id\":\"3\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": LineString, \"tags\": [\"a tag\":\"a value\"]}]}";
 
 		// Create json writer
-		OsmObjectFileWriter writer = new OsmObjectJsonWriter(fileName);
+		writer = new OsmObjectJsonWriter(fileName);
 
 		// create business logic
 		QueryLatestVersionObjectsBusinessLogic query = new QueryLatestVersionObjectsBusinessLogic(writer,
@@ -113,7 +119,7 @@ public class QueryOsmObjectsTests implements ProgressIndicator {
 		String expextedFileContent = "{ \"objects\": [{\"id\":\"2\", \"version\":\"1\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"a tag\":\"a value\"]}, {\"id\":\"2\", \"version\":\"2\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"a tag\":\"a value\"]}]}";
 
 		// Create json writer
-		OsmObjectFileWriter writer = new OsmObjectJsonWriter(fileName);
+		writer = new OsmObjectJsonWriter(fileName);
 
 		// create business logic
 		QueryObjectsByIdBusinessLogic query = new QueryObjectsByIdBusinessLogic(OsmObjectType.NODE,
@@ -135,7 +141,7 @@ public class QueryOsmObjectsTests implements ProgressIndicator {
 				+ "2,2, Point, 2008-12-11 14:21:24";
 
 		// Create json writer
-		OsmObjectFileWriter writer = new OsmObjectCsvWriter(fileName);
+		writer = new OsmObjectCsvWriter(fileName);
 
 		// create business logic
 		QueryFirstAndLastVersionOfObjectBusinessLogic query = new QueryFirstAndLastVersionOfObjectBusinessLogic(
@@ -157,7 +163,7 @@ public class QueryOsmObjectsTests implements ProgressIndicator {
 		String expextedFileContent = "{ \"objects\": [{\"id\":\"1\", \"version\":\"4\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"tag2\":\"value2\"]}, {\"id\":\"1\", \"version\":\"5\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"tag2\":\"value2\"]}, {\"id\":\"1\", \"version\":\"6\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": LineString, \"tags\": [\"tag2\":\"value2\"]}]}";
 
 		// Create json writer
-		OsmObjectFileWriter writer = new OsmObjectJsonWriter(fileName);
+		writer = new OsmObjectJsonWriter(fileName);
 
 		// create business logic
 		QueryObjectsByTagBusinessLogic query = new QueryObjectsByTagBusinessLogic(dataProvider.tagKeyForQuery,
@@ -179,7 +185,7 @@ public class QueryOsmObjectsTests implements ProgressIndicator {
 				+ "1,2, Point, 2008-12-11 14:21:24\n" + "1,3, LineString, 2008-12-11 14:21:24";
 
 		// Create json writer
-		OsmObjectFileWriter writer = new OsmObjectCsvWriter(fileName);
+		writer = new OsmObjectCsvWriter(fileName);
 
 		// create business logic
 		QueryAllEditsPerformedByUserBusinessLogic query = new QueryAllEditsPerformedByUserBusinessLogic(
@@ -201,7 +207,7 @@ public class QueryOsmObjectsTests implements ProgressIndicator {
 				+ "1, a user, 5, 4, 1, 0, 0\n" + "2, a user, 3, 2, 1, 0, 0\n" + "3, a user, 2, 0, 2, 0, 0";
 
 		// Create json writer
-		OsmObjectFileWriter writer = new UserEditsRankingCsvWriter(fileName);
+		writer = new UserEditsRankingCsvWriter(fileName);
 
 		// create business logic
 		QueryRankingUserEditsBusinessLogic query = new QueryRankingUserEditsBusinessLogic(writer,
@@ -223,7 +229,7 @@ public class QueryOsmObjectsTests implements ProgressIndicator {
 				+ "2, 0, 2, 0, 0, 1";
 
 		// Create json writer
-		OsmObjectFileWriter writer = new SummaryEditsCsvWriter(fileName);
+		writer = new SummaryEditsCsvWriter(fileName);
 
 		String dateFormat = DateUtil.DATE_FORMAT_ISO8601;
 		Date startDate = DateUtil.convertStringToDate(dateFormat, TestDataProvider.startDateForQueryEditsByUser);

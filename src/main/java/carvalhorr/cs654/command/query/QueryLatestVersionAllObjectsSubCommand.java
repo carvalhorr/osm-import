@@ -48,6 +48,8 @@ public class QueryLatestVersionAllObjectsSubCommand extends BaseSubCommand {
 
 		QueryLatestVersionObjectsBusinessLogic business = new QueryLatestVersionObjectsBusinessLogic(writer,
 				persistence, command);
+		
+		business.queryDataAndExportToFile();
 
 	}
 
