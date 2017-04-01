@@ -11,6 +11,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import carvalhorr.cs654.command.query.BaseSubCommand;
 import carvalhorr.cs654.command.query.QueryAllEditsByUserSubCommand;
 import carvalhorr.cs654.command.query.QueryEditingSummarySubCommand;
 import carvalhorr.cs654.command.query.QueryFirstAndLastObjectSubCommand;
@@ -28,6 +29,8 @@ import carvalhorr.cs654.util.Params;
 
 public class QueryCommand extends BaseCommand implements QueryParams {
 
+	private static final String USAGE_MESSAGE = "";
+
 	public static void main(String[] args) {
 		QueryCommand queryCommand = new QueryCommand();
 		queryCommand.parseParameters(args);
@@ -37,15 +40,15 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 			e.printStackTrace();
 		} catch (PostgresqlDriverNotFound e) {
 			e.printStackTrace();
-			
+
 		} catch (ErrorConnectingToDatabase e) {
 			e.printStackTrace();
 		} catch (SchemaDoesNotExistException e) {
 			e.printStackTrace();
 		} catch (FailedToCompleteQueryException e) {
 			e.printStackTrace();
-		} catch (IllegalArgumentException e ) {
-			
+		} catch (IllegalArgumentException e) {
+
 		}
 	}
 
@@ -99,32 +102,27 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 				"(mandatory for editing-summary query) The end date to query in the format yyyy-MM-dd hh:mm:ss");
 		endDate.setRequired(false);
 		options.addOption(endDate);
-		
-		Option objectType = new Option("ot", "object-type",true,
-				"Type of the object to query.");
+
+		Option objectType = new Option("ot", "object-type", true, "Type of the object to query.");
 		objectType.setRequired(false);
 		options.addOption(objectType);
 
-		Option objectId = new Option("id", "object-id",true,
-				"ID of the object to query.");
+		Option objectId = new Option("id", "object-id", true, "ID of the object to query.");
 		objectId.setRequired(false);
 		options.addOption(objectId);
-		
-		Option tagName = new Option("tn", "tag-name", true,
-				"Tag name");
+
+		Option tagName = new Option("tn", "tag-name", true, "Tag name");
 		tagName.setRequired(false);
 		options.addOption(tagName);
-		
-		Option tagValue = new Option("tv", "tag-value", true,
-				"Tag value");
+
+		Option tagValue = new Option("tv", "tag-value", true, "Tag value");
 		tagValue.setRequired(false);
 		options.addOption(tagValue);
-		
-		Option userId = new Option("u", "user-id", true,
-				"User id");
+
+		Option userId = new Option("u", "user-id", true, "User id");
 		userId.setRequired(false);
 		options.addOption(userId);
-		
+
 		CommandLineParser parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();
 		CommandLine cmd;
@@ -166,59 +164,49 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 		try {
 			config = new Configuration();
 		} catch (FileNotFoundException e1) {
-			printFatalError("Could not find database properties file " + mDbConfig);
+			printFatalErrorAndExit("Could not find database properties file " + mDbConfig);
 			System.exit(1);
 		}
 
-		persistence = new OshQueryPersistence(config.getJdbcString(),
-				config.getUsername(), config.getPassword(), mSchemaName);
+		persistence = new OshQueryPersistence(config.getJdbcString(), config.getUsername(), config.getPassword(),
+				mSchemaName);
 
+		BaseSubCommand subCommand = null;
 		switch (mQueryType) {
 		case "editing-summary": {
-			// OK
-			QueryEditingSummarySubCommand subCommand = new QueryEditingSummarySubCommand();
-			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
+			subCommand = new QueryEditingSummarySubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "first-and-last": {
-			// OK
-			QueryFirstAndLastObjectSubCommand subCommand = new QueryFirstAndLastObjectSubCommand();
-			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
+			subCommand = new QueryFirstAndLastObjectSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "latest-version-all-objects": {
-			// OK
-			QueryLatestVersionAllObjectsSubCommand subCommand = new QueryLatestVersionAllObjectsSubCommand();
-			subCommand.executeSubCommand((BaseCommand) this,(QueryParams) this, persistence);
+			subCommand = new QueryLatestVersionAllObjectsSubCommand((BaseCommand) this, (QueryParams) this,
+					persistence);
 			break;
 		}
 		case "objects-by-id": {
-			// OK
-			QueryObjectsByIdSubCommand subCommand = new QueryObjectsByIdSubCommand();
-			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
+			subCommand = new QueryObjectsByIdSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "objects-by-tag": {
-			// OK
-			QueryObjectsByTagSubCommand subCommand = new QueryObjectsByTagSubCommand();
-			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
+			subCommand = new QueryObjectsByTagSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "user-edit-ranking": {
-			// OK
-			QueryUserEditsRankingSubCommand subCommand = new QueryUserEditsRankingSubCommand();
-			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
+			subCommand = new QueryUserEditsRankingSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		case "all-edits-for-user": {
-			// OK
-			QueryAllEditsByUserSubCommand subCommand = new QueryAllEditsByUserSubCommand();
-			subCommand.executeSubCommand((BaseCommand) this, (QueryParams) this, persistence);
+			subCommand = new QueryAllEditsByUserSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
 		default:
+			printFatalErrorAndExit(USAGE_MESSAGE);
 			break;
 		}
+		subCommand.executeSubCommand();
 	}
 
 	@Override
@@ -296,7 +284,7 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 	public String getOutputFormat() {
 		return mOutputFormat;
 	}
-	
+
 	@Override
 	public void setOutputFormat(String format) {
 		mOutputFormat = format;

@@ -23,7 +23,7 @@ public class QueryParamsParser {
 	private static Date parseDate(BaseCommand command, QueryParams params, String usageMessage, String dateString)
 			throws ParseException {
 		if (dateString == null || dateString.equals("")) {
-			command.printFatalError(
+			command.printFatalErrorAndExit(
 					"It is mandatory to provide both the start and end dates for querying the editing summary.");
 			command.printMessage(usageMessage);
 			System.exit(1);
@@ -41,7 +41,7 @@ public class QueryParamsParser {
 			try {
 				returnValue = ExportFormatType.fromString(params.getOutputFormat());
 			} catch (IllegalArgumentException e) {
-				command.printFatalError("Output format not supported: " + params.getOutputFormat());
+				command.printFatalErrorAndExit("Output format not supported: " + params.getOutputFormat());
 				command.printMessage(usageMessage);
 				System.exit(1);
 			}
@@ -55,7 +55,7 @@ public class QueryParamsParser {
 		try {
 			objectType = OsmObjectType.fromString(params.getObjectType());
 		} catch (IllegalArgumentException e) {
-			command.printFatalError("Object type not supported: " + params.getOutputFormat());
+			command.printFatalErrorAndExit("Object type not supported: " + params.getOutputFormat());
 			command.printMessage(usageMessage);
 			System.exit(1);
 		}
@@ -68,7 +68,7 @@ public class QueryParamsParser {
 		try {
 			objectId = Long.parseLong(params.getObjectId());
 		} catch (NumberFormatException e) {
-			command.printFatalError("Object id must be numeric");
+			command.printFatalErrorAndExit("Object id must be numeric");
 			command.printMessage(usageMessage);
 			System.exit(1);
 		}
@@ -80,7 +80,7 @@ public class QueryParamsParser {
 		try {
 			userId = Long.parseLong(params.getUserId());
 		} catch (NumberFormatException e) {
-			command.printFatalError("User id must be numeric");
+			command.printFatalErrorAndExit("User id must be numeric");
 			command.printMessage(usageMessage);
 			System.exit(1);
 		}

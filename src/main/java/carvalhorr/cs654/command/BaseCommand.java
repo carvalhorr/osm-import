@@ -7,7 +7,7 @@ public abstract class BaseCommand implements ProgressIndicator {
 	public void printMessage(String message) {
 		System.out.println(message);
 	}
-	public void printFatalError(String errorMessage) {
+	public void printFatalErrorAndExit(String errorMessage) {
 		System.out.println("FATAL ERROR: " + errorMessage);
 	}
 	
