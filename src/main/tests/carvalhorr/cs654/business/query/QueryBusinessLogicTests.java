@@ -87,7 +87,8 @@ public class QueryBusinessLogicTests implements ProgressIndicator {
 		query.queryDataAndExportToFile();
 
 		// verify that file was created correctly
-		assertEquals(TestDataProvider.LATEST_VERSION_ALL_OBJECTS_CSV_RESULTS, FileUtil.readFileAsString(writer.getFullFileName()));
+		assertEquals(TestDataProvider.LATEST_VERSION_ALL_OBJECTS_CSV_RESULTS,
+				FileUtil.readFileAsString(writer.getFullFileName()));
 
 	}
 
@@ -137,9 +138,6 @@ public class QueryBusinessLogicTests implements ProgressIndicator {
 	public void whenQueryingFirstAndLastObjectsWhithCsvWriterACsvFileShoulBeCreated()
 			throws FileNotFoundException, FailedToCompleteQueryException {
 
-		String expextedFileContent = "ID, Version, Type, Timestamp\n" + "2,1, Point, 2008-12-11 14:21:24\n"
-				+ "2,2, Point, 2008-12-11 14:21:24";
-
 		// Create json writer
 		writer = new OsmObjectCsvWriter(fileName);
 
@@ -152,15 +150,13 @@ public class QueryBusinessLogicTests implements ProgressIndicator {
 		query.queryDataAndExportToFile();
 
 		// verify that file was created correctly
-		assertEquals(expextedFileContent, FileUtil.readFileAsString(writer.getFullFileName()));
+		assertEquals(TestDataProvider.FIRST_AND_LAST_CSV, FileUtil.readFileAsString(writer.getFullFileName()));
 
 	}
 
 	@Test
 	public void whenQueryingObjectsByTagWithJsonWriterAJsonFileShouldBeCreated()
 			throws FileNotFoundException, FailedToCompleteQueryException {
-
-		String expextedFileContent = "{ \"objects\": [{\"id\":\"1\", \"version\":\"4\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"tag2\":\"value2\"]}, {\"id\":\"1\", \"version\":\"5\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"tag2\":\"value2\"]}, {\"id\":\"1\", \"version\":\"6\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": LineString, \"tags\": [\"tag2\":\"value2\"]}]}";
 
 		// Create json writer
 		writer = new OsmObjectJsonWriter(fileName);
@@ -173,16 +169,13 @@ public class QueryBusinessLogicTests implements ProgressIndicator {
 		query.queryDataAndExportToFile();
 
 		// verify that file was created correctly
-		assertEquals(expextedFileContent, FileUtil.readFileAsString(writer.getFullFileName()));
+		assertEquals(TestDataProvider.OBJECTS_BY_TAG_JSON, FileUtil.readFileAsString(writer.getFullFileName()));
 
 	}
 
 	@Test
 	public void whenQueryingAllObjectsEditedByUserWithCsvWriterACsvFileShouldBeCreated()
 			throws FileNotFoundException, FailedToCompleteQueryException {
-
-		String expextedFileContent = "ID, Version, Type, Timestamp\n" + "1,1, Point, 2008-12-11 14:21:24\n"
-				+ "1,2, Point, 2008-12-11 14:21:24\n" + "1,3, LineString, 2008-12-11 14:21:24";
 
 		// Create json writer
 		writer = new OsmObjectCsvWriter(fileName);
@@ -195,16 +188,13 @@ public class QueryBusinessLogicTests implements ProgressIndicator {
 		query.queryDataAndExportToFile();
 
 		// verify that file was created correctly
-		assertEquals(expextedFileContent, FileUtil.readFileAsString(writer.getFullFileName()));
+		assertEquals(TestDataProvider.ALL_EDITS_BY_USER_2_CSV, FileUtil.readFileAsString(writer.getFullFileName()));
 
 	}
 
 	@Test
 	public void whenQueryingRankEditsByUserACsvFileShouldBeCreated()
 			throws FileNotFoundException, FailedToCompleteQueryException {
-
-		String expextedFileContent = "User id, User name, Total edits, Total points, Total linestrings, Total polygons, Total multilines\n"
-				+ "1, a user, 5, 4, 1, 0, 0\n" + "2, a user, 3, 2, 1, 0, 0\n" + "3, a user, 2, 0, 2, 0, 0";
 
 		// Create json writer
 		writer = new UserEditsRankingCsvWriter(fileName);
@@ -217,16 +207,13 @@ public class QueryBusinessLogicTests implements ProgressIndicator {
 		query.queryDataAndExportToFile();
 
 		// verify that file was created correctly
-		assertEquals(expextedFileContent, FileUtil.readFileAsString(writer.getFullFileName()));
+		assertEquals(TestDataProvider.USER_EDITS_RANKING_SCV, FileUtil.readFileAsString(writer.getFullFileName()));
 
 	}
 
 	@Test
 	public void whenQueryingEditsSummaryACsvFileShouldBeCreated()
 			throws FailedToCompleteQueryException, FileNotFoundException, ParseException {
-
-		String expextedFileContent = "Total edits, Total points, Total linestrings, Total polygons, Total multilines, Total distinct users\n"
-				+ "2, 0, 2, 0, 0, 1";
 
 		// Create json writer
 		writer = new SummaryEditsCsvWriter(fileName);
@@ -243,7 +230,7 @@ public class QueryBusinessLogicTests implements ProgressIndicator {
 		query.queryDataAndExportToFile();
 
 		// verify that file was created correctly
-		assertEquals(expextedFileContent, FileUtil.readFileAsString(writer.getFullFileName()));
+		assertEquals(TestDataProvider.EDITING_SUMMARY_CSV, FileUtil.readFileAsString(writer.getFullFileName()));
 	}
 
 	@Override

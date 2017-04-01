@@ -5,6 +5,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.cli.MissingArgumentException;
+
 import carvalhorr.cs654.business.query.QueryBusinessLogic;
 import carvalhorr.cs654.business.query.QueryEditingSummaryBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
@@ -24,14 +26,16 @@ public class QueryEditingSummarySubCommand extends BaseSubCommand {
 	private Date startDate;
 	private Date endDate;
 
-	public QueryEditingSummarySubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence) {
-		super(command, params, persistence, ExportFormatType.GEOJSON, USAGE_MESSAGE);
+	public QueryEditingSummarySubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence)
+			throws MissingArgumentException {
+		super(command, params, persistence, ExportFormatType.CSV, USAGE_MESSAGE);
 		try {
 			startDate = QueryParamsParser.parseStartDate(command, params, USAGE_MESSAGE);
 			endDate = QueryParamsParser.parseEndDate(command, params, USAGE_MESSAGE);
 		} catch (ParseException e) {
 			command.printFatalErrorAndExit("The start and end date must be in the format yyyy-MM-dd hh:mm:ss.");
 			command.printMessage(USAGE_MESSAGE);
+			throw new MissingArgumentException("Please provide arguments --start-date and --end-data");
 		}
 	}
 

@@ -1,5 +1,7 @@
 package carvalhorr.cs654.command.query;
 
+import org.apache.commons.cli.MissingArgumentException;
+
 import carvalhorr.cs654.business.query.QueryAllEditsPerformedByUserBusinessLogic;
 import carvalhorr.cs654.business.query.QueryBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
@@ -16,7 +18,7 @@ public class QueryAllEditsByUserSubCommand extends BaseSubCommand {
 
 	private long userId;
 
-	public QueryAllEditsByUserSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence) {
+	public QueryAllEditsByUserSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence) throws MissingArgumentException {
 		super(command, params, persistence, ExportFormatType.CSV, USAGE_MESSAGE);
 		userId = QueryParamsParser.parseUserId(command, params, USAGE_MESSAGE);
 	}

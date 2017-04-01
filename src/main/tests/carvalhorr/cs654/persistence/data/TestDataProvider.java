@@ -41,6 +41,27 @@ public class TestDataProvider {
 			+ "2, 2, Point, 1\n" + "1, 8, LineString, 1";
 	public static final String LATEST_VERSION_ALL_OBJECTS_JSON_RESULTS = "{ \"objects\": [{\"id\":\"2\", \"version\":\"2\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"a tag\":\"a value\"]}, {\"id\":\"1\", \"version\":\"8\", \"timestamp\":\"2009-12-11 14:21:24\", \"user_id\":\"3\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": LineString, \"tags\": [\"a tag\":\"a value\"]}]}";
 
+	public static final String ALL_EDITS_BY_USER_2_CSV = "ID, Version, Type, Timestamp\n"
+			+ "1,1, Point, 2008-12-11 14:21:24\n" + "1,2, Point, 2008-12-11 14:21:24\n"
+			+ "1,3, LineString, 2008-12-11 14:21:24";
+
+	public static final String EDITING_SUMMARY_CSV = "Total edits, Total points, Total linestrings, Total polygons, Total multilines, Total distinct users\n"
+			+ "2, 0, 2, 0, 0, 1";
+
+	public static final String FIRST_AND_LAST_CSV = "ID, Version, Type, Timestamp\n"
+			+ "2,1, Point, 2008-12-11 14:21:24\n" + "2,2, Point, 2008-12-11 14:21:24";
+
+	public static final String FIRST_AND_LAST_GEOJSON = "{\"type\": \"FeatureCollection\", \"features\": [{ \"type\": \"Feature\", \"geometry\": { \"type\": \"Point\", \"coordinates\": coordinates}, \"properties\": {\"id\":\"2\", \"version\":\"1\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"a tag\":\"a value\"}}, { \"type\": \"Feature\", \"geometry\": { \"type\": \"Point\", \"coordinates\": coordinates}, \"properties\": {\"id\":\"2\", \"version\":\"2\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"a tag\":\"a value\"}}]}";
+
+	public static final String OBJECTS_BY_TAG_JSON = "{ \"objects\": [{\"id\":\"1\", \"version\":\"4\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"tag2\":\"value2\"]}, {\"id\":\"1\", \"version\":\"5\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"tag2\":\"value2\"]}, {\"id\":\"1\", \"version\":\"6\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": LineString, \"tags\": [\"tag2\":\"value2\"]}]}";
+
+	public static final String OBJECTS_BY_TAG_CSV = "ID, Version, Type, Timestamp\n"
+			+ "1,4, Point, 2008-12-11 14:21:24\n" + "1,5, Point, 2008-12-11 14:21:24\n"
+			+ "1,6, LineString, 2008-12-11 14:21:24";
+
+	public static final String USER_EDITS_RANKING_SCV = "User id, User name, Total edits, Total points, Total linestrings, Total polygons, Total multilines\n"
+			+ "1, a user, 5, 4, 1, 0, 0\n" + "2, a user, 3, 2, 1, 0, 0\n" + "3, a user, 2, 0, 2, 0, 0";
+
 	// Persistence object for creating schema and inserting data into the
 	// database
 	public OshDataPersistence insertOshDataPersistence;

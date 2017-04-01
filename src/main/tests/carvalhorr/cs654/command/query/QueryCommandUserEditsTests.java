@@ -8,28 +8,21 @@ import org.junit.Test;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.persistence.data.TestDataProvider;
 
-public class QueryCommandLatestVersionTests extends BaseQueryCommandTests {
+public class QueryCommandUserEditsTests extends BaseQueryCommandTests {
 
-	private String defaultFileName = "all-objects-latest-version";
+	private String defaultFileName = "ranking-user-edits";
 	private String defaultOutputFormat = "csv";
+	
+	private static final String QUERY_TYPE = "user-edit-ranking";
 
 	@Test
-	public void queryLatestVersionAllObjectsNoFormatShouldCreateCsvFile()
+	public void queryUserEditsRankingWithNoFilenameShouldCreateDefaultCsvFile()
 			throws FileNotFoundException, FailedToCompleteQueryException {
-		List<String> args = createArgs("latest-version-all-objects", "latest-all-objects.csv", dataProvider.SCHEMA_NAME,
+		List<String> args = createArgs(QUERY_TYPE, "", dataProvider.SCHEMA_NAME,
 				"");
 
-		executeTest(args, defaultFileName, "latest-all-objects.csv", "",
-				TestDataProvider.LATEST_VERSION_ALL_OBJECTS_CSV_RESULTS);
-	}
-
-	@Test
-	public void queryLatestVersionAllObjectsJsonShouldCreateJsonFile()
-			throws FileNotFoundException, FailedToCompleteQueryException {
-
-		List<String> args = createArgs("latest-version-all-objects", "", dataProvider.SCHEMA_NAME, "json");
-
-		executeTest(args, defaultFileName, "", "json", TestDataProvider.LATEST_VERSION_ALL_OBJECTS_JSON_RESULTS);
+		executeTest(args, defaultFileName, "", "csv",
+				TestDataProvider.USER_EDITS_RANKING_SCV);
 	}
 
 	@Override
@@ -37,7 +30,7 @@ public class QueryCommandLatestVersionTests extends BaseQueryCommandTests {
 
 		// set expected output
 		String expectedOutput = "PROCESSING FILE\n" + "Area name : " + dataProvider.SCHEMA_NAME + "\n"
-				+ "Query type : latest-version-all-objects\n" + "Output file name : "
+				+ "Query type : user-edit-ranking\n" + "Output file name : "
 				+ ("".equals(file) ? "default file name" : file) + "\n" + "Output format : "
 				+ ("".equals(format) ? defaultOutputFormat : format) + "\n" + "Database properties file : "
 				+ dataProvider.DB_CONFIG + "\n" + "\n" + "Query finished.\n" + "File saved in: " + super.fullFilename;

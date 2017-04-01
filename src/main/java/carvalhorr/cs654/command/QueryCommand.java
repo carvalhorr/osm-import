@@ -7,6 +7,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -48,7 +49,9 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 		} catch (FailedToCompleteQueryException e) {
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-
+			e.printStackTrace();
+		} catch (MissingArgumentException e) {
+			//e.printStackTrace();
 		}
 	}
 
@@ -132,7 +135,6 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 		} catch (ParseException e) {
 			System.out.println(e.getMessage());
 			formatter.printHelp("java -jar import.jar", options);
-
 			System.exit(1);
 			return;
 		}
@@ -154,7 +156,7 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 	}
 
 	public void exportFile() throws SQLException, PostgresqlDriverNotFound, ErrorConnectingToDatabase,
-			SchemaDoesNotExistException, FailedToCompleteQueryException {
+			SchemaDoesNotExistException, FailedToCompleteQueryException, MissingArgumentException {
 
 		String fullDbConfigPath = getClass().getClassLoader().getResource(mDbConfig).getPath();
 

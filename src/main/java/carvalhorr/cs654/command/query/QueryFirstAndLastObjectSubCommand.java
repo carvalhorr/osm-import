@@ -1,5 +1,7 @@
 package carvalhorr.cs654.command.query;
 
+import org.apache.commons.cli.MissingArgumentException;
+
 import carvalhorr.cs654.business.query.QueryBusinessLogic;
 import carvalhorr.cs654.business.query.QueryFirstAndLastVersionOfObjectBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
@@ -18,7 +20,7 @@ public class QueryFirstAndLastObjectSubCommand extends BaseSubCommand {
 	private OsmObjectType objectType;
 	private long objectId;
 
-	public QueryFirstAndLastObjectSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence) {
+	public QueryFirstAndLastObjectSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence) throws MissingArgumentException {
 		super(command, params, persistence, ExportFormatType.GEOJSON, USAGE_MESSAGE);
 		objectType = QueryParamsParser.parseObjectType(command, params, USAGE_MESSAGE);
 		objectId = QueryParamsParser.parseObjectId(command, params, USAGE_MESSAGE);

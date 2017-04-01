@@ -1,5 +1,7 @@
 package carvalhorr.cs654.command.query;
 
+import org.apache.commons.cli.MissingArgumentException;
+
 import carvalhorr.cs654.business.query.QueryBusinessLogic;
 import carvalhorr.cs654.business.query.QueryObjectsByIdBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
@@ -18,7 +20,8 @@ public class QueryObjectsByIdSubCommand extends BaseSubCommand {
 	private OsmObjectType objectType;
 	private long objectId;
 
-	public QueryObjectsByIdSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence) {
+	public QueryObjectsByIdSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence)
+			throws MissingArgumentException {
 		super(command, params, persistence, ExportFormatType.GEOJSON, USAGE_MESSAGE);
 		objectType = QueryParamsParser.parseObjectType(command, params, USAGE_MESSAGE);
 		objectId = QueryParamsParser.parseObjectId(command, params, USAGE_MESSAGE);
@@ -30,9 +33,11 @@ public class QueryObjectsByIdSubCommand extends BaseSubCommand {
 		switch (objectType) {
 		case NODE: {
 			name = "node-" + objectId + "-all-versions";
+			break;
 		}
 		case WAY: {
 			name = "way-" + objectId + "-all-versions";
+			break;
 		}
 		default:
 			command.printFatalErrorAndExit(USAGE_MESSAGE);

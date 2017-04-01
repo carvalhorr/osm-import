@@ -1,5 +1,7 @@
 package carvalhorr.cs654.command.query;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -12,20 +14,22 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import carvalhorr.cs654.command.QueryCommand;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
+import carvalhorr.cs654.exception.FailedToCompleteQueryException;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
 import carvalhorr.cs654.persistence.data.TestDataProvider;
 import carvalhorr.cs654.util.FileUtil;
 
-public class BaseQueryCommandTests {
+public abstract class BaseQueryCommandTests {
 
 	protected static final String OUTPUT = "out.txt";
 
 	protected static TestDataProvider dataProvider;
 
-	protected String fileName;
+	protected String fullFilename;
 
 	@BeforeClass
 	public static void setup() throws FileNotFoundException, SQLException, PostgresqlDriverNotFound,
@@ -55,10 +59,35 @@ public class BaseQueryCommandTests {
 	@After
 	public void deleteFile() {
 
-		FileUtil.deleteFile(fileName);
+		FileUtil.deleteFile(fullFilename);
 		FileUtil.deleteFile(OUTPUT);
 
 	}
+	
+
+	public void executeTest(List<String> args, String defaultFileName, String file, String format, String expectedFileResults)
+			throws FailedToCompleteQueryException, FileNotFoundException {
+
+		// name of file to be created
+		if (!file.equals(""))
+			fullFilename = getFileFullname(file);
+		else
+			fullFilename = file;
+
+		// execute command
+		QueryCommand.main(convertListToArray(args));
+
+		if (file.equals(""))
+			fullFilename = getFileFullname(defaultFileName + "." + format);
+
+		// verify that file was created correctly
+		
+		
+		assertEquals(getExpectedOutput(file, format), FileUtil.readFileAsString(OUTPUT));
+		assertEquals(expectedFileResults, FileUtil.readFileAsString(fullFilename));
+
+	}
+
 	
 
 	protected List<String> createArgs(String queryType, String fileName, String areaName, String exportType) {
@@ -93,5 +122,7 @@ public class BaseQueryCommandTests {
 		String fullName = f.getAbsolutePath();
 		return fullName;
 	}
+	
+	protected abstract String getExpectedOutput(String file, String format);
 
 }

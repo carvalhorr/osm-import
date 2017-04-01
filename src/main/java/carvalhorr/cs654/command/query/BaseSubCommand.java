@@ -1,5 +1,7 @@
 package carvalhorr.cs654.command.query;
 
+import org.apache.commons.cli.MissingArgumentException;
+
 import carvalhorr.cs654.business.query.QueryBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.command.QueryParams;
@@ -30,7 +32,7 @@ public abstract class BaseSubCommand {
 		this.defaultExportFormat = exportFormat;
 	}
 
-	public void executeSubCommand() throws FailedToCompleteQueryException {
+	public void executeSubCommand() throws FailedToCompleteQueryException, MissingArgumentException {
 
 		// setup export type
 		setDefaulExportFormatIfEmpty();
@@ -54,12 +56,11 @@ public abstract class BaseSubCommand {
 
 	}
 
-	protected void setDefaulExportFormatIfEmpty() {
+	protected void setDefaulExportFormatIfEmpty() throws MissingArgumentException {
 		if (params.getOutputFormat() == null || params.getOutputFormat().equals("")) {
 			params.setOutputFormat(defaultExportFormat.toString());
 		}
-		outputFormat = QueryParamsParser.parseExportFormatType(command, params, defaultExportFormat,
-				mUsageMessage);
+		outputFormat = QueryParamsParser.parseExportFormatType(command, params, defaultExportFormat, mUsageMessage);
 
 	}
 
