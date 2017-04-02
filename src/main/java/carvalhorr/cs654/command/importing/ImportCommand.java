@@ -1,5 +1,6 @@
 package carvalhorr.cs654.command.importing;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -13,6 +14,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import com.google.common.io.Files;
 
 import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.business.importing.DataImportBusinessLogic;
@@ -107,7 +110,14 @@ public class ImportCommand implements ProgressIndicator {
 		System.out.println("OSH file :" + oshFileName);
 		System.out.println("Database properties file :" + dbConfig);
 		
-		String fullDbConfigPath = getClass().getClassLoader().getResource(dbConfig).getPath();
+		String fullDbConfigPath = "";
+		
+		File f = new File(dbConfig);
+		if (f.exists()) {
+			fullDbConfigPath = dbConfig;
+		} else {
+			fullDbConfigPath = getClass().getClassLoader().getResource(dbConfig).getPath();
+		}
 		
 		Params.getInstance().setParam(Params.PARAM_DB_CONFIG_FILENAME, fullDbConfigPath);
 		

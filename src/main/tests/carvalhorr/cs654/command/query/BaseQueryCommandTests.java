@@ -20,6 +20,7 @@ import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.exception.SchemaDoesNotExistException;
 import carvalhorr.cs654.persistence.data.TestDataProvider;
+import carvalhorr.cs654.util.ArrayUtil;
 import carvalhorr.cs654.util.FileUtil;
 
 public abstract class BaseQueryCommandTests {
@@ -62,10 +63,9 @@ public abstract class BaseQueryCommandTests {
 		FileUtil.deleteFile(OUTPUT);
 
 	}
-	
 
-	public void executeTest(List<String> args, String defaultFileName, String file, String format, String expectedFileResults)
-			throws FailedToCompleteQueryException, FileNotFoundException {
+	public void executeTest(List<String> args, String defaultFileName, String file, String format,
+			String expectedFileResults) throws FailedToCompleteQueryException, FileNotFoundException {
 
 		// name of file to be created
 		if (!file.equals(""))
@@ -74,20 +74,17 @@ public abstract class BaseQueryCommandTests {
 			fullFilename = file;
 
 		// execute command
-		QueryCommand.main(convertListToArray(args));
+		QueryCommand.main(ArrayUtil.convertStringListToStringArray(args));
 
 		if (file.equals(""))
 			fullFilename = getFileFullname(defaultFileName + "." + format);
 
 		// verify that file was created correctly
-		
-		
+
 		assertEquals(getExpectedOutput(file, format), FileUtil.readFileAsString(OUTPUT));
 		assertEquals(expectedFileResults, FileUtil.readFileAsString(fullFilename));
 
 	}
-
-	
 
 	protected List<String> createArgs(String queryType, String fileName, String areaName, String exportType) {
 		List<String> args = new ArrayList<String>();
@@ -110,18 +107,12 @@ public abstract class BaseQueryCommandTests {
 		return args;
 	}
 
-	protected String[] convertListToArray(List<String> args) {
-		String[] argsStr = new String[args.size()];
-		argsStr = args.toArray(argsStr);
-		return argsStr;
-	}
-
 	protected String getFileFullname(String fileName) {
 		File f = new File(fileName);
 		String fullName = f.getAbsolutePath();
 		return fullName;
 	}
-	
+
 	protected abstract String getExpectedOutput(String file, String format);
 
 }

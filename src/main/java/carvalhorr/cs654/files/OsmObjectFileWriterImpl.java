@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import carvalhorr.cs654.exception.ErrorProcessingReadObjectException;
 import carvalhorr.cs654.exception.ErrorWritingToFileException;
-import carvalhorr.cs654.model.OsmObject;
 
 public abstract class OsmObjectFileWriterImpl implements OsmObjectFileWriter {
 
