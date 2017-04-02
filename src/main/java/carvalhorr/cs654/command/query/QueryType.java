@@ -1,4 +1,4 @@
-package carvalhorr.cs654.command;
+package carvalhorr.cs654.command.query;
 
 public enum QueryType {
 	DATE_SUMMARY("summary");

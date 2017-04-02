@@ -1,11 +1,11 @@
-package carvalhorr.cs654.command;
+package carvalhorr.cs654.command.query;
 
 import java.text.ParseException;
 import java.util.Date;
 
 import org.apache.commons.cli.MissingArgumentException;
 
-import carvalhorr.cs654.command.query.QueryEditingSummarySubCommand;
+import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.util.DateUtil;

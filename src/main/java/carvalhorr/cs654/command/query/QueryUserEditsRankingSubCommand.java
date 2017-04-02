@@ -3,7 +3,6 @@ package carvalhorr.cs654.command.query;
 import carvalhorr.cs654.business.query.QueryBusinessLogic;
 import carvalhorr.cs654.business.query.QueryRankingUserEditsBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
-import carvalhorr.cs654.command.QueryParams;
 import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.files.OsmObjectFileWriter;
 import carvalhorr.cs654.files.UserEditsRankingCsvWriter;

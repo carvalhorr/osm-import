@@ -1,4 +1,4 @@
-package carvalhorr.cs654.command;
+package carvalhorr.cs654.command.query;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
@@ -12,14 +12,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import carvalhorr.cs654.command.query.BaseSubCommand;
-import carvalhorr.cs654.command.query.QueryAllEditsByUserSubCommand;
-import carvalhorr.cs654.command.query.QueryEditingSummarySubCommand;
-import carvalhorr.cs654.command.query.QueryFirstAndLastObjectSubCommand;
-import carvalhorr.cs654.command.query.QueryLatestVersionAllObjectsSubCommand;
-import carvalhorr.cs654.command.query.QueryObjectsByIdSubCommand;
-import carvalhorr.cs654.command.query.QueryObjectsByTagSubCommand;
-import carvalhorr.cs654.command.query.QueryUserEditsRankingSubCommand;
+import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.config.Configuration;
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.FailedToCompleteQueryException;

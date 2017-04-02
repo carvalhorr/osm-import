@@ -1,4 +1,4 @@
-package carvalhorr.cs654.command;
+package carvalhorr.cs654.command.query;
 
 public interface QueryParams {
 	String getSchemaName();
