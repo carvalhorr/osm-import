@@ -3,7 +3,10 @@ package carvalhorr.cs654.persistence;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import carvalhorr.cs654.exception.ErrorConnectingToDatabase;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
@@ -11,6 +14,7 @@ import carvalhorr.cs654.exception.PostgresqlDriverNotFound;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
 import carvalhorr.cs654.model.OsmObject;
+import carvalhorr.cs654.model.WayOsmObject;
 
 /**
  * Persistence class to insert data into the database. It includes an instance
@@ -112,36 +116,60 @@ public class OshDataPersistence extends BaseOshDatabasePersistence {
 	public void flushOsmObjectsBatch() throws SQLException {
 		StringBuffer sqlString = new StringBuffer();
 		for (OsmObject object : objectsToInsert) {
+			
+			/*if (object.getId() == 93405844) {
+				System.out.println("");
+			}*/
 
 			String objectType = (object instanceof NodeOsmObject) ? "N" : "W";
 
 			// Add sql to insert user if not exists yet
 			sqlString.append(
 					" INSERT INTO " + schemaName + ".osm_user(user_id, user_name) select " + object.getUser().getUid()
-							+ ", '" + object.getUser().getUserName() + "' WHERE not exists (select 1 from " + schemaName
+							+ ", \"" + StringEscapeUtils.escapeXml11(object.getUser().getUserName()) + "\" WHERE not exists (select 1 from " + schemaName
 							+ ".osm_user where user_id = " + object.getUser().getUid() + ");");
 
+			String nodeKeysForWay = (object instanceof WayOsmObject) ? ((WayOsmObject)object).getNodesKeys().toString(): "";
 			// Add sql to insert osm_object
 			sqlString.append("INSERT INTO " + schemaName
-					+ ".osm_object(osm_type, osm_id, osm_version, coordinates, timestamp, user_id, visible, geojson_type, changeset) "
-					+ "VALUES('" + objectType + "', " + object.getId() + ", " + object.getVersion() + ", '"
-					+ object.getCoordinates() + "', '" + object.getTimestamp() + "', " + object.getUser().getUid()
-					+ ", " + object.getVisible() + ", '" + object.getGeoJsonType().getDatabaseType() + "'" + ", "
-					+ object.getChangeset() + ");");
+					+ ".osm_object(osm_type, osm_id, osm_version, coordinates, timestamp, user_id, visible, geojson_type, changeset, way_nodes) "
+					+ "VALUES(\"" + objectType + "\", " + object.getId() + ", " + object.getVersion() + ", \""
+					+ object.getCoordinates() + "\", \"" + StringEscapeUtils.escapeXml11(object.getTimestamp()) + "\", " + object.getUser().getUid()
+					+ ", " + object.getVisible() + ", \"" + object.getGeoJsonType().getDatabaseType() + "\"" + ", "
+					+ object.getChangeset() + ", \"" + nodeKeysForWay + "\");");
 
 			// Add sql to insert tags
 			for (String key : object.getTags().keySet()) {
 				if (key != null)
 					sqlString.append(
 							"insert into " + schemaName + ".osm_tag(object_key, tag_key, tag_value) values( LASTVAL()"
-									+ ", '" + key + "', '" + object.getTags().get(key) + "');");
+									+ ", \"" + StringEscapeUtils.escapeXml11(key) + "\", \"" + StringEscapeUtils.escapeXml11(object.getTags().get(key)) + "\");");
 			}
+
+			// store nodes that are part of a way
+			/*
+			if (object instanceof WayOsmObject) {
+				int order = 0;
+				WayOsmObject way = (WayOsmObject) object;
+				for (Long nodeKey : way.getNodesKeys()) {
+					sqlString.append(
+							"insert into " + schemaName + ".nodes_ways(way_key, node_key, position) values( LASTVAL(), "
+									+ nodeKey + ", " + order + ");");
+					order++;
+				}
+			}*/
+
 		}
 		// Execute the insert statemets
-		statement.execute(sqlString.toString());
+		// System.out.println(escape(sqlString.toString()));
+		statement.execute(escape(sqlString.toString()));
 
 		// Clear the list of objects just inserted in the database
 		objectsToInsert.clear();
+	}
+	
+	private String escape(String str) {
+		return str.replace("'", "''").replace("\"", "'");
 	}
 
 	/**
@@ -168,30 +196,14 @@ public class OshDataPersistence extends BaseOshDatabasePersistence {
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<String> readCoordinatesForNodes(String nodeIds, String timestamp) throws SQLException {
+	public ResultSet readCoordinatesForNodes(String nodeIds, String timestamp) throws SQLException {
 
-		// Read and store the coordinates
-		List<String> coordinates = new ArrayList<String>();
-		ResultSet result = statement.executeQuery("select coordinates from " + schemaName
+		ResultSet result = statement.executeQuery("select coordinates, object_key from " + schemaName
 				+ ".osm_object where (osm_id, osm_version) in (select osm_id, max(osm_version) from " + schemaName
 				+ ".osm_object where osm_id in (" + nodeIds + ") and timestamp <= '" + timestamp
 				+ "' and osm_type = 'N' group by osm_id) and osm_type = 'N' order by position(osm_id::text in '"
 				+ nodeIds + "');");
-		while (result.next()) {
-			coordinates.add(result.getString(1));
-		}
 
-		// In case of circular list of nodes (first node equals last node), the
-		// SQL return the coordinates for the node only once. This hack add the
-		// first object coordinates to the end of the list in case of a circular
-		// list of objects.
-		String[] ids = nodeIds.split(",");
-		if (ids[0].trim().equals(ids[ids.length - 1].trim())) {
-			if (coordinates.size() > 0) {
-				coordinates.add(coordinates.get(0));
-			}
-		}
-
-		return coordinates;
+		return result;
 	}
 }

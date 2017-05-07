@@ -40,6 +40,7 @@ public class OshSchemaCreationPersistence {
 		createUserTable(schemaName);
 		createOsmObjectTable(schemaName);
 		createTagTable(schemaName);
+		//createNodesWayTable(schemaName);
 
 	}
 
@@ -58,13 +59,14 @@ public class OshSchemaCreationPersistence {
 
 	/**
 	 * Create the user table.
+	 * 
 	 * @param schemaName
 	 * @throws SQLException
 	 */
 	private void createUserTable(String schemaName) throws SQLException {
 
-		statement.execute("CREATE TABLE " + schemaName + ".osm_user(" + "user_id integer NOT NULL, "
-				+ "user_name character varying(30), " + "CONSTRAINT osm_user_pkey PRIMARY KEY (user_id));");
+		statement.execute("CREATE TABLE " + schemaName + ".osm_user(" + "user_id BIGINT NOT NULL, "
+				+ "user_name character varying(255), " + "CONSTRAINT osm_user_pkey PRIMARY KEY (user_id));");
 
 	}
 
@@ -76,9 +78,9 @@ public class OshSchemaCreationPersistence {
 	 */
 	private void createOsmObjectTable(String schemaName) throws SQLException {
 		statement.execute("CREATE TABLE " + schemaName + ".osm_object(" + "object_key BIGSERIAL PRIMARY KEY, "
-				+ "osm_type CHAR(1), " + "osm_id BIGINT, " + "osm_version INTEGER, " + "coordinates TEXT, "
-				+ "timestamp TIMESTAMP, " + "user_id INTEGER REFERENCES " + schemaName + ".osm_user(user_id), "
-				+ "visible boolean, geojson_type CHAR(1), changeset BIGINT, "
+				+ "osm_type CHAR(1), " + "osm_id BIGINT, " + "osm_version BIGINT, " + "coordinates TEXT, "
+				+ "timestamp TIMESTAMP, " + "user_id BIGINT REFERENCES " + schemaName + ".osm_user(user_id), "
+				+ "visible boolean, geojson_type CHAR(1), changeset BIGINT, way_nodes TEXT, "
 				+ "CONSTRAINT osm_object_unique UNIQUE (osm_type, osm_id, osm_version));");
 	}
 
@@ -90,12 +92,13 @@ public class OshSchemaCreationPersistence {
 	 */
 	private void createTagTable(String schemaName) throws SQLException {
 		statement.execute("CREATE TABLE " + schemaName + ".osm_tag(" + "object_key BIGINT REFERENCES " + schemaName
-				+ ".osm_object(object_key), " + "tag_key VARCHAR(100), " + "tag_value VARCHAR(300), "
+				+ ".osm_object(object_key), " + "tag_key VARCHAR(255), " + "tag_value TEXT, "
 				+ "CONSTRAINT osm_tag_primary_key PRIMARY KEY (object_key, tag_key, tag_value));");
 	}
 
 	/**
-	 * Create indexes for the tables. Indexes are created after the nodes are inserted.
+	 * Create indexes for the tables. Indexes are created after the nodes are
+	 * inserted.
 	 * 
 	 * @param schemaName
 	 * @throws SQLException
@@ -105,6 +108,19 @@ public class OshSchemaCreationPersistence {
 		statement.execute("CREATE INDEX osm_object_timestamp ON " + schemaName + ".osm_object(timestamp);");
 		statement.execute("CREATE INDEX osm_object_id_version ON " + schemaName + ".osm_object(osm_id, osm_version);");
 		statement.execute("CREATE INDEX user_id ON " + schemaName + ".osm_object(user_id);");
+	}
+
+	/**
+	 * Create table to store nodes that are part of a way in the order they
+	 * appear.
+	 * 
+	 * @param schemaName
+	 * @throws SQLException
+	 */
+	public void createNodesWayTable(String schemaName) throws SQLException {
+		statement.execute("CREATE TABLE " + schemaName + ".nodes_ways(way_key BIGINT REFERENCES " + schemaName
+				+ ".osm_object(object_key), node_key BIGINT REFERENCES " + schemaName
+				+ ".osm_object(object_key), position INTEGER NOT NULL);");
 	}
 
 }
