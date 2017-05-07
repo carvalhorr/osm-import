@@ -15,8 +15,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import com.google.common.io.Files;
-
 import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.business.importing.DataImportBusinessLogic;
 import carvalhorr.cs654.config.Configuration;
@@ -43,8 +41,6 @@ public class ImportCommand implements ProgressIndicator {
 
 	@Override
 	public void updateProgress(String type, float progress) {
-		//System.out.print("\b\b\b\b\b\b\b\b\b\b\b");
-		//System.out.flush();
 		if (progressMap.containsKey(type)) {
 			int currentPercent = (int) Math.floor(progressMap.get(type));
 			int newPercent = (int) Math.floor(progress);
@@ -109,6 +105,7 @@ public class ImportCommand implements ProgressIndicator {
 		System.out.println("Area name :" + schemaName);
 		System.out.println("OSH file :" + oshFileName);
 		System.out.println("Database properties file :" + dbConfig);
+		System.out.println("WARNING: Nodes without coordinates will be ignored.");
 		
 		String fullDbConfigPath = "";
 		
