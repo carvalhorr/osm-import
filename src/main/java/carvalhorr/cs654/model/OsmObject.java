@@ -140,5 +140,7 @@ public abstract class OsmObject {
 		}
 		return true;
 	}
+	
+	public abstract boolean isValid();
 
 }

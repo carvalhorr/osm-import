@@ -13,6 +13,8 @@ import carvalhorr.cs654.osh.WayNodesProcessor;
  */
 public class WayOsmObject extends OsmObject {
 
+	private List<Long> nodesKeys;
+	
 	// nodes processor to determine keep track of the way nodes
 	WayNodesProcessor wayCoordinates = new WayNodesProcessor();
 
@@ -30,6 +32,15 @@ public class WayOsmObject extends OsmObject {
 	public List<LinkedList<String>> getNodeIds() {
 		return wayCoordinates.getNodeIds();
 	}
+	
+	
+	public void setNodesKeys(List<Long> nodesKeys) {
+		this.nodesKeys = nodesKeys;
+	}
+	
+	public List<Long> getNodesKeys() {
+		return nodesKeys;
+	}
 
 	/**
 	 * Compare two way objects for equality
@@ -40,6 +51,11 @@ public class WayOsmObject extends OsmObject {
 			return false;
 		if (obj == null || !(obj instanceof WayOsmObject))
 			return false;
+		return true;
+	}
+
+	@Override
+	public boolean isValid() {
 		return true;
 	}
 

@@ -28,4 +28,9 @@ public class NodeOsmObject extends OsmObject {
 		return true;
 	}
 
+	@Override
+	public boolean isValid() {
+		return !getCoordinates().equals("[null, null]");
+	}
+
 }
