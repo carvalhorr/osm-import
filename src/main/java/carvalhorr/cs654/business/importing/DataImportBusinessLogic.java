@@ -1,6 +1,7 @@
 package carvalhorr.cs654.business.importing;
 
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -10,15 +11,23 @@ import carvalhorr.cs654.business.BaseBusinessLogic;
 import carvalhorr.cs654.business.ProgressIndicator;
 import carvalhorr.cs654.exception.CouldNotCreateSchemaException;
 import carvalhorr.cs654.exception.ErrorInsertingDataToDatabase;
+import carvalhorr.cs654.exception.ErrorProcessingXml;
 import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.exception.UnexpectedTokenException;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
+import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.WayOsmObject;
+import carvalhorr.cs654.osh.BoundsOsmParser;
+import carvalhorr.cs654.osh.GenericParser;
+import carvalhorr.cs654.osh.InvalidOsmObjectException;
+import carvalhorr.cs654.osh.NodeOsmParser;
+import carvalhorr.cs654.osh.OsmParser;
+import carvalhorr.cs654.osh.WayOsmParser;
 import carvalhorr.cs654.persistence.OshSchemaCreationPersistence;
 import carvalhorr.cs654.persistence.OshDataPersistence;;
 
-public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObjectsReadFromFileCallback {
+public class DataImportBusinessLogic extends BaseBusinessLogic {
 
 	private long totalNodes = 0;
 	private long totalWays = 0;
@@ -45,104 +54,141 @@ public class DataImportBusinessLogic extends BaseBusinessLogic implements OsmObj
 		} catch (SQLException e) {
 			throw new CouldNotCreateSchemaException(e);
 		}
-
-		long startTime = System.currentTimeMillis();
-
-		DataImportPass1CountLines pass1 = new DataImportPass1CountLines(fileName, this);
-		pass1.countObjects();
-
-		sendMessage("File contains " + totalNodes + " nodes and " + totalWays + " ways");
-
-		long endTime = System.currentTimeMillis();
-
-		sendMessage("Time spent to count objects " + ((endTime - startTime) / 1000) + " seconds");
-
-		startTime = System.currentTimeMillis();
-
-		DataImportPass2NodesAndUsersImport pass2 = new DataImportPass2NodesAndUsersImport(fileName, this);
-		pass2.importFile();
+		
+		
 		try {
-			persistence.flushOsmObjectsBatch();
-		} catch (SQLException e1) {
-			throw new ErrorInsertingDataToDatabase(e1);
+			GenericParser<OsmBounds> boundsParser = new BoundsOsmParser(fileName);
+			OsmBounds bounds = boundsParser.next();
+			persistBounds(bounds);
+			boundsParser.close();
+			
+			GenericParser<NodeOsmObject> nodeParser = new NodeOsmParser(fileName);
+			GenericParser<WayOsmObject> wayParser = new WayOsmParser(fileName);
+
+			long startTime = System.currentTimeMillis();
+			totalNodes = nodeParser.size();
+			totalWays = wayParser.size();
+			sendMessage("File contains " + totalNodes + " nodes and " + totalWays + " ways");
+			long endTime = System.currentTimeMillis();
+			sendMessage("Time spent to count objects " + ((endTime - startTime) / 1000) + " seconds");
+
+
+			// Import nodes
+			startTime = System.currentTimeMillis();
+			NodeOsmObject node = nodeParser.next();
+			while (node != null) {
+				if (node.getId() == 334192501) {
+					System.out.println("");
+				}
+				persistNode(node);
+				node = nodeParser.next();
+			}
+			nodeParser.close();
+			try {
+				persistence.flushOsmObjectsBatch();
+			} catch (SQLException e1) {
+				throw new ErrorInsertingDataToDatabase(e1);
+			}
+
+			endTime = System.currentTimeMillis();
+
+			sendMessage("Time spent to import nodes: " + ((endTime - startTime) / 1000) + " seconds");
+
+			// Import ways
+			startTime = System.currentTimeMillis();
+
+			WayOsmObject way = wayParser.next();
+			while (way != null) {
+				persistWay(way);
+				way = wayParser.next();
+			} 
+			wayParser.close();
+			try {
+				persistence.flushOsmObjectsBatch();
+			} catch (SQLException e1) {
+				throw new ErrorInsertingDataToDatabase(e1);
+			}
+
+			sendMessage("Finished importing ways.");
+
+			endTime = System.currentTimeMillis();
+
+			sendMessage("Time spent to import ways: " + ((endTime - startTime) / 1000) + " seconds");
+
+		} catch (ErrorProcessingXml e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (InvalidOsmObjectException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		try {
-			persistence.createOsmObjectTableIndexes();
-			sendMessage("Finished importing nodes.");
-		} catch (SQLException e) {
-			throw new CouldNotCreateSchemaException(e);
-		}
-
-		endTime = System.currentTimeMillis();
-
-		sendMessage("Time spent to import nodes: " + ((endTime - startTime) / 1000) + " seconds");
-
-		startTime = System.currentTimeMillis();
-
-		DataImportPass3WaysImport pass3 = new DataImportPass3WaysImport(fileName, this);
-		pass3.importFile();
-
-		try {
-			persistence.flushOsmObjectsBatch();
-		} catch (SQLException e1) {
-			throw new ErrorInsertingDataToDatabase(e1);
-		}
-
-		sendMessage("Finished importing ways.");
-
-		endTime = System.currentTimeMillis();
-
-		System.out.println("time to import ways: " + ((endTime - startTime) / 1000));
-		sendMessage("Time spent to import ways: " + ((endTime - startTime) / 1000) + " seconds");
-
+		
 	}
 
-	@Override
-	public void numberObjectsDetermined(long nodesCount, long waysCount) {
-		this.totalNodes = nodesCount;
-		this.totalWays = waysCount;
-	}
-
-	@Override
-	public void nodeObjectReadFromFile(NodeOsmObject node) throws ErrorInsertingDataToDatabase {
+	public void persistNode(NodeOsmObject node) throws ErrorInsertingDataToDatabase {
 		try {
 			persistence.batchInsertOsmObject(node);
 		} catch (SQLException e) {
-			throw new ErrorInsertingDataToDatabase("Error inserting node ID: " + node.getId(), e);
+			throw new ErrorInsertingDataToDatabase("Error inserting node ID: " + node.getId() + ". Message: " + e.getMessage(), e);
 		}
 		countProcessedNodes = countProcessedNodes + 1;
-		mProgressIndicator.updateProgress(PROGRESS_TYPE_NODES, ((countProcessedNodes * 1f) / totalNodes));
+		mProgressIndicator.updateProgress(PROGRESS_TYPE_NODES, (((countProcessedNodes * 1f) / totalNodes) * 100));
 	}
 
-	@Override
-	public void wayObjectReadFromFile(WayOsmObject way) throws ErrorInsertingDataToDatabase {
+	public void persistWay(WayOsmObject way) throws ErrorInsertingDataToDatabase {
 		try {
 
 			List<String> coordinates = new ArrayList<String>();
+			List<Long> nodesKeys = new ArrayList<Long>();
 			for (LinkedList<String> coordinatesSegmentIds : way.getNodeIds()) {
+				Long firstNodeKey = -1l;
 				if (!coordinatesSegmentIds.toString().equals("[]")) {
-					String partialCoordinates = persistence
-							.readCoordinatesForNodes(coordinatesSegmentIds.toString().replace("[", "").replace("]", ""),
-									way.getTimestamp())
-							.toString();
-					coordinates.add(partialCoordinates);
+					String nodeIds = coordinatesSegmentIds.toString().replace("[", "").replace("]", "");
+					ResultSet partialResult = persistence
+							.readCoordinatesForNodes(nodeIds,
+									way.getTimestamp());
+					
+					// Read and store the coordinates for a cycle
+					List<String> partialCoordinates = new ArrayList<String>();
+
+					
+					while (partialResult.next()) {
+						partialCoordinates.add(partialResult.getString(1));
+						nodesKeys.add(partialResult.getLong(2));
+						if (firstNodeKey.equals(-1l)) {
+							firstNodeKey = partialResult.getLong(2); 
+						}
+					}
+
+					// In case of circular list of nodes (first node equals last node), the
+					// SQL return the coordinates for the node only once. This hack add the
+					// first object coordinates to the end of the list in case of a circular
+					// list of objects.
+					String[] ids = nodeIds.split(",");
+					if (ids[0].trim().equals(ids[ids.length - 1].trim())) {
+						if (partialCoordinates.size() > 0) {
+							partialCoordinates.add(partialCoordinates.get(0));
+							nodesKeys.add(firstNodeKey);
+						}
+					}
+
+					coordinates.add(partialCoordinates.toString());
 				}
 			}
+			way.setNodesKeys(nodesKeys);
 			way.setCoordinates(coordinates.toString());
 			way.setGeoJsonType(way.determineGeoJsonType());
 			persistence.batchInsertOsmObject(way);
 
 		} catch (SQLException e) {
-			throw new ErrorInsertingDataToDatabase("Error inserting way ID: " + way.getId(), e);
+			throw new ErrorInsertingDataToDatabase("Error inserting way ID: " + way.getId() + ". Message: " + e.getMessage(), e);
 		}
 
 		countProcessedWays = countProcessedWays + 1;
-		mProgressIndicator.updateProgress(PROGRESS_TYPE_WAYS, (countProcessedWays / totalWays));
+		mProgressIndicator.updateProgress(PROGRESS_TYPE_WAYS, ((countProcessedWays * 1f) / totalWays) * 100);
 	}
 
-	@Override
-	public void boundsObjectReadfFromFile(OsmBounds bounds) throws ErrorInsertingDataToDatabase {
+	public void persistBounds(OsmBounds bounds) throws ErrorInsertingDataToDatabase {
 		try {
 			persistence.insertBounds(bounds);
 		} catch (SQLException e) {

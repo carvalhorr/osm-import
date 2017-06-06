@@ -86,8 +86,10 @@ public abstract class OsmParser<T extends OsmObject> implements GenericParser<T>
 							} else {
 								if (objectStarted) {
 									if ("tag".equals(reader.getLocalName())) {
-										object.addTag(reader.getAttributeValue(null, "k").toString(),
-												reader.getAttributeValue(null, "v").toString());
+										if (reader.getAttributeValue(null, "k") != null
+												&& reader.getAttributeValue(null, "v") != null)
+											object.addTag(reader.getAttributeValue(null, "k").toString(),
+													reader.getAttributeValue(null, "v").toString());
 									} else if (!processSubTags(object, reader)) {
 										throw new UnexpectedTokenException("Object "
 												+ reader.getAttributeValue(null, "id") + " version "
@@ -155,7 +157,11 @@ public abstract class OsmParser<T extends OsmObject> implements GenericParser<T>
 					reader.getAttributeValue(null, "user").toString());
 		}
 		object.setUser(user);
-		object.setVisible(Boolean.parseBoolean(reader.getAttributeValue(null, "visible").toString()));
+		if (reader.getAttributeValue(null, "visible") == null) {
+			object.setVisible(false);
+		} else {
+			object.setVisible(Boolean.parseBoolean(reader.getAttributeValue(null, "visible").toString()));
+		}
 		if (reader.getAttributeValue(null, "lon") != null && reader.getAttributeValue(null, "lat") != null) {
 			object.setCoordinates("[" + reader.getAttributeValue(null, "lon").toString() + ","
 					+ reader.getAttributeValue(null, "lat").toString() + "]");
