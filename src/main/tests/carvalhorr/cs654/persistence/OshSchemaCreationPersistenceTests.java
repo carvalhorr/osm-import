@@ -172,10 +172,10 @@ public class OshSchemaCreationPersistenceTests implements OsmObjectsReadFromData
 	 */
 	private boolean isOsmObjectTableCreated() throws SQLException {
 		List<String> columns = getColumnsForTable(SCHEMA_NAME, "osm_object");
-		return (columns.size() == 10) && columns.contains("object_key") && columns.contains("osm_type")
+		return (columns.size() == 11) && columns.contains("object_key") && columns.contains("osm_type")
 				&& columns.contains("osm_id") && columns.contains("osm_version") && columns.contains("coordinates")
 				&& columns.contains("timestamp") && columns.contains("user_id") && columns.contains("visible")
-				&& columns.contains("geojson_type") && columns.contains("changeset");
+				&& columns.contains("geojson_type") && columns.contains("changeset") && columns.contains("way_nodes");
 	}
 
 	/**

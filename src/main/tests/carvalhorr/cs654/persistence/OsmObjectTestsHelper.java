@@ -1,5 +1,6 @@
 package carvalhorr.cs654.persistence;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import carvalhorr.cs654.model.GeoJsonObjectType;
@@ -22,6 +23,7 @@ public class OsmObjectTestsHelper {
 			String timestamp, String tagKey, String tagValue) {
 		OsmObject object = new WayOsmObject();
 		fillOsmObjectCommonInfo(object, type, changeset, id, version, uid, userName, timestamp, tagKey, tagValue);
+		((WayOsmObject) object).setNodesKeys(new ArrayList<Long>());
 		return object;
 	}
 

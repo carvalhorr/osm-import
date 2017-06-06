@@ -16,15 +16,12 @@ import carvalhorr.cs654.exception.NotConnectedToDatabase;
 import carvalhorr.cs654.exception.UnexpectedTokenException;
 import carvalhorr.cs654.model.NodeOsmObject;
 import carvalhorr.cs654.model.OsmBounds;
-import carvalhorr.cs654.model.OsmObject;
 import carvalhorr.cs654.model.WayOsmObject;
 import carvalhorr.cs654.osh.BoundsOsmParser;
 import carvalhorr.cs654.osh.GenericParser;
 import carvalhorr.cs654.osh.InvalidOsmObjectException;
 import carvalhorr.cs654.osh.NodeOsmParser;
-import carvalhorr.cs654.osh.OsmParser;
 import carvalhorr.cs654.osh.WayOsmParser;
-import carvalhorr.cs654.persistence.OshSchemaCreationPersistence;
 import carvalhorr.cs654.persistence.OshDataPersistence;;
 
 public class DataImportBusinessLogic extends BaseBusinessLogic {
@@ -77,9 +74,6 @@ public class DataImportBusinessLogic extends BaseBusinessLogic {
 			startTime = System.currentTimeMillis();
 			NodeOsmObject node = nodeParser.next();
 			while (node != null) {
-				if (node.getId() == 334192501) {
-					System.out.println("");
-				}
 				persistNode(node);
 				node = nodeParser.next();
 			}

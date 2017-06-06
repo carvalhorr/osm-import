@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -156,6 +157,7 @@ public class OshDataPersistenceTests {
 		WayOsmObject object = new WayOsmObject();
 		fillOsmObjectCommonInfo(object);
 		object.setGeoJsonType(GeoJsonObjectType.LINE_STRING);
+		object.setNodesKeys(new ArrayList<Long>());
 		return object;
 	}
 
