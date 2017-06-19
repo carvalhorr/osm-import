@@ -3,23 +3,24 @@ package carvalhorr.cs654.command.query;
 import org.apache.commons.cli.MissingArgumentException;
 
 import carvalhorr.cs654.business.query.QueryBusinessLogic;
-import carvalhorr.cs654.business.query.QueryFirstAndLastVersionOfObjectBusinessLogic;
+import carvalhorr.cs654.business.query.QueryTagsForObjectBusinessLogic;
 import carvalhorr.cs654.command.BaseCommand;
 import carvalhorr.cs654.files.ExportFormatType;
 import carvalhorr.cs654.files.OsmObjectFileWriter;
-import carvalhorr.cs654.files.OsmObjectWriterFactory;
+import carvalhorr.cs654.files.OsmObjectTagsWriter;
 import carvalhorr.cs654.model.OsmObjectType;
 import carvalhorr.cs654.persistence.OshQueryPersistence;
 
-public class QueryFirstAndLastObjectSubCommand extends BaseSubCommand {
+public class QueryTagsForObjectSubCommand extends BaseSubCommand {
 
-	private static final String USAGE_MESSAGE = "USAGE: java -jar QueryOsh --query-type first-and-last --area <area_name> --object-type <WAY | NODE> --object-id <object_id> (OPTIONAL) --output-format <CSV | JSON | (default) GEOJSON> (OPTIONAL) --file \"<file_name>\"";
+	private static final String USAGE_MESSAGE = "USAGE: java -jar QueryOsh --query-type tags-for-object --area <area_name> --object-type <WAY | NODE> --object-id <object_id> (OPTIONAL) --file \"<file_name>\"";
 
 	private OsmObjectType objectType;
 	private long objectId;
 
-	public QueryFirstAndLastObjectSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence) throws MissingArgumentException {
-		super(command, params, persistence, ExportFormatType.GEOJSON, USAGE_MESSAGE);
+	public QueryTagsForObjectSubCommand(BaseCommand command, QueryParams params, OshQueryPersistence persistence)
+			throws MissingArgumentException {
+		super(command, params, persistence, ExportFormatType.CSV, USAGE_MESSAGE);
 		objectType = QueryParamsParser.parseObjectType(command, params, USAGE_MESSAGE);
 		objectId = QueryParamsParser.parseObjectId(command, params, USAGE_MESSAGE);
 	}
@@ -29,11 +30,11 @@ public class QueryFirstAndLastObjectSubCommand extends BaseSubCommand {
 		String name = "";
 		switch (objectType) {
 		case NODE: {
-			name = "node-" + objectId + "-first-and-last";
+			name = "tags-for-node-" + objectId;
 			break;
 		}
 		case WAY: {
-			name = "way-" + objectId + "-first-and-last";
+			name = "tags-for-way-" + objectId;
 			break;
 		}
 		default:
@@ -45,13 +46,12 @@ public class QueryFirstAndLastObjectSubCommand extends BaseSubCommand {
 
 	@Override
 	protected OsmObjectFileWriter getWriter() {
-		return OsmObjectWriterFactory.getOsmObjectWriter(outputFormat, fileName);
+		return new OsmObjectTagsWriter(fileName);
 	}
 
 	@Override
 	protected QueryBusinessLogic getBusinessLogic() {
-		return new QueryFirstAndLastVersionOfObjectBusinessLogic(objectType, objectId, getWriter(), persistence,
-				command);
+		return new QueryTagsForObjectBusinessLogic(objectType, objectId, getWriter(), persistence, command);
 	}
 
 	@Override

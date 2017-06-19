@@ -119,6 +119,24 @@ public class OshQueryPersistence extends BaseOshDatabasePersistence {
 		}
 	}
 
+	public List<String> queryAllTagsForObject(OsmObjectType type, long id) throws ErrorReadingDataFromDatabase {
+		List<String> tags = new ArrayList<>();
+		try {
+			// Execute the query
+			ResultSet result = statement.executeQuery("select distinct tag_key from " + schemaName + ".osm_tag t, "
+					+ schemaName + ".osm_object o where o.object_key = t.object_key and o.osm_type = '"
+					+ type.toString() + "' and o.osm_id = " + id + ";");
+
+			// The query return only one record
+			while (result.next()) {
+				tags.add(result.getString(1));
+			}
+		} catch (SQLException ex) {
+			throw new ErrorReadingDataFromDatabase("Error while tags for " + type.name() + " " + id, ex);
+		}
+		return tags;
+	}
+
 	/**
 	 * Implement functional requirement 9.8 at the persistence level.
 	 * 

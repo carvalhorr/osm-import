@@ -53,6 +53,8 @@ public class TestDataProvider {
 
 	public static final String FIRST_AND_LAST_GEOJSON = "{\"type\": \"FeatureCollection\", \"features\": [{ \"type\": \"Feature\", \"geometry\": { \"type\": \"Point\", \"coordinates\": coordinates}, \"properties\": {\"id\":\"2\", \"version\":\"1\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"a tag\":\"a value\"}}, { \"type\": \"Feature\", \"geometry\": { \"type\": \"Point\", \"coordinates\": coordinates}, \"properties\": {\"id\":\"2\", \"version\":\"2\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"a tag\":\"a value\"}}]}";
 
+	public static final String TAGS_FOR_OBJECT = "ID, Version, Type, Timestamp ,a tag\n" + "2,1, Point, 2008-12-11 14:21:24 ,a value\n" + "2,2, Point, 2008-12-11 14:21:24 ,a value";
+	
 	public static final String OBJECTS_BY_TAG_JSON = "{ \"objects\": [{\"id\":\"1\", \"version\":\"4\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"tag2\":\"value2\"]}, {\"id\":\"1\", \"version\":\"5\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": Point, \"tags\": [\"tag2\":\"value2\"]}, {\"id\":\"1\", \"version\":\"6\", \"timestamp\":\"2008-12-11 14:21:24\", \"user_id\":\"1\", \"user_name\":\"a user\", \"visible\":\"true\", \"coordinates\": coordinates, \"type\": LineString, \"tags\": [\"tag2\":\"value2\"]}]}";
 
 	public static final String OBJECTS_BY_TAG_CSV = "ID, Version, Type, Timestamp\n"

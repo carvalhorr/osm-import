@@ -197,6 +197,10 @@ public class QueryCommand extends BaseCommand implements QueryParams {
 			subCommand = new QueryAllEditsByUserSubCommand((BaseCommand) this, (QueryParams) this, persistence);
 			break;
 		}
+		case "tags-for-object": {
+			subCommand = new QueryTagsForObjectSubCommand((BaseCommand) this, (QueryParams) this, persistence);
+			break;
+		}
 		default:
 			printFatalErrorAndExit(USAGE_MESSAGE);
 			break;
